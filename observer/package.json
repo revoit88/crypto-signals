@@ -1,0 +1,29 @@
+{
+  "name": "crypto-signals-observer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test node app",
+    "start": "node app",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop ecosystem.config.js",
+    "pm2:restart": "pm2 restart ecosystem.config.js",
+    "pm2:delete": "pm2 delete ecosystem.config.js",
+    "pm2:stop-and-delete": "npm run pm2:stop && npm run pm2:delete",
+    "pm2:stop-and-restart": "npm run pm2:stop-and-delete && npm run pm2:start",
+    "pm2:test:start": "pm2 start test.ecosystem.config.js",
+    "pm2:test:stop": "pm2 stop test.ecosystem.config.js",
+    "pm2:test:restart": "pm2 restart test.ecosystem.config.js",
+    "pm2:test:delete": "pm2 delete test.ecosystem.config.js",
+    "pm2:test:stop-and-delete": "npm run pm2:test:stop && npm run pm2:test:delete"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "dotenv": "^8.2.0",
+    "ws": "^7.3.1",
+    "@crypto-signals/utils": "file:../utils"
+  }
+}

@@ -229,5 +229,8 @@
   { "symbol": "FORTHUSDT", "priceTickSize": 0.001, "stepSize": 0.001 },
   { "symbol": "BAKEUSDT", "priceTickSize": 0.0001, "stepSize": 0.1 },
   { "symbol": "BURGERUSDT", "priceTickSize": 0.01, "stepSize": 0.1 },
-  { "symbol": "SLPUSDT", "priceTickSize": 0.0001, "stepSize": 1.0 }
+  { "symbol": "SLPUSDT", "priceTickSize": 0.0001, "stepSize": 1.0 },
+  { "symbol": "SHIBUSDT", "priceTickSize": 0.00000001, "stepSize": 1.0 },
+  { "symbol": "ICPUSDT", "priceTickSize": 0.01, "stepSize": 0.01 },
+  { "symbol": "ARUSDT", "priceTickSize": 0.001, "stepSize": 0.01 }
 ]

@@ -1,4 +1,5 @@
-const { exchange, symbol, interval } = require("./config");
+const { exchange, interval } = require("@crypto-signals/config");
+const { symbol } = require("./config");
 const Observer = require(`./src/observer`);
 
 const start = async () => {

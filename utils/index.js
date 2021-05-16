@@ -63,6 +63,54 @@ const capValue = (currentValue, capAtValue) => {
   return currentValue > capAtValue ? capAtValue : currentValue;
 };
 
+/**
+ *
+ * @param {Number} current Current value
+ * @param {Number} from From value
+ * @returns {Number} result
+ */
+function getChange(current, from) {
+  return Number(Number((current * 100) / from - 100).toFixed(2));
+}
+
+function orderAlphabetically(string1 = "", string2 = "") {
+  string1 = string1.toUpperCase();
+  string2 = string2.toUpperCase();
+  return string1 < string2 ? -1 : string1 > string2 ? 1 : 0;
+}
+
+const validateNumber = n => n === null || (typeof n === "number" && !isNaN(n));
+
+function getPercentageOfValue(value, percent) {
+  return Number(value * (percent / 100));
+}
+
+/**
+ *
+ * @param {Number} candles Candles offset
+ * @param {"1d"|"4h"|"1h"|"5m"|"1m"} interval Candles interval
+ * @returns {Number} Time offset
+ */
+function getTimeDiff(candles, interval) {
+  let factor = 0;
+  if (interval === "1d") {
+    factor = milliseconds.day;
+  }
+  if (interval === "4h") {
+    factor = milliseconds.hour * 4;
+  }
+  if (interval === "1h") {
+    factor = milliseconds.hour;
+  }
+  if (interval === "5m") {
+    factor = milliseconds.minute * 5;
+  }
+  if (interval === "1m") {
+    factor = milliseconds.minute;
+  }
+  return factor * candles;
+}
+
 module.exports = {
   pairs,
   milliseconds,
@@ -72,5 +120,10 @@ module.exports = {
   toFixedDecimal,
   toSymbolPrecision,
   toSymbolStepPrecision,
-  capValue
+  capValue,
+  getChange,
+  orderAlphabetically,
+  validateNumber,
+  getPercentageOfValue,
+  getTimeDiff
 };

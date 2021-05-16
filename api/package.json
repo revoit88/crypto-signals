@@ -1,0 +1,28 @@
+{
+  "name": "crypto-signals-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2 start app.js --name crypto-signals-api",
+    "stop": "pm2 stop crypto-signals-api && pm2 delete crypto-signals-api",
+    "restart": "npm stop && npm start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@crypto-signals/utils": "file:../utils",
+    "@crypto-signals/config": "file:../config",
+    "@crypto-signals/http": "file:../http",
+    "@hapi/hapi": "^20.0.1",
+    "@hapi/iron": "^6.0.0",
+    "@hapi/nes": "^12.0.4",
+    "axios": "^0.20.0",
+    "dotenv": "^8.2.0",
+    "hapi-pino": "^8.3.0",
+    "joi": "^17.2.1",
+    "mongoose": "^5.10.7",
+    "pino-http-send": "^0.4.2",
+    "redis": "^3.1.0"
+  }
+}

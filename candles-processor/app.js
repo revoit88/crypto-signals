@@ -1,0 +1,75 @@
+const Hapi = require("@hapi/hapi");
+const Boom = require("@hapi/boom");
+const config = require("./config");
+const { getTimeDiff } = require("@crypto-signals/utils");
+const { getIndicatorsValues, getOHLCValues } = require("./utils");
+
+const init = async () => {
+  const server = Hapi.server({
+    port: config.port,
+    host: config.host
+  });
+  await server.register([
+    {
+      plugin: require("./db"),
+      options: {
+        db_uri: config.db_uri
+      }
+    }
+  ]);
+
+  server.route({
+    path: "/",
+    method: "POST",
+    handler: async (request, h) => {
+      try {
+        const CandleModel =
+          request.server.plugins.mongoose.connection.model("Candle");
+        const { symbol } = request.query;
+        const candlesToUpdate = request.payload;
+
+        const toUpdate = await CandleModel.find({
+          id: { $in: candlesToUpdate }
+        }).sort({ open_time: 1 });
+
+        await Promise.all(
+          toUpdate.map(async candle => {
+            const candles = await CandleModel.find({
+              $and: [
+                { exchange: config.exchange },
+                { symbol },
+                { interval: config.interval },
+                {
+                  open_time: {
+                    $gte: candle.open_time - getTimeDiff(150, config.interval)
+                  }
+                },
+                { open_time: { $lte: candle.open_time } }
+              ]
+            })
+              // .hint()
+              .sort({ open_time: 1 });
+
+            const ohlc = getOHLCValues(candles);
+            const indicators = await getIndicatorsValues(ohlc, candles);
+
+            return CandleModel.updateOne(
+              { id: candle.id },
+              { $set: indicators }
+            );
+          })
+        );
+
+        return h.response();
+      } catch (error) {
+        console.error(error);
+        return Boom.internal();
+      }
+    }
+  });
+
+  await server.start();
+  console.log(`Server running on port ${config.port}`);
+};
+
+init();

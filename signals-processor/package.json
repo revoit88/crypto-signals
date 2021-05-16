@@ -1,0 +1,22 @@
+{
+  "name": "signal-processor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "pm2 start app.js --name signals-processor",
+    "stop": "pm2 stop signals-processor && pm2 delete signals-processor",
+    "restart": "npm stop && npm start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@crypto-signals/utils": "file:../utils",
+    "@crypto-signals/config": "file:../config",
+    "@crypto-signals/http": "file:../http",
+    "@hapi/hapi": "^20.0.1",
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.10.7",
+    "redis": "^3.1.0"
+  }
+}

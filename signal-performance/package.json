@@ -1,0 +1,21 @@
+{
+  "name": "signal-performance",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "pm2 start app.js --name signals-performance",
+    "stop": "pm2 stop signals-performance && pm2 delete signals-performance",
+    "restart": "npm stop && npm start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@crypto-signals/utils": "file:../utils",
+    "@crypto-signals/config": "file:../config",
+    "@crypto-signals/http": "file:../http",
+    "@hapi/hapi": "^20.0.1",
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.10.7"
+  }
+}

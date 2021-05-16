@@ -1,0 +1,20 @@
+{
+  "name": "account-observer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2 start app.js --name account-observer",
+    "stop": "pm2 stop account-observer && pm2 delete account-observer",
+    "restart": "npm stop && npm start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@crypto-signals/utils": "file:../utils",
+    "@crypto-signals/config": "file:../config",
+    "@crypto-signals/http": "file:../http",
+    "mongoose": "^5.10.3",
+    "ws": "^7.3.1"
+  }
+}

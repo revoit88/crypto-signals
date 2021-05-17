@@ -1,15 +1,12 @@
 const axios = require("axios");
-const { api_url } = require("@crypto-signals/config");
-const config = require("./config");
+const { api_url, api_token } = require("@crypto-signals/config");
 
 /**
  * @type {axios.AxiosInstance}
  */
 const API = axios.create({
   baseURL: api_url,
-  headers: {
-    Authorization: `Bearer ${config.api_token}`
-  }
+  headers: { Authorization: `Bearer ${api_token}` }
 });
 
 const persist = async value => {

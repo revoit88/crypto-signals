@@ -1,6 +1,10 @@
 const dotenv = require("dotenv");
-dotenv.config();
+const path = require("path");
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 module.exports = {
   symbol: process.env.SYMBOL,
-  api_token: process.env.API_TOKEN
+  interval: process.env.INTERVAL,
+  api_url: process.env.API_URL,
+  api_token: process.env.API_TOKEN,
+  exchange: process.env.EXCHANGE
 };

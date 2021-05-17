@@ -1,4 +1,4 @@
-const pairs = require("./pairs.json");
+const pairs = require("./pairs");
 
 const milliseconds = {
   seconds: 1e3,

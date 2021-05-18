@@ -1,6 +1,6 @@
 const Hapi = require("@hapi/hapi");
 const Boom = require("@hapi/boom");
-const config = require("./config");
+const config = require("@crypto-signals/config");
 const { getTimeDiff } = require("@crypto-signals/utils");
 const { getIndicatorsValues, getOHLCValues } = require("./utils");
 
@@ -12,9 +12,7 @@ const init = async () => {
   await server.register([
     {
       plugin: require("./db"),
-      options: {
-        db_uri: config.db_uri
-      }
+      options: { db_uri: config.db_uri }
     }
   ]);
 
@@ -47,7 +45,7 @@ const init = async () => {
                 { open_time: { $lte: candle.open_time } }
               ]
             })
-              // .hint()
+              .hint("exchange_1_symbol_1_interval_1_open_time_1")
               .sort({ open_time: 1 });
 
             const ohlc = getOHLCValues(candles);

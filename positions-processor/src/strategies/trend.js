@@ -22,8 +22,12 @@ module.exports = db => {
         { open_time: { $lte: Date.now() } }
       ]
     })
-      //   .hint()
+      .hint("exchange_1_symbol_1_interval_1_open_time_1")
       .sort({ open_time: 1 });
+
+    if (candles.length <= 1) {
+      return;
+    }
     const [previous_candle, candle] = candles.slice(-2);
 
     try {
@@ -32,7 +36,7 @@ module.exports = db => {
       }).hint("exchange_1_symbol_1_status_1");
 
       if (!positions.length) {
-        return Promise.resolve();
+        return;
       }
 
       return Promise.all(

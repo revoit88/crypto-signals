@@ -1,6 +1,6 @@
 const Hapi = require("@hapi/hapi");
 const Boom = require("@hapi/boom");
-const config = require("./config");
+const config = require("@crypto-signals/config");
 const { getChange, toSymbolPrecision } = require("@crypto-signals/utils");
 const strategies = require("./src/strategies");
 const { trader, api } = require("./axios");
@@ -13,9 +13,7 @@ const init = async () => {
   await server.register([
     {
       plugin: require("./db"),
-      options: {
-        db_uri: config.db_uri
-      }
+      options: { db_uri: config.db_uri }
     }
   ]);
 
@@ -37,7 +35,7 @@ const init = async () => {
 
         const results = await strategy.process(symbol);
 
-        if (results.length) {
+        if ((results || []).length) {
           for (const result of results) {
             try {
               if (result) {
@@ -81,20 +79,20 @@ const init = async () => {
 
                 // broadcast sell position
                 api
-                .broadcast("positions", {
-                  exchange: position.exchange,
-                  symbol: position.symbol,
-                  price: position.sell_price,
-                  signal: position.signal.toString(),
-                  type: "exit",
-                  _id: position._id.toString()
-                })
-                .catch(error => {
-                  console.log("Exit position broadcast error.");
-                  if (error) {
-                    console.error(error);
-                  }
-                });
+                  .broadcast("positions", {
+                    exchange: position.exchange,
+                    symbol: position.symbol,
+                    price: position.sell_price,
+                    signal: position.signal.toString(),
+                    type: "exit",
+                    _id: position._id.toString()
+                  })
+                  .catch(error => {
+                    console.log("Exit position broadcast error.");
+                    if (error) {
+                      console.error(error);
+                    }
+                  });
 
                 // send to trader
 

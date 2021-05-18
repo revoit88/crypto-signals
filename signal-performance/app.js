@@ -1,6 +1,6 @@
 const Hapi = require("@hapi/hapi");
 const Boom = require("@hapi/boom");
-const config = require("./config");
+const config = require("@crypto-signals/config");
 const { milliseconds, getChange } = require("@crypto-signals/utils");
 
 const init = async () => {
@@ -11,9 +11,7 @@ const init = async () => {
   await server.register([
     {
       plugin: require("./db"),
-      options: {
-        db_uri: config.db_uri
-      }
+      options: { db_uri: config.db_uri }
     }
   ]);
 

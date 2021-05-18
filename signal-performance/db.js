@@ -12,6 +12,7 @@ module.exports = {
       const db = await Mongoose.createConnection(options.db_uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        maxPoolSize: 50
       });
 
       require("./src/signal/model")(db);

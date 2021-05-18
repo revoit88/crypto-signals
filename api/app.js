@@ -1,5 +1,5 @@
 const Hapi = require("@hapi/hapi");
-const config = require("./config");
+const config = require("@crypto-signals/config");
 const { createWriteStream } = require("pino-http-send");
 
 const init = async () => {
@@ -49,54 +49,35 @@ const init = async () => {
     require("./src/auth"),
     {
       plugin: require("./db"),
-      options: {
-        db_uri: config.db_uri
-      }
+      options: { db_uri: config.db_uri }
     },
     {
       plugin: require("./redis"),
-      options: {
-        redis_uri: config.redis_uri
-      }
+      options: { redis_uri: config.redis_uri }
     },
     { plugin: require("@hapi/nes") },
     {
       plugin: require("./src/candle/routes"),
-      routes: {
-        prefix: "/candles"
-      },
-      options: {
-        pairs: config.allowed_pairs,
-        candle_minutes: config.candle_minutes
-      }
+      routes: { prefix: "/candles" },
+      options: { pairs: config.allowed_pairs }
     },
     {
       plugin: require("./src/signal/routes"),
-      routes: {
-        prefix: "/signals"
-      },
+      routes: { prefix: "/signals" },
       options: { pairs: config.allowed_pairs }
     },
     {
       plugin: require("./src/position/routes"),
-      routes: {
-        prefix: "/positions"
-      },
+      routes: { prefix: "/positions" },
       options: { pairs: config.allowed_pairs }
     },
     // allow localhost requests only
     {
       plugin: require("./src/telegram/routes"),
-      routes: {
-        prefix: "/telegram"
-      },
+      routes: { prefix: "/telegram" },
       options: {
         pairs: config.allowed_pairs,
-        auth: {
-          access: {
-            scope: ["telegram"]
-          }
-        }
+        auth: { access: { scope: ["telegram"] } }
       }
     },
     {

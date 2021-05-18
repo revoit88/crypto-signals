@@ -1,6 +1,10 @@
 const axios = require("axios");
-const { binance, api, trader } = require("@crypto-signals/http");
-const config = require("../config");
+const {
+  getBinanceInstance,
+  getAPIInstance,
+  getTraderInstance
+} = require("@crypto-signals/utils");
+const config = require("@crypto-signals/config");
 
 const signals_performance_microservice = axios.create({
   baseURL: config.signals_performance_microservice_url,
@@ -29,6 +33,10 @@ const candles_processor_microservice = axios.create({
     Authorization: `Bearer ${config.microservice_token}`
   }
 });
+
+const binance = getBinanceInstance(config);
+const api = getAPIInstance(config);
+const trader = getTraderInstance(config);
 
 module.exports = {
   binance,

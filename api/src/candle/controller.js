@@ -179,7 +179,6 @@ exports.persist = async function (request, h) {
 
     const candle = request.payload;
 
-    console.log("candle", candle);
     request.server.publish(`/candles/${candle.symbol}`, candle);
 
     const last_signals_process_date = await getAsync(
@@ -236,15 +235,14 @@ exports.persist = async function (request, h) {
           `?symbol=${candle.symbol}`,
           toUpdate.map(c => c.id)
         );
-      }
-      await delAsync(`${candle.symbol}_candles_persist_lock`);
 
-      if (toUpdate.length) {
         await signals_performance_microservice.post(
           `?symbol=${candle.symbol}`,
           toUpdate
         );
       }
+      await delAsync(`${candle.symbol}_candles_persist_lock`);
+
       if (
         Date.now() - (last_positions_process_date || 0) >
           positions_interval * milliseconds.seconds &&
@@ -257,13 +255,7 @@ exports.persist = async function (request, h) {
         );
       }
 
-      const { data: open_signals } = await signals_processor_microservice.post(
-        `?symbol=${candle.symbol}`
-      );
-
-      if ((open_signals || []).length) {
-        await setAsync(`${candle.symbol}_has_open_signal`, true);
-      }
+      await signals_processor_microservice.post(`?symbol=${candle.symbol}`);
     } else {
       try {
         await rpushAsync(`${candle.symbol}_candles`, JSON.stringify(candle));

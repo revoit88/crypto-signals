@@ -2,7 +2,7 @@
 
 const mongoose = require("mongoose");
 const { validateNumber, pairs } = require("@crypto-signals/utils");
-const { strategy } = require("../../config");
+const { strategy } = require("@crypto-signals/config");
 
 const Schema = mongoose.Schema;
 

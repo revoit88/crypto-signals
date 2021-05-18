@@ -12,8 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@crypto-signals/utils": "file:../utils",
-    "@crypto-signals/config": "file:../config",
-    "@crypto-signals/http": "file:../http",
+    "@crypto-signals/config": "file:./config",
     "@hapi/hapi": "^20.0.1",
     "dotenv": "^8.2.0",
     "mongoose": "^5.10.7",

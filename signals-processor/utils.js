@@ -2,7 +2,7 @@ const Mongoose = require("mongoose");
 const { Candle, OHLC } = require("./src/interfaces");
 const strategies = require("./src/strategies");
 const { toSymbolPrecision } = require("@crypto-signals/utils");
-const config = require("./config");
+const config = require("@crypto-signals/config");
 
 /**
  *

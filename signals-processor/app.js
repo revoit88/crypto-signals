@@ -22,15 +22,11 @@ const init = async () => {
   await server.register([
     {
       plugin: require("./db"),
-      options: {
-        db_uri: config.db_uri
-      }
+      options: { db_uri: config.db_uri }
     },
     {
       plugin: require("./redis"),
-      options: {
-        redis_uri: config.redis_uri
-      }
+      options: { redis_uri: config.redis_uri }
     }
   ]);
 

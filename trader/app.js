@@ -1,5 +1,5 @@
 const Hapi = require("@hapi/hapi");
-const config = require("./config");
+const config = require("@crypto-signals/config");
 const { createWriteStream } = require("pino-http-send");
 
 const init = async () => {
@@ -31,9 +31,7 @@ const init = async () => {
     require("./src/auth"),
     {
       plugin: require("./db"),
-      options: {
-        db_uri: config.db_uri
-      }
+      options: { db_uri: config.db_uri }
     },
     {
       plugin: require("./src/order/routes"),

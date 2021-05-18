@@ -1,3 +1,5 @@
+const axios = require("axios");
+const crypto = require("crypto");
 const pairs = require("./pairs");
 
 const milliseconds = {
@@ -111,6 +113,80 @@ function getTimeDiff(candles, interval) {
   return factor * candles;
 }
 
+/**
+ *
+ * @param {Object} config
+ * @returns {axios.AxiosInstance} Instance
+ */
+function getAPIInstance(config) {
+  return axios.create({
+    baseURL: config.api_url,
+    headers: {
+      Authorization: `Bearer ${config.microservice_token}`
+    }
+  });
+}
+
+/**
+ *
+ * @param {Object} config
+ * @returns {axios.AxiosInstance} Instance
+ */
+function getTraderInstance(config) {
+  return axios.create({
+    baseURL: config.trader_url,
+    headers: { Authorization: `Bearer ${config.microservice_token}` }
+  });
+}
+
+/**
+ *
+ * @param {Object} config
+ * @returns {axios.AxiosInstance} Instance
+ */
+function getBinanceInstance(config) {
+  const binance = axios.create({
+    baseURL: config.binance_api_url,
+    headers: { "X-MBX-APIKEY": config.binance_api_key }
+  });
+
+  const getSignature = query => {
+    return crypto
+      .createHmac("sha256", config.binance_api_secret)
+      .update(query)
+      .digest("hex");
+  };
+
+  const secureEndpoints = [
+    "/api/v3/order",
+    "/api/v3/allOrders",
+    "/api/v3/account",
+    "/wapi/v3/withdraw.html",
+    "/wapi/v3/withdrawHistory.html",
+    "/sapi/v1/asset/dust"
+  ];
+
+  binance.interceptors.request.use(
+    cfg => {
+      const [base, query] = String(cfg.url).split("?");
+      const timestamp = Date.now();
+      const requiresSignature = secureEndpoints.some(
+        endpoint => endpoint === base
+      );
+      if (requiresSignature) {
+        const newQuery = `timestamp=${timestamp}&recvWindow=15000`.concat(
+          query ? `&${query}` : ""
+        );
+        cfg.url = `${base}?${newQuery}&signature=${getSignature(newQuery)}`;
+      }
+      return cfg;
+    },
+    error => Promise.reject(error)
+  );
+
+  return binance;
+}
+
 module.exports = {
   pairs,
   milliseconds,
@@ -125,5 +201,8 @@ module.exports = {
   orderAlphabetically,
   validateNumber,
   getPercentageOfValue,
-  getTimeDiff
+  getTimeDiff,
+  getAPIInstance,
+  getTraderInstance,
+  getBinanceInstance
 };

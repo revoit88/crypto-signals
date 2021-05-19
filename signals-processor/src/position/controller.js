@@ -94,15 +94,7 @@ module.exports = db => {
         ...(signal.buy_order && { buy_order: signal.buy_order }),
         is_test: false,
         account_id: account._id,
-        last_stop_loss_update: Date.now(),
-        configuration: {
-          take_profit: config.position_take_profit,
-          stop_loss: getChange(stop_loss, price),
-          arm_trailing_stop_loss:
-            config.position_arm_trailing_stop_loss * current_candle_signals,
-          trailing_stop_loss:
-            config.position_trailing_stop_loss * current_candle_signals
-        }
+        last_stop_loss_update: Date.now()
       });
 
       await SignalModel.findByIdAndUpdate(signal._id, {

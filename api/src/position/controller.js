@@ -277,12 +277,8 @@ exports.broadcast = async function (request, h) {
                 pair: position.symbol,
                 price: position.price,
                 signalId: position.signal,
-                buyTTL: 600,
-                ...(to.type === "copytrade" && {
-                  positionSizePercentage: position_percentage_size,
-                  takeProfitPercentage1: position.take_profit,
-                  orderType: "market"
-                })
+                orderType: "market",
+                buyTTL: 600
               });
             } catch (error) {
               request.logger.error(error.toJSON());

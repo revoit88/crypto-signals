@@ -193,10 +193,6 @@ const init = async () => {
                       symbol: position.symbol,
                       price: position.buy_price,
                       signal: position.signal.toString(),
-                      stop_loss: position.configuration.stop_loss * -1,
-                      trailing_stop_loss:
-                        position.configuration.arm_trailing_stop_loss,
-                      take_profit: position.configuration.take_profit,
                       type: "entry",
                       _id: position._id.toString(),
                       time: position.open_time

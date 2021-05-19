@@ -1,18 +1,16 @@
 const Boom = require("@hapi/boom");
 const axios = require("axios");
 const {
-  zignaly_copytrading_key,
   zignaly_url,
+  zignaly_provider_key,
   environment,
   position_percentage_size
-} = require("../../config");
+} = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 const {
   orderAlphabetically,
   toSymbolPrecision
 } = require("@crypto-signals/utils");
-const { trader } = require("../../utils/axios");
-const qs = require("querystring");
 
 exports.create = async function (request, h) {
   try {
@@ -206,8 +204,6 @@ exports.findOpenPositions = async function (request, h) {
 };
 
 exports.broadcast = async function (request, h) {
-  const PositionModel =
-    request.server.plugins.mongoose.connection.model("Position");
   const MarketModel =
     request.server.plugins.mongoose.connection.model("Market");
   const position = request.payload;
@@ -217,8 +213,6 @@ exports.broadcast = async function (request, h) {
     const market = await MarketModel.findOne({
       $and: [{ exchange: position.exchange }, { symbol: position.symbol }]
     }).hint("exchange_1_symbol_1");
-
-    const profit_sharing_allowed = !!market.send_to_profit_sharing;
 
     if (position.type === "exit") {
       request.logger.info(
@@ -230,17 +224,10 @@ exports.broadcast = async function (request, h) {
       if (environment === "production") {
         //broadcast sell signal
         const promises = []
-          .concat(
-            position.exchange === "binance"
-              ? [
-                  {
-                    key: zignaly_copytrading_key,
-                    exchange: "zignaly",
-                    type: "copytrade"
-                  }
-                ]
-              : []
-          )
+          .concat({
+            key: zignaly_provider_key,
+            exchange: "zignaly"
+          })
           .map(async to => {
             try {
               await axios.post(zignaly_url, {
@@ -272,14 +259,11 @@ exports.broadcast = async function (request, h) {
         // send to zignaly
         const promises = []
           .concat(
-            position.exchange === "binance" &&
-              profit_sharing_allowed &&
-              !!zignaly_copytrading_key
+            !!zignaly_provider_key
               ? [
                   {
-                    key: zignaly_copytrading_key,
-                    exchange: "zignaly",
-                    type: "copytrade"
+                    key: zignaly_provider_key,
+                    exchange: "zignaly"
                   }
                 ]
               : []

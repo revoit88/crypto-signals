@@ -57,25 +57,21 @@ const init = async () => {
                   candle.symbol
                 );
 
-                await PositionModel.findByIdAndUpdate(
-                  position._id,
-                  {
-                    $set: {
-                      sell_price: toSymbolPrecision(
-                        candle.close_price,
-                        candle.symbol
-                      ),
-                      close_date: new Date(),
-                      close_time: Date.now(),
-                      status: "closed",
-                      change: getChange(candle.close_price, position.buy_price),
-                      sell_trigger,
-                      profit,
-                      sell_candle: candle
-                    }
-                  },
-                  { new: true }
-                );
+                await PositionModel.findByIdAndUpdate(position._id, {
+                  $set: {
+                    sell_price: toSymbolPrecision(
+                      candle.close_price,
+                      candle.symbol
+                    ),
+                    close_date: new Date(),
+                    close_time: Date.now(),
+                    status: "closed",
+                    change: getChange(candle.close_price, position.buy_price),
+                    sell_trigger,
+                    profit,
+                    sell_candle: candle
+                  }
+                });
 
                 // broadcast sell position
                 api

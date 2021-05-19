@@ -5,7 +5,11 @@ const {
   signals_processor_microservice,
   candles_processor_microservice
 } = require("../../utils/axios");
-const { orderAlphabetically, milliseconds } = require("@crypto-signals/utils");
+const {
+  orderAlphabetically,
+  milliseconds,
+  getBooleanValue
+} = require("@crypto-signals/utils");
 const { positions_interval, signals_interval } = require("../../config");
 
 exports.create = async function (request, h) {
@@ -176,6 +180,8 @@ exports.persist = async function (request, h) {
 
     const CandleModel =
       request.server.plugins.mongoose.connection.model("Candle");
+    const MarketModel =
+      request.server.plugins.mongoose.connection.model("Market");
 
     const candle = request.payload;
 
@@ -192,7 +198,17 @@ exports.persist = async function (request, h) {
       `${candle.symbol}_candles_persist_lock`
     );
 
-    const has_open_signal = await getAsync(`${candle.symbol}_has_open_signal`);
+    const has_open_signal = getBooleanValue(
+      await getAsync(`${candle.symbol}_has_open_signal`)
+    );
+
+    const processSignals = async c => {
+      await MarketModel.updateOne(
+        { $and: [{ exchange: c.exchange }, { symbol: c.symbol }] },
+        { $set: { last_price: c.close_price } }
+      );
+      await signals_processor_microservice.post(`?symbol=${c.symbol}`);
+    };
 
     if (
       Date.now() - (last_signals_process_date || 0) >
@@ -231,15 +247,16 @@ exports.persist = async function (request, h) {
           { ordered: false }
         );
 
-        await candles_processor_microservice.post(
-          `?symbol=${candle.symbol}`,
-          toUpdate.map(c => c.id)
-        );
-
-        await signals_performance_microservice.post(
-          `?symbol=${candle.symbol}`,
-          toUpdate
-        );
+        await Promise.all([
+          candles_processor_microservice.post(
+            `?symbol=${candle.symbol}`,
+            toUpdate.map(c => c.id)
+          ),
+          signals_performance_microservice.post(
+            `?symbol=${candle.symbol}`,
+            toUpdate
+          )
+        ]);
       }
       await delAsync(`${candle.symbol}_candles_persist_lock`);
 
@@ -255,7 +272,7 @@ exports.persist = async function (request, h) {
         );
       }
 
-      await signals_processor_microservice.post(`?symbol=${candle.symbol}`);
+      await processSignals(candle);
     } else {
       try {
         await rpushAsync(`${candle.symbol}_candles`, JSON.stringify(candle));
@@ -270,7 +287,7 @@ exports.persist = async function (request, h) {
     }
 
     if (has_open_signal) {
-      await signals_processor_microservice.post(`?symbol=${candle.symbol}`);
+      await processSignals(candle);
     }
 
     return h.response();

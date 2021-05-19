@@ -187,6 +187,14 @@ function getBinanceInstance(config) {
   return binance;
 }
 
+function getBooleanValue(value) {
+  return typeof value === "boolean"
+    ? value
+    : typeof value === "string"
+    ? value === "true"
+    : false;
+}
+
 module.exports = {
   pairs,
   milliseconds,
@@ -204,5 +212,6 @@ module.exports = {
   getTimeDiff,
   getAPIInstance,
   getTraderInstance,
-  getBinanceInstance
+  getBinanceInstance,
+  getBooleanValue
 };

@@ -1,5 +1,9 @@
-const { binance, api } = require("@crypto-signals/http");
+const { getAPIInstance, getBinanceInstance } = require("@crypto-signals/utils");
+const config = require("@crypto-signals/config");
 const qs = require("querystring");
+
+const api = getAPIInstance(config);
+const binance = getBinanceInstance(config);
 
 const createListenKey = async () => {
   try {

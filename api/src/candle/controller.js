@@ -3,14 +3,22 @@ const {
   signals_performance_microservice,
   positions_processor_microservice,
   signals_processor_microservice,
-  candles_processor_microservice
+  candles_processor_microservice,
+  binance
 } = require("../../utils/axios");
 const {
   orderAlphabetically,
   milliseconds,
-  getBooleanValue
+  getBooleanValue,
+  getTimeDiff,
+  buildCandles
 } = require("@crypto-signals/utils");
-const { positions_interval, signals_interval } = require("../../config");
+const {
+  positions_interval,
+  signals_interval,
+  exchange
+} = require("@crypto-signals/config");
+const qs = require("querystring");
 
 exports.create = async function (request, h) {
   try {
@@ -288,6 +296,51 @@ exports.persist = async function (request, h) {
 
     if (has_open_signal) {
       await processSignals(candle);
+    }
+
+    return h.response();
+  } catch (error) {
+    console.error(error);
+    return Boom.internal();
+  }
+};
+
+exports.getCandlesFromBinance = async function (request, h) {
+  try {
+    const { symbol, interval } = request.query;
+    const CandleModel =
+      request.server.plugins.mongoose.connection.model("Candle");
+
+    const query = qs.stringify({
+      symbol,
+      interval,
+      startTime: Date.now() - getTimeDiff(160, interval)
+    });
+
+    const { data } = await binance.get(`/api/v3/klines?${query}`);
+    const processed = buildCandles({
+      candles: data,
+      exchange,
+      symbol,
+      interval
+    });
+
+    if (Array.isArray(data) && !!data.length) {
+      await CandleModel.bulkWrite(
+        processed.map(value => ({
+          updateOne: {
+            filter: { id: value.id },
+            update: { $set: value },
+            upsert: true
+          }
+        })),
+        { ordered: false }
+      );
+
+      await candles_processor_microservice.post(
+        `?symbol=${symbol}`,
+        processed.slice(-10).map(c => c.id)
+      );
     }
 
     return h.response();

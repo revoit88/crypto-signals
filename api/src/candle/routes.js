@@ -104,5 +104,12 @@ module.exports = {
       handler: Controller.persist,
       options: { auth: { access: { scope: ["observer", "microservice"] } } }
     });
+
+    server.route({
+      method: "POST",
+      path: "/binance",
+      handler: Controller.getCandlesFromBinance,
+      options: { auth: { access: { scope: ["admin"] } } }
+    });
   }
 };

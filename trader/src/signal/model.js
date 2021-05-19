@@ -1,8 +1,8 @@
 "use strict";
 
 const mongoose = require("mongoose");
-const { validateNumber } = require("../../utils");
-const { allowed_pairs, strategies } = require("../../config");
+const { validateNumber } = require("@crypto-signals/utils");
+const { pairs } = require("@crypto-signals/config");
 
 const Schema = mongoose.Schema;
 
@@ -15,7 +15,7 @@ const SignalSchema = new Schema(
     symbol: {
       type: String,
       required: true,
-      validate: value => allowed_pairs.includes(value)
+      validate: value => pairs.map(p => p.symbol).includes(value)
     },
     interval: {
       type: String,
@@ -27,16 +27,8 @@ const SignalSchema = new Schema(
     date: { type: Date, required: true },
     close_date: { type: Date },
     drop_price: { type: Number, required: true, validate: validateNumber },
-    trigger: {
-      type: String,
-      required: true,
-      validate: value => strategies.includes(value)
-    },
-    status: {
-      type: String,
-      enum: ["open", "closed"],
-      default: "open"
-    },
+    trigger: { type: String, required: true },
+    status: { type: String, enum: ["open", "closed"], default: "open" },
     trailing_stop_buy: {
       type: Number,
       required: true,

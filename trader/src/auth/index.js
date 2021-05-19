@@ -2,7 +2,7 @@
 
 const Boom = require("@hapi/boom");
 const Iron = require("@hapi/iron");
-const { iron_secret, environment } = require("../../config");
+const { iron_secret, environment } = require("@crypto-signals/config");
 
 module.exports = {
   name: "authScheme",

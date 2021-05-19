@@ -1,7 +1,4 @@
-const {
-  getBinanceInstance,
-  getAPIInstance
-} = require("@crypto-signals/config");
+const { getBinanceInstance, getAPIInstance } = require("@crypto-signals/utils");
 const config = require("@crypto-signals/config");
 
 const binance = getBinanceInstance(config);

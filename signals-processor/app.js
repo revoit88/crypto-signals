@@ -12,7 +12,6 @@ const {
   calculateBuySignal,
   castToObjectId
 } = require("./utils");
-const { trader } = require("./axios");
 
 const init = async () => {
   const server = Hapi.server({
@@ -43,6 +42,10 @@ const init = async () => {
           request.server.plugins.mongoose.connection.model("Market");
         const PositionModel =
           request.server.plugins.mongoose.connection.model("Position");
+
+        const positionController = require("./src/position/controller")(
+          request.server.plugins.mongoose.connection
+        );
 
         const setAsync = request.server.plugins.redis.setAsync;
         const delAsync = request.server.plugins.redis.delAsync;
@@ -164,10 +167,47 @@ const init = async () => {
                   await delAsync(`${last_candle.symbol}_has_open_signal`);
 
                   // create position
+                  const position = await positionController.create(
+                    updatedSignal,
+                    last_candle
+                  );
                   // broadcast signal closed
+                  api
+                    .broadcast("signals", {
+                      exchange: open_signal.exchange,
+                      symbol: open_signal.symbol,
+                      type: "exit",
+                      _id: open_signal._id.toString()
+                    })
+                    .catch(error => {
+                      console.log("Exit signal broadcast error.");
+                      if (error) {
+                        console.error(error);
+                      }
+                    });
                   // broadcast new position
+
+                  api
+                    .broadcast("positions", {
+                      exchange: position.exchange,
+                      symbol: position.symbol,
+                      price: position.buy_price,
+                      signal: position.signal.toString(),
+                      stop_loss: position.configuration.stop_loss * -1,
+                      trailing_stop_loss:
+                        position.configuration.arm_trailing_stop_loss,
+                      take_profit: position.configuration.take_profit,
+                      type: "entry",
+                      _id: position._id.toString(),
+                      time: position.open_time
+                    })
+                    .catch(error => {
+                      console.log("Entry position broadcast error.");
+                      if (error) {
+                        console.error(error);
+                      }
+                    });
                   return Promise.resolve();
-                  // return positionController.create(updatedSignal, last_candle);
                 }
 
                 const tsb = getTSB(open_signal, last_candle);

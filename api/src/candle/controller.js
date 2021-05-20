@@ -213,7 +213,8 @@ exports.persist = async function (request, h) {
     const processSignals = async c => {
       await MarketModel.updateOne(
         { $and: [{ exchange: c.exchange }, { symbol: c.symbol }] },
-        { $set: { last_price: c.close_price } }
+        { $set: { last_price: c.close_price } },
+        { upsert: true }
       );
       await signals_processor_microservice.post(`?symbol=${c.symbol}`);
     };

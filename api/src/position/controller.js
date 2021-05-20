@@ -3,8 +3,7 @@ const axios = require("axios");
 const {
   zignaly_url,
   zignaly_provider_key,
-  environment,
-  position_percentage_size
+  environment
 } = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 const {

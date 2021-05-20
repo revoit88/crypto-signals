@@ -1,8 +1,8 @@
 "use strict";
 
 const mongoose = require("mongoose");
-const { allowed_pairs } = require("../../config");
-const { validateNumber } = require("../../utils");
+const { allowed_pairs } = require("@crypto-signals/config");
+const { validateNumber } = require("@crypto-signals/utils");
 
 const Schema = mongoose.Schema;
 

@@ -5,8 +5,8 @@ const {
   milliseconds,
   toSymbolStepPrecision,
   getChange
-} = require("../../utils");
-const { exchange } = require("../../config");
+} = require("@crypto-signals/utils");
+const { exchange } = require("@crypto-signals/config");
 
 exports.getUpdatedBalance = async function (request, h) {
   try {
@@ -69,15 +69,12 @@ exports.getUpdatedBalance = async function (request, h) {
 
 exports.cancelUnfilledOrders = async function (request, h) {
   try {
-    const SignalModel = request.server.plugins.mongoose.connection.model(
-      "Signal"
-    );
-    const OrderModel = request.server.plugins.mongoose.connection.model(
-      "Order"
-    );
-    const MarketModel = request.server.plugins.mongoose.connection.model(
-      "Market"
-    );
+    const SignalModel =
+      request.server.plugins.mongoose.connection.model("Signal");
+    const OrderModel =
+      request.server.plugins.mongoose.connection.model("Order");
+    const MarketModel =
+      request.server.plugins.mongoose.connection.model("Market");
 
     const orders = await OrderModel.find({
       $and: [
@@ -196,9 +193,8 @@ exports.convertDust = async function (request, h) {
 
 exports.updateListenKey = async function (request, h) {
   try {
-    const AccountModel = request.server.plugins.mongoose.connection.model(
-      "Account"
-    );
+    const AccountModel =
+      request.server.plugins.mongoose.connection.model("Account");
     const account = await AccountModel.findOne({ id: "production" }).hint(
       "id_1"
     );
@@ -235,9 +231,8 @@ exports.broadcast = async function (request, h) {
 
 exports.getAccountById = async function (request, h) {
   try {
-    const AccountModel = request.server.plugins.mongoose.connection.model(
-      "Account"
-    );
+    const AccountModel =
+      request.server.plugins.mongoose.connection.model("Account");
     const account = await AccountModel.findOne({ id: request.params.id }).hint(
       "id_1"
     );
@@ -255,12 +250,10 @@ exports.getAccountById = async function (request, h) {
 
 exports.bnbToUsdt = async function (request, h) {
   try {
-    const PositionModel = request.server.plugins.mongoose.connection.model(
-      "Position"
-    );
-    const MarketModel = request.server.plugins.mongoose.connection.model(
-      "Market"
-    );
+    const PositionModel =
+      request.server.plugins.mongoose.connection.model("Position");
+    const MarketModel =
+      request.server.plugins.mongoose.connection.model("Market");
 
     const accountPromise = binance.get("/api/v3/account");
 

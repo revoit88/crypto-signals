@@ -163,7 +163,9 @@ function getBinanceInstance(env) {
     "/api/v3/account",
     "/wapi/v3/withdraw.html",
     "/wapi/v3/withdrawHistory.html",
-    "/sapi/v1/asset/dust"
+    "/sapi/v1/asset/dust",
+    "/sapi/v1/capital/withdraw/apply",
+    "/sapi/v1/capital/withdraw/history"
   ];
 
   binance.interceptors.request.use(

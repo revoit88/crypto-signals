@@ -1,8 +1,8 @@
 "use strict";
 
 const mongoose = require("mongoose");
-const { validateNumber } = require("../../utils");
-const { allowed_pairs } = require("../../config");
+const { validateNumber } = require("@crypto-signals/utils");
+const { allowed_pairs } = require("@crypto-signals/config");
 
 const Schema = mongoose.Schema;
 
@@ -26,7 +26,7 @@ const SignalSchema = new Schema(
     interval: {
       type: String,
       required: true,
-      validate: value => ["4h", "1h", "1m"].includes(value)
+      validate: value => ["1d", "4h", "1h", "1m"].includes(value)
     },
     price: { type: Number, required: true, validate: validateNumber },
     type: { type: String, required: true, enum: ["buy", "sell"] },

@@ -16,7 +16,8 @@ const {
 const {
   positions_interval,
   signals_interval,
-  exchange
+  exchange,
+  interval
 } = require("@crypto-signals/config");
 const qs = require("querystring");
 
@@ -76,7 +77,7 @@ exports.getSymbolCandles = async function (request, h) {
     const symbol = request.params.symbol;
 
     const candles = await Candle.find({
-      $and: [{ exchange: "binance" }, { symbol }, { interval: "4h" }]
+      $and: [{ exchange }, { symbol }, { interval }]
     })
       .limit(1000)
       .sort({ open_time: -1 });
@@ -128,13 +129,12 @@ exports.getObserverStatus = async function (request, h) {
 exports.deleteOldCandles = async function (request, h) {
   try {
     const Candle = request.server.plugins.mongoose.connection.model("Candle");
-    const week = 604800000;
     const symbol = request.query.symbol;
 
     await Candle.deleteMany({
       $and: [
-        { close_time: { $lt: new Date().getTime() - week } },
-        { interval: "1h" },
+        { close_time: { $lt: new Date().getTime() - milliseconds.week } },
+        { interval },
         ...(symbol ? [{ symbol }] : [])
       ]
     });
@@ -161,7 +161,7 @@ exports.broadcast = async function (request, h) {
 exports.getPastDayCandles = async function (request, h) {
   try {
     const Candle = request.server.plugins.mongoose.connection.model("Candle");
-    const open_time = new Date().setUTCMinutes(0, 0, 0) - 1440 * 6e4;
+    const open_time = new Date().setUTCMinutes(0, 0, 0) - milliseconds.day;
     const candles = await Candle.find(
       { open_time },
       {
@@ -308,7 +308,7 @@ exports.persist = async function (request, h) {
 
 exports.getCandlesFromBinance = async function (request, h) {
   try {
-    const { symbol, interval } = request.query;
+    const { symbol } = request.query;
     const CandleModel =
       request.server.plugins.mongoose.connection.model("Candle");
 

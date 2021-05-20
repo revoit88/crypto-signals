@@ -1,5 +1,6 @@
 const Boom = require("@hapi/boom");
 const { milliseconds } = require("@crypto-signals/utils");
+const { exchange } = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 
 exports.updateById = async function (request, h) {
@@ -42,7 +43,7 @@ exports.getMarkets = async function (request, h) {
   // const symbol = request.query.symbol;
   //TO DO FIX WHEN NEEDED
   try {
-    const markets = await Market.find({ exchange: "binance" });
+    const markets = await Market.find({ exchange });
     return markets.map(market => ({
       _id: market._id,
       broadcast_signals: market.broadcast_signals,
@@ -69,7 +70,7 @@ exports.updateMarketLocks = async function (request, h) {
         { trader_lock: true },
         {
           last_trader_lock_update: {
-            $lt: Date.now() - milliseconds.minute * 1
+            $lt: Date.now() - milliseconds.minute
           }
         }
       ]

@@ -12,6 +12,7 @@ const {
   calculateBuySignal,
   castToObjectId
 } = require("./utils");
+const { api } = require("./axios");
 
 const init = async () => {
   const server = Hapi.server({

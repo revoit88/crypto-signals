@@ -30,34 +30,33 @@ const init = async () => {
           id: { $in: candlesToUpdate }
         }).sort({ open_time: 1 });
 
-        await Promise.all(
-          toUpdate.map(async candle => {
-            const candles = await CandleModel.find({
-              $and: [
-                { exchange: config.exchange },
-                { symbol },
-                { interval: config.interval },
-                {
-                  open_time: {
-                    $gte: candle.open_time - getTimeDiff(150, config.interval)
-                  }
-                },
-                { open_time: { $lte: candle.open_time } }
-              ]
-            })
-              .hint("exchange_1_symbol_1_interval_1_open_time_1")
-              .sort({ open_time: 1 });
+        for (const candle of toUpdate) {
+          const candles = await CandleModel.find({
+            $and: [
+              { exchange: config.exchange },
+              { symbol },
+              { interval: config.interval },
+              {
+                open_time: {
+                  $gte: candle.open_time - getTimeDiff(155, config.interval)
+                }
+              },
+              { open_time: { $lte: candle.open_time } }
+            ]
+          })
+            .hint("exchange_1_symbol_1_interval_1_open_time_1")
+            .sort({ open_time: 1 });
 
+          if (candles.length >= 150) {
             const ohlc = getOHLCValues(candles);
             const indicators = await getIndicatorsValues(ohlc, candles);
 
-            return CandleModel.updateOne(
+            await CandleModel.updateOne(
               { id: candle.id },
               { $set: indicators }
             );
-          })
-        );
-
+          }
+        }
         return h.response();
       } catch (error) {
         console.error(error);

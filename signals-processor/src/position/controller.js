@@ -6,7 +6,6 @@ const config = require("@crypto-signals/config");
 const {
   toSymbolPrecision,
   toSymbolStepPrecision,
-  getChange,
   getPercentageOfValue,
   toFixedDecimal
 } = require("@crypto-signals/utils");
@@ -101,7 +100,7 @@ module.exports = db => {
         $set: { position: createdPosition._id }
       });
 
-      if (!!market.use_main_account) {
+      if (!!market.use_main_account && config.environment === "production") {
         trader
           .createMarketBuyOrder({
             symbol: createdPosition.symbol,

@@ -115,7 +115,7 @@ const init = async () => {
             last_open_position
           ).map(s => ({
             ...s,
-            trailing_stop_buy: getTSB(s, last_candle),
+            trailing_stop_buy: getTSB(last_candle),
             open_candle: getPlainCandle(last_candle),
             is_test: !!last_candle.is_test,
             id: `${last_candle.exchange}_${last_candle.symbol}_${s.trigger}_${last_candle.event_time}`

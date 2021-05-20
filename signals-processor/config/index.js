@@ -8,6 +8,7 @@ module.exports = {
   redis_uri: process.env.REDIS_URI,
   exchange: process.env.EXCHANGE,
   interval: process.env.INTERVAL,
+  environment: process.env.NODE_ENV,
   host: process.env.SIGNALS_PROCESSOR_HOST || "localhost",
   port: +process.env.SIGNALS_PROCESSOR_PORT || 8080,
   strategy: (process.env.SIGNALS_PROCESSOR_STRATEGY || "")

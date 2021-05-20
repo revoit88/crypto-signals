@@ -212,5 +212,6 @@ module.exports = [
   { symbol: "SLPUSDT", priceTickSize: 0.0001, stepSize: 1.0 },
   { symbol: "SHIBUSDT", priceTickSize: 0.00000001, stepSize: 1.0 },
   { symbol: "ICPUSDT", priceTickSize: 0.01, stepSize: 0.01 },
-  { symbol: "ARUSDT", priceTickSize: 0.001, stepSize: 0.01 }
+  { symbol: "ARUSDT", priceTickSize: 0.001, stepSize: 0.01 },
+  { symbol: "POLSUSDT", priceTickSize: 0.001, stepSize: 0.01 }
 ];

@@ -1,6 +1,6 @@
 const Hapi = require("@hapi/hapi");
 const Boom = require("@hapi/boom");
-const config = require("./config");
+const config = require("@crypto-signals/config");
 const {
   toSymbolPrecision,
   getTimeDiff,

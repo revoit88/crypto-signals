@@ -115,44 +115,44 @@ function getTimeDiff(candles, interval) {
 
 /**
  *
- * @param {Object} config
+ * @param {Object} env
  * @returns {axios.AxiosInstance} Instance
  */
-function getAPIInstance(config) {
+function getAPIInstance(env) {
   return axios.create({
-    baseURL: config.api_url,
+    baseURL: env.API_URL,
     headers: {
-      Authorization: `Bearer ${config.microservice_token}`
+      Authorization: `Bearer ${env.MICROSERVICE_TOKEN}`
     }
   });
 }
 
 /**
  *
- * @param {Object} config
+ * @param {Object} env
  * @returns {axios.AxiosInstance} Instance
  */
-function getTraderInstance(config) {
+function getTraderInstance(env) {
   return axios.create({
-    baseURL: config.trader_url,
-    headers: { Authorization: `Bearer ${config.microservice_token}` }
+    baseURL: env.TRADER_URL,
+    headers: { Authorization: `Bearer ${env.MICROSERVICE_TOKEN}` }
   });
 }
 
 /**
  *
- * @param {Object} config
+ * @param {Object} env
  * @returns {axios.AxiosInstance} Instance
  */
-function getBinanceInstance(config) {
+function getBinanceInstance(env) {
   const binance = axios.create({
-    baseURL: config.binance_api_url,
-    headers: { "X-MBX-APIKEY": config.binance_api_key }
+    baseURL: env.BINANCE_API_URL,
+    headers: { "X-MBX-APIKEY": env.BINANCE_API_KEY }
   });
 
   const getSignature = query => {
     return crypto
-      .createHmac("sha256", config.binance_api_secret)
+      .createHmac("sha256", env.BINANCE_API_SECRET)
       .update(query)
       .digest("hex");
   };
@@ -167,8 +167,8 @@ function getBinanceInstance(config) {
   ];
 
   binance.interceptors.request.use(
-    cfg => {
-      const [base, query] = String(cfg.url).split("?");
+    config => {
+      const [base, query] = String(config.url).split("?");
       const timestamp = Date.now();
       const requiresSignature = secureEndpoints.some(
         endpoint => endpoint === base
@@ -177,9 +177,9 @@ function getBinanceInstance(config) {
         const newQuery = `timestamp=${timestamp}&recvWindow=15000`.concat(
           query ? `&${query}` : ""
         );
-        cfg.url = `${base}?${newQuery}&signature=${getSignature(newQuery)}`;
+        config.url = `${base}?${newQuery}&signature=${getSignature(newQuery)}`;
       }
-      return cfg;
+      return config;
     },
     error => Promise.reject(error)
   );

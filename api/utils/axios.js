@@ -34,9 +34,9 @@ const candles_processor_microservice = axios.create({
   }
 });
 
-const binance = getBinanceInstance(config);
-const api = getAPIInstance(config);
-const trader = getTraderInstance(config);
+const binance = getBinanceInstance(process.env);
+const api = getAPIInstance(process.env);
+const trader = getTraderInstance(process.env);
 
 module.exports = {
   binance,

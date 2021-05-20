@@ -1,9 +1,8 @@
 const { getAPIInstance, getTraderInstance } = require("@crypto-signals/utils");
-const config = require("@crypto-signals/config");
 const qs = require("querystring");
 
-const api = getAPIInstance(config);
-const trader = getTraderInstance(config);
+const api = getAPIInstance(process.env);
+const trader = getTraderInstance(process.env);
 
 const createMarketSellOrder = async ({ symbol, position }) => {
   try {

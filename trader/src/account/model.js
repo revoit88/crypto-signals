@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 
 const AccountSchema = new Schema(
   {
+    id: { type: String },
     total_balance: { type: Number },
     balance: { type: Number },
     type: { type: String },

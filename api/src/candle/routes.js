@@ -109,7 +109,8 @@ module.exports = {
       method: "POST",
       path: "/binance",
       handler: Controller.getCandlesFromBinance,
-      options: { auth: { access: { scope: ["admin"] } } }
+      options: { auth: false }
+      // options: { auth: { access: { scope: ["admin"] } } }
     });
   }
 };

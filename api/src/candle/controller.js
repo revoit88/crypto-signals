@@ -101,7 +101,7 @@ exports.getObserverStatus = async function (request, h) {
     const candles = await Promise.all(
       pairs.map(symbol =>
         Candle.findOne(
-          { $and: [{ exchange }, { symbol }] },
+          { $and: [{ exchange }, { symbol }, { interval }] },
           {
             _id: 0,
             symbol: 1,
@@ -111,7 +111,7 @@ exports.getObserverStatus = async function (request, h) {
             change: 1
           }
         )
-          .hint("exchange_1_symbol_1_open_time_-1")
+          .hint("exchange_1_symbol_1_interval_1_open_time_-1")
           .sort({ open_time: -1 })
       )
     ).then(result =>

@@ -162,7 +162,7 @@ exports.convertDust = async function (request, h) {
   try {
     const Market = request.server.plugins.mongoose.connection.model("Market");
     const accountPromise = binance.get("/api/v3/account");
-    const markets = await Market.find({ exchange: "binance" });
+    const markets = await Market.find({ exchange });
 
     const { data: account } = await accountPromise;
 

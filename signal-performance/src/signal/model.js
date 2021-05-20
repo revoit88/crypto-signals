@@ -48,14 +48,14 @@ const SignalSchema = new Schema(
     drop_percent: { type: Number, validate: validateNumber },
     position: { type: mongoose.Types.ObjectId, ref: "Position" },
     is_test: { type: Boolean, default: false },
-    high1d: { type: Number },
-    high3d: { type: Number },
-    high7d: { type: Number },
-    high30d: { type: Number },
-    low1d: { type: Number },
-    low3d: { type: Number },
-    low7d: { type: Number },
-    low30d: { type: Number }
+    high1d: { type: Number, default: 0 },
+    high3d: { type: Number, default: 0 },
+    high7d: { type: Number, default: 0 },
+    high30d: { type: Number, default: 0 },
+    low1d: { type: Number, default: 0 },
+    low3d: { type: Number, default: 0 },
+    low7d: { type: Number, default: 0 },
+    low30d: { type: Number, default: 0 }
   },
   { timestamps: true }
 );

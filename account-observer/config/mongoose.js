@@ -9,8 +9,7 @@ module.exports = async () => {
   try {
     const db = await Mongoose.createConnection(db_uri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      maxPoolSize: 25
+      useUnifiedTopology: true
     });
 
     require("../src/account/model")(db);

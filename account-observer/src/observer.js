@@ -50,8 +50,10 @@ module.exports = class Observer {
       await Account.findOneAndUpdate(
         { id: "production" },
         {
-          spot_account_listen_key,
-          last_spot_account_listen_key_update: Date.now()
+          $set: {
+            spot_account_listen_key,
+            last_spot_account_listen_key_update: Date.now()
+          }
         }
       );
 

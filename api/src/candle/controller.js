@@ -333,6 +333,14 @@ exports.getCandlesFromBinance = async function (request, h) {
     });
 
     if (Array.isArray(data) && !!data.length) {
+      await CandleModel.deleteMany({
+        $and: [
+          { exchange },
+          { symbol },
+          { interval },
+          { open_time: { $gte: Date.now() - getTimeDiff(160, interval) } }
+        ]
+      });
       await CandleModel.bulkWrite(
         processed.map(value => ({
           updateOne: {

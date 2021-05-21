@@ -15,7 +15,7 @@ module.exports = {
       options: {
         auth: {
           access: {
-            scope: ["observer"]
+            scope: ["observer", "microservice"]
           }
         }
       }

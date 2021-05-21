@@ -53,6 +53,24 @@ const init = async () => {
 
         const { symbol } = request.query;
 
+        const count = await CandleModel.countDocuments({
+          $and: [
+            { exchange: config.exchange },
+            { symbol },
+            { interval: config.interval },
+            {
+              open_time: {
+                $gte: Date.now() - getTimeDiff(155, config.interval)
+              }
+            },
+            { open_time: { $lte: Date.now() } }
+          ]
+        });
+
+        if (count < 150) {
+          return h.response();
+        }
+
         //last 10
         const candles = await CandleModel.find({
           $and: [

@@ -13,6 +13,20 @@ module.exports = db => {
   const CandleModel = db.model("Candle");
 
   const process = async symbol => {
+    const count = await CandleModel.countDocuments({
+      $and: [
+        { exchange },
+        { symbol },
+        { interval },
+        { open_time: { $gte: Date.now() - getTimeDiff(155, interval) } },
+        { open_time: { $lte: Date.now() } }
+      ]
+    });
+
+    if (count < 150) {
+      return;
+    }
+
     const candles = await CandleModel.find({
       $and: [
         { exchange },
@@ -25,9 +39,6 @@ module.exports = db => {
       .hint("exchange_1_symbol_1_interval_1_open_time_1")
       .sort({ open_time: 1 });
 
-    if (candles.length <= 1) {
-      return;
-    }
     const [previous_candle, candle] = candles.slice(-2);
 
     try {

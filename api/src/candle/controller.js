@@ -4,8 +4,7 @@ const {
   positions_processor_microservice,
   signals_processor_microservice,
   candles_processor_microservice,
-  binance,
-  api
+  binance
 } = require("../../utils/axios");
 const {
   orderAlphabetically,
@@ -195,7 +194,7 @@ exports.persist = async function (request, h) {
     const candle = request.payload;
 
     request.server.publish(`/candles/${candle.symbol}`, candle);
-    await api.post("/markets/broadcast", {
+    request.server.publish(`/markets/${candle.symbol}`, {
       exchange: candle.exchange,
       symbol: candle.symbol,
       last_price: candle.close_price,

@@ -369,6 +369,26 @@ const getSupertrend = async (candles, ohlc) => {
   return { trend, trend_up, trend_down };
 };
 
+const getCumulativeIndicator = async ({ candles, ohlc, fn, getter }) => {
+  const [result] = await candles
+    .reduce(async (p_acc, candle, index, array) => {
+      const acc = await p_acc;
+      const sliced_candles = array.slice(0, index + 1).map(sliced => ({
+        ...sliced,
+        ...getter(acc.find(v => v.id === sliced.id) || {})
+      }));
+      const sliced_ohlc = Object.entries(ohlc).reduce(
+        (acc, [key, value]) => ({ ...acc, [key]: value.slice(0, index + 1) }),
+        {}
+      );
+
+      const value = await fn(sliced_candles, sliced_ohlc);
+      return acc.concat({ ...candle, ...value });
+    }, Promise.resolve([]))
+    .then(r => r.slice(-1));
+  return result;
+};
+
 /**
  *
  * @param {Candle[]} candles
@@ -482,8 +502,23 @@ const getIndicatorsValues = (ohlc, candles) => {
       // getStochasticOscillator([high, close, low]),
       getBollingerBands([close], currentCandle.close_price),
       getMACD([close]),
-      getSupertrend(candles, ohlc),
-      getATRStop(candles, ohlc),
+      // getSupertrend(candles, ohlc),
+      getCumulativeIndicator({
+        candles,
+        ohlc,
+        getter: ({ trend, trend_up, trend_down } = {}) => ({
+          trend,
+          trend_up,
+          trend_down
+        }),
+        fn: getSupertrend
+      }),
+      getCumulativeIndicator({
+        candles,
+        ohlc,
+        getter: ({ atr_stop } = {}) => ({ atr_stop }),
+        fn: getATRStop
+      }),
       getCHATR(candles, ohlc)
     ];
 
@@ -577,7 +612,6 @@ const buildCandlesData = ({ candles, symbol, interval }) => {
     []
   );
 };
-
 
 const castToObjectId = id =>
   typeof id === "string" ? Mongoose.Types.ObjectId(id) : id;

@@ -216,7 +216,7 @@ function buildCandles({ candles, exchange, symbol, interval }) {
         number_of_trades: Number(cloneObject(current[8])),
         is_closed: new Date().getTime() > Number(cloneObject(current[6])),
         quote_asset_volume: Number(cloneObject(current[7])),
-        date: new Date(Number(cloneObject(current[0])))
+        date: new Date(Number(cloneObject(current[0]))).toISOString()
       }),
     []
   );

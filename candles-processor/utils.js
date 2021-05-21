@@ -476,7 +476,7 @@ const promisify = (key, fn, args) => {
  */
 const getIndicatorsValues = (ohlc, candles) => {
   const { high, close, low, volume, hl2 } = ohlc;
-  const [currentCandle] = cloneObject(candles.slice(-1));
+  const [previous_candle, current_candle] = cloneObject(candles.slice(-2));
   return new Promise(async resolve => {
     const promises = [
       // getRSI([close]),
@@ -500,25 +500,33 @@ const getIndicatorsValues = (ohlc, candles) => {
       getDMI([high, low, close]),
       // getStochRSI(await getRSI([close], true)),
       // getStochasticOscillator([high, close, low]),
-      getBollingerBands([close], currentCandle.close_price),
+      getBollingerBands([close], current_candle.close_price),
       getMACD([close]),
-      // getSupertrend(candles, ohlc),
-      getCumulativeIndicator({
-        candles,
-        ohlc,
-        getter: ({ trend, trend_up, trend_down } = {}) => ({
-          trend,
-          trend_up,
-          trend_down
-        }),
-        fn: getSupertrend
-      }),
-      getCumulativeIndicator({
-        candles,
-        ohlc,
-        getter: ({ atr_stop } = {}) => ({ atr_stop }),
-        fn: getATRStop
-      }),
+      ...(!previous_candle.trend && !current_candle.trend
+        ? [
+            getCumulativeIndicator({
+              candles,
+              ohlc,
+              getter: ({ trend, trend_up, trend_down } = {}) => ({
+                trend,
+                trend_up,
+                trend_down
+              }),
+              fn: getSupertrend
+            })
+          ]
+        : [getSupertrend(candles, ohlc)]),
+      ...(!previous_candle.atr_stop && !current_candle.atr_stop
+        ? [
+            getCumulativeIndicator({
+              candles,
+              ohlc,
+              getter: ({ atr_stop } = {}) => ({ atr_stop }),
+              fn: getATRStop
+            })
+          ]
+        : [getATRStop(candles, ohlc)]),
+
       getCHATR(candles, ohlc)
     ];
 

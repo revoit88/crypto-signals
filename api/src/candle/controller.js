@@ -325,14 +325,15 @@ exports.getCandlesFromBinance = async function (request, h) {
     });
 
     const { data } = await binance.get(`/api/v3/klines?${query}`);
-    const processed = buildCandles({
-      candles: data,
-      exchange,
-      symbol,
-      interval
-    });
 
     if (Array.isArray(data) && !!data.length) {
+      const processed = buildCandles({
+        candles: data,
+        exchange,
+        symbol,
+        interval
+      });
+
       await CandleModel.deleteMany({
         $and: [
           { exchange },
@@ -341,16 +342,7 @@ exports.getCandlesFromBinance = async function (request, h) {
           { open_time: { $gte: Date.now() - getTimeDiff(160, interval) } }
         ]
       });
-      await CandleModel.bulkWrite(
-        processed.map(value => ({
-          updateOne: {
-            filter: { id: value.id },
-            update: { $set: value },
-            upsert: true
-          }
-        })),
-        { ordered: false }
-      );
+      await CandleModel.insertMany(processed);
 
       await candles_processor_microservice.post(
         `?symbol=${symbol}`,

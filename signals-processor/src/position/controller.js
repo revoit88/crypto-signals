@@ -18,21 +18,16 @@ module.exports = db => {
   const PositionModel = db.model("Position");
   const AccountModel = db.model("Account");
   const SignalModel = db.model("Signal");
-  const MarketModel = db.model("Market");
 
   /**
    *
    * @param {import("../interfaces").SignalI} signal
    */
-  const create = async (signal, candle) => {
-    const market = await MarketModel.findOne({
-      $and: [{ exchange: config.exchange }, { symbol: signal.symbol }]
-    }).hint("exchange_1_symbol_1");
-
+  const create = async (signal, candle, use_main_account) => {
     let buy_amount = config.position_minimum_buy_amount;
     let enough_balance = false;
 
-    if (!!market.use_main_account) {
+    if (!!use_main_account) {
       const account = await AccountModel.findOne({
         id: "production"
       }).hint("id_1");
@@ -100,7 +95,7 @@ module.exports = db => {
         $set: { position: createdPosition._id }
       });
 
-      if (!!market.use_main_account && config.environment === "production") {
+      if (!!use_main_account && config.environment === "production") {
         trader
           .createMarketBuyOrder({
             symbol: createdPosition.symbol,

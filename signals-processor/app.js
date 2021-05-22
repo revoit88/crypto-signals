@@ -188,7 +188,8 @@ const init = async () => {
                   // create position
                   const position = await positionController.create(
                     updatedSignal,
-                    last_candle
+                    last_candle,
+                    !!market.use_main_account
                   );
                   // broadcast signal closed
                   api

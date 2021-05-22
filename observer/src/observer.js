@@ -59,7 +59,7 @@ module.exports = class Observer {
           const message = (JSON.parse(data) || {}).data;
           if (message?.e === "kline") {
             const k = message.k;
-            let candle = {
+            await api.persist({
               id: `${this.exchange}_${message.s}_${k.i}_${k.t}`,
               symbol: message.s,
               event_time: message.E || Date.now(),
@@ -74,8 +74,7 @@ module.exports = class Observer {
               quote_asset_volume: +k.q,
               date: new Date(k.t).toISOString(),
               exchange: this.exchange
-            };
-            await api.persist(candle);
+            });
           }
         } catch (error) {
           throw error;

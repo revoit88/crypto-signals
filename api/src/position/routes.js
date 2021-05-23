@@ -127,5 +127,12 @@ module.exports = {
         }
       }
     });
+
+    server.route({
+      method: "POST",
+      path: "/repeat-close",
+      handler: Controller.repeatClosePositions,
+      options: { auth: { access: { scope: ["microservice"] } } }
+    });
   }
 };

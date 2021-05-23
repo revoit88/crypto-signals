@@ -3,13 +3,15 @@ const axios = require("axios");
 const {
   zignaly_url,
   zignaly_provider_key,
-  environment
+  environment,
+  repeat_close_position_hours
 } = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 const {
   orderAlphabetically,
   toSymbolPrecision
 } = require("@crypto-signals/utils");
+const { api } = require("../../utils/axios");
 
 exports.create = async function (request, h) {
   try {
@@ -375,6 +377,45 @@ exports.getWeeklyReport = async function (request, h) {
     }));
 
     return processed;
+  } catch (error) {
+    request.logger.error(error);
+    return Boom.internal();
+  }
+};
+
+exports.repeatClosePositions = async function (request, h) {
+  try {
+    const Position =
+      request.server.plugins.mongoose.connection.model("Position");
+
+    const positions = await Position.find(
+      {
+        $and: [
+          { status: "closed" },
+          { close_time: { $gt: Date.now() - repeat_close_position_hours } }
+        ]
+      },
+      {
+        exchange: 1,
+        symbol: 1,
+        sell_price: 1,
+        signal: 1,
+        _id: 1
+      }
+    ).then(found => found.map(v => v.toJSON()));
+
+    for (const position of positions) {
+      await api.post(`/positions/broadcast`, {
+        exchange: position.exchange,
+        symbol: position.symbol,
+        price: position.sell_price,
+        signal: position.signal.toString(),
+        type: "exit",
+        _id: position._id.toString()
+      });
+    }
+
+    return h.response();
   } catch (error) {
     request.logger.error(error);
     return Boom.internal();

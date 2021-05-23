@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
-const { pairs } = require("@crypto-signals/utils");
+const { pairs, milliseconds } = require("@crypto-signals/utils");
 
 module.exports = {
   exchange: process.env.EXCHANGE,
@@ -29,5 +29,7 @@ module.exports = {
   signals_performance_microservice_url: process.env.SIGNALS_PERFORMANCE_URL,
   signals_processor_microservice_url: process.env.SIGNALS_PROCESSOR_URL,
   positions_processor_microservice_url: process.env.POSITIONS_PROCESSOR_URL,
-  candles_processor_microservice_url: process.env.CANDLES_PROCESSOR_URL
+  candles_processor_microservice_url: process.env.CANDLES_PROCESSOR_URL,
+  repeat_close_position_hours:
+    +process.env.REPEAT_CLOSE_POSITION_HOURS * milliseconds.hour
 };

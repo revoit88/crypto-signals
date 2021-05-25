@@ -92,36 +92,33 @@ const init = async () => {
 
         let open_signals = await SignalModel.find({
           $and: [
-            { exchange: config.exchange },
             { symbol },
             { status: "open" },
             { trigger_time: { $gt: Date.now() - hoursLookup } }
           ]
         })
-          .hint("exchange_1_symbol_1_status_1_trigger_time_-1")
+          .hint("symbol_1_status_1_trigger_time_-1")
           .sort({ trigger_time: -1 });
 
         if (!open_signals.length) {
           const last_closed_signal = await SignalModel.findOne({
             $and: [
-              { exchange: config.exchange },
               { symbol },
               { status: "closed" },
               { close_time: { $gt: Date.now() - hoursLookup } }
             ]
           })
-            .hint("exchange_1_symbol_1_status_1_close_time_-1")
+            .hint("symbol_1_status_1_close_time_-1")
             .sort({ close_time: -1 });
 
           const last_open_position = await PositionModel.findOne({
             $and: [
-              { exchange: config.exchange },
               { symbol },
               { status: "open" },
               { open_time: { $gt: Date.now() - positionHoursLookup } }
             ]
           })
-            .hint("exchange_1_symbol_1_status_1_open_time_-1")
+            .hint("symbol_1_status_1_open_time_-1")
             .sort({ open_time: -1 });
 
           const [triggered_signal] = calculateBuySignal(

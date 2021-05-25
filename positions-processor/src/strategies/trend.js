@@ -39,8 +39,8 @@ module.exports = db => {
 
     try {
       const positions = await PositionModel.find({
-        $and: [{ exchange }, { symbol }, { status: "open" }]
-      }).hint("exchange_1_symbol_1_status_1");
+        $and: [{ symbol }, { status: "open" }]
+      }).hint("symbol_1_status_1");
 
       if (!positions.length) {
         return;

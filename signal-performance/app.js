@@ -43,7 +43,6 @@ const init = async () => {
         const signals = await SignalModel.find(
           {
             $and: [
-              { exchange: config.exchange },
               { symbol: symbol },
               { status: "closed" },
               { close_time: { $gt: now - ninetyDays } },
@@ -62,7 +61,7 @@ const init = async () => {
               {}
             )
           }
-        ).hint("exchange_1_symbol_1_status_1_close_time_-1");
+        ).hint("symbol_1_status_1_close_time_-1");
 
         if (!signals.length) {
           return h.response();

@@ -28,7 +28,9 @@ const init = async () => {
 
         const toUpdate = await CandleModel.find({
           id: { $in: candlesToUpdate }
-        }).sort({ open_time: 1 });
+        })
+          .hint("id_1")
+          .sort({ open_time: 1 });
 
         for (const candle of toUpdate) {
           const candles = await CandleModel.find({
@@ -50,10 +52,9 @@ const init = async () => {
             const ohlc = getOHLCValues(candles);
             const indicators = await getIndicatorsValues(ohlc, candles);
 
-            await CandleModel.updateOne(
-              { id: candle.id },
-              { $set: indicators }
-            );
+            await CandleModel.findByIdAndUpdate(candle._id, {
+              $set: indicators
+            });
           }
         }
         return h.response();

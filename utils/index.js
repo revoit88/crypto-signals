@@ -222,6 +222,18 @@ function buildCandles({ candles, exchange, symbol, interval }) {
   );
 }
 
+const benchmark = (fn, text) => {
+  return new Promise(async (resolve, reject) => {
+    console.time(text);
+    let result = fn();
+    if (result instanceof Promise) {
+      result = await result;
+    }
+    console.timeEnd(text);
+    return resolve(result);
+  });
+};
+
 module.exports = {
   pairs,
   milliseconds,
@@ -241,5 +253,6 @@ module.exports = {
   getTraderInstance,
   getBinanceInstance,
   getBooleanValue,
-  buildCandles
+  buildCandles,
+  benchmark
 };

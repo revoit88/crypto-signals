@@ -1,7 +1,7 @@
 const Hapi = require("@hapi/hapi");
 const Boom = require("@hapi/boom");
 const config = require("@crypto-signals/config");
-const { getTimeDiff } = require("@crypto-signals/utils");
+const { getTimeDiff, benchmark } = require("@crypto-signals/utils");
 const { getIndicatorsValues, getOHLCValues } = require("./utils");
 
 const init = async () => {
@@ -26,42 +26,50 @@ const init = async () => {
         const { symbol } = request.query;
         const candlesToUpdate = request.payload;
 
-        console.log("candlesToUpdate.length", candlesToUpdate.length);
+        const toUpdate = await benchmark(
+          () =>
+            CandleModel.find({
+              id: { $in: candlesToUpdate }
+            }).sort({ open_time: 1 }),
+          `${symbol} - toUpdate find`
+        );
 
-        const toUpdate = await CandleModel.find({
-          id: { $in: candlesToUpdate }
-        }).sort({ open_time: 1 });
-        console.time(`${symbol} - test candle processor`);
         for (const candle of toUpdate) {
-          const candles = await CandleModel.find({
-            $and: [
-              { exchange: config.exchange },
-              { symbol },
-              { interval: config.interval },
-              {
-                open_time: {
-                  $gte: candle.open_time - getTimeDiff(155, config.interval)
-                }
-              },
-              { open_time: { $lte: candle.open_time } }
-            ]
-          })
-            .hint("exchange_1_symbol_1_interval_1_open_time_1")
-            .sort({ open_time: 1 })
-            .then(found => found.map(c => c.toJSON()));
+          const candles = await benchmark(
+            () =>
+              CandleModel.find({
+                $and: [
+                  { exchange: config.exchange },
+                  { symbol },
+                  { interval: config.interval },
+                  {
+                    open_time: {
+                      $gte: candle.open_time - getTimeDiff(155, config.interval)
+                    }
+                  },
+                  { open_time: { $lte: candle.open_time } }
+                ]
+              })
+                .hint("exchange_1_symbol_1_interval_1_open_time_1")
+                .sort({ open_time: 1 })
+                .then(found => found.map(c => c.toJSON())),
+            `${symbol} - find candles`
+          );
 
           if (candles.length >= 150) {
             const ohlc = getOHLCValues(candles);
-            const indicators = await getIndicatorsValues(ohlc, candles);
+            const indicators = await benchmark(
+              () => getIndicatorsValues(ohlc, candles),
+              `${symbol} - get indicators`
+            );
 
-            await CandleModel.updateOne(
-              { id: candle.id },
-              { $set: indicators }
+            await benchmark(
+              () =>
+                CandleModel.updateOne({ id: candle.id }, { $set: indicators }),
+              `${symbol} - updateOne`
             );
           }
         }
-
-        console.timeEnd(`${symbol} - test candle processor`);
         return h.response();
       } catch (error) {
         console.error(error);

@@ -31,7 +31,7 @@ const init = async () => {
         const toUpdate = await CandleModel.find({
           id: { $in: candlesToUpdate }
         }).sort({ open_time: 1 });
-        console.time("test candlle processor");
+        console.time(`${symbol} - test candle processor`);
         for (const candle of toUpdate) {
           const candles = await CandleModel.find({
             $and: [
@@ -61,7 +61,7 @@ const init = async () => {
           }
         }
 
-        console.timeEnd("test candlle processor");
+        console.timeEnd(`${symbol} - test candle processor`);
         return h.response();
       } catch (error) {
         console.error(error);

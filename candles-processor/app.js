@@ -26,10 +26,12 @@ const init = async () => {
         const { symbol } = request.query;
         const candlesToUpdate = request.payload;
 
+        console.log("candlesToUpdate.length", candlesToUpdate.length);
+
         const toUpdate = await CandleModel.find({
           id: { $in: candlesToUpdate }
         }).sort({ open_time: 1 });
-
+        console.time("test candlle processor");
         for (const candle of toUpdate) {
           const candles = await CandleModel.find({
             $and: [
@@ -58,6 +60,8 @@ const init = async () => {
             );
           }
         }
+
+        console.timeEnd("test candlle processor");
         return h.response();
       } catch (error) {
         console.error(error);

@@ -55,9 +55,7 @@ const init = async () => {
 
         const count = await CandleModel.countDocuments({
           $and: [
-            { exchange: config.exchange },
             { symbol },
-            { interval: config.interval },
             {
               open_time: {
                 $gte: Date.now() - getTimeDiff(155, config.interval)
@@ -74,9 +72,7 @@ const init = async () => {
         //last 10
         const candles = await CandleModel.find({
           $and: [
-            { exchange: config.exchange },
             { symbol },
-            { interval: config.interval },
             {
               open_time: {
                 $gte: Date.now() - getTimeDiff(10, config.interval)
@@ -85,7 +81,7 @@ const init = async () => {
             { open_time: { $lte: Date.now() } }
           ]
         })
-          .hint("exchange_1_symbol_1_interval_1_open_time_1")
+          .hint("symbol_1_open_time_1")
           .sort({ open_time: 1 });
 
         let [sliced_last_candle] = candles.slice(-1);

@@ -262,16 +262,14 @@ exports.persist = async function (request, h) {
           { ordered: false }
         );
 
-        await Promise.all([
-          candles_processor_microservice.post(
-            `?symbol=${candle.symbol}`,
-            toUpdate.map(c => c.id)
-          ),
-          signals_performance_microservice.post(
-            `?symbol=${candle.symbol}`,
-            toUpdate
-          )
-        ]);
+        await candles_processor_microservice.post(
+          `?symbol=${candle.symbol}`,
+          toUpdate.map(c => c.id)
+        );
+        await signals_performance_microservice.post(
+          `?symbol=${candle.symbol}`,
+          toUpdate
+        );
       }
       await delAsync(`${candle.symbol}_candles_persist_lock`);
 

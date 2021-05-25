@@ -370,6 +370,13 @@ const getSupertrend = async (candles, ohlc) => {
 };
 
 const getCumulativeIndicator = async ({ candles, ohlc, fn, getter }) => {
+  console.log(
+    `${candles[0].symbol} - Cumulative indicator (${new Date(
+      candles[0].open_time
+    ).toISOString()} - ${new Date(
+      candles[candles.length - 1].open_time
+    ).toISOString()})`
+  );
   const [result] = await candles
     .reduce(async (p_acc, candle, index, array) => {
       const acc = await p_acc;

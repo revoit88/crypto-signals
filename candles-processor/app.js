@@ -39,7 +39,6 @@ const init = async () => {
             () =>
               CandleModel.find({
                 $and: [
-                  { exchange: config.exchange },
                   { symbol },
                   {
                     open_time: {
@@ -49,7 +48,7 @@ const init = async () => {
                   { open_time: { $lte: candle.open_time } }
                 ]
               })
-                .hint("exchange_1_symbol_1_open_time_1")
+                .hint("symbol_1_open_time_1")
                 .sort({ open_time: 1 })
                 .then(found => found.map(c => c.toJSON())),
             `${symbol} - find candles`

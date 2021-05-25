@@ -17,8 +17,7 @@ const {
   positions_interval,
   signals_interval,
   exchange,
-  interval,
-  signals_performance_microservice_url
+  interval
 } = require("@crypto-signals/config");
 const qs = require("querystring");
 
@@ -268,14 +267,10 @@ exports.persist = async function (request, h) {
             `?symbol=${candle.symbol}`,
             toUpdate.map(c => c.id)
           ),
-          ...(signals_performance_microservice_url
-            ? [
-                signals_performance_microservice.post(
-                  `?symbol=${candle.symbol}`,
-                  toUpdate
-                )
-              ]
-            : [])
+          signals_performance_microservice.post(
+            `?symbol=${candle.symbol}`,
+            toUpdate
+          )
         ]);
       }
       await delAsync(`${candle.symbol}_candles_persist_lock`);

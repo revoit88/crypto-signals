@@ -41,7 +41,6 @@ const init = async () => {
                 $and: [
                   { exchange: config.exchange },
                   { symbol },
-                  { interval: config.interval },
                   {
                     open_time: {
                       $gte: candle.open_time - getTimeDiff(155, config.interval)
@@ -50,7 +49,7 @@ const init = async () => {
                   { open_time: { $lte: candle.open_time } }
                 ]
               })
-                .hint("exchange_1_symbol_1_interval_1_open_time_1")
+                .hint("exchange_1_symbol_1_open_time_1")
                 .sort({ open_time: 1 })
                 .then(found => found.map(c => c.toJSON())),
             `${symbol} - find candles`

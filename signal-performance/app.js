@@ -30,6 +30,15 @@ const init = async () => {
         const week = milliseconds.week;
         const month = day * 30;
         const now = Date.now();
+        const ninetyDays = month * 3;
+
+        const days = [
+          [day, 1],
+          [threeDays, 3],
+          [week, 7],
+          [month, 30],
+          [ninetyDays, 90]
+        ];
 
         const signals = await SignalModel.find(
           {
@@ -37,21 +46,21 @@ const init = async () => {
               { exchange: config.exchange },
               { symbol: symbol },
               { status: "closed" },
-              { close_time: { $gt: now - month } },
+              { close_time: { $gt: now - ninetyDays } },
               { close_time: { $lt: now } }
             ]
           },
           {
             close_time: 1,
             price: 1,
-            high1d: 1,
-            high3d: 1,
-            high7d: 1,
-            high30: 1,
-            low1d: 1,
-            low3d: 1,
-            low7d: 1,
-            low30d: 1
+            ...days.reduce(
+              (acc, [_, prop]) => ({
+                ...acc,
+                [`high${prop}d`]: 1,
+                [`low${prop}d`]: 1
+              }),
+              {}
+            )
           }
         ).hint("exchange_1_symbol_1_status_1_close_time_-1");
 
@@ -61,13 +70,6 @@ const init = async () => {
 
         const updates = signals
           .map(signal => {
-            const days = [
-              [day, "1d"],
-              [threeDays, "3d"],
-              [week, "7d"],
-              [month, "30d"]
-            ];
-
             const toUpdate = candles.reduce((acc, candle) => {
               const change = getChange(candle.close_price, signal.price);
 
@@ -75,16 +77,16 @@ const init = async () => {
                 ...acc,
                 ...days.reduce((daysAcc, [time, prop]) => {
                   return signal.close_time + time > now &&
-                    change > signal[`high${prop}`] &&
-                    change > (acc[`high${prop}`] ?? 0)
-                    ? { ...daysAcc, [`high${prop}`]: change }
+                    change > signal[`high${prop}d`] &&
+                    change > (acc[`high${prop}d`] ?? 0)
+                    ? { ...daysAcc, [`high${prop}d`]: change }
                     : daysAcc;
                 }, {}),
                 ...days.reduce((daysAcc, [time, prop]) => {
                   return signal.close_time + time > now &&
-                    change < signal[`low${prop}`] &&
-                    change < (acc[`low${prop}`] ?? 0)
-                    ? { ...daysAcc, [`low${prop}`]: change }
+                    change < signal[`low${prop}d`] &&
+                    change < (acc[`low${prop}d`] ?? 0)
+                    ? { ...daysAcc, [`low${prop}d`]: change }
                     : daysAcc;
                 }, {})
               };

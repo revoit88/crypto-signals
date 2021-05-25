@@ -52,10 +52,12 @@ const SignalSchema = new Schema(
     high3d: { type: Number, default: 0 },
     high7d: { type: Number, default: 0 },
     high30d: { type: Number, default: 0 },
+    high90d: { type: Number, default: 0 },
     low1d: { type: Number, default: 0 },
     low3d: { type: Number, default: 0 },
     low7d: { type: Number, default: 0 },
-    low30d: { type: Number, default: 0 }
+    low30d: { type: Number, default: 0 },
+    low90d: { type: Number, default: 0 }
   },
   { timestamps: true }
 );

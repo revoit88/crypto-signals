@@ -46,7 +46,6 @@ const init = async () => {
           })
             .hint("symbol_1_open_time_1")
             .sort({ open_time: 1 });
-          // .then(found => found.map(c => c.toJSON()));
 
           if (candles.length >= 150) {
             const ohlc = getOHLCValues(candles);

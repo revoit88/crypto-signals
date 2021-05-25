@@ -55,13 +55,7 @@ module.exports = {
       method: "POST",
       path: "/broadcast",
       handler: Controller.broadcast,
-      options: {
-        auth: {
-          access: {
-            scope: ["observer"]
-          }
-        }
-      }
+      options: { auth: { access: { scope: ["observer", "microservice"] } } }
       // options: {
       //   validate: {
       //     payload: joi.object({

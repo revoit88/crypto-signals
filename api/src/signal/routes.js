@@ -68,11 +68,7 @@ module.exports = {
       path: "/broadcast",
       handler: Controller.broadcast,
       options: {
-        auth: {
-          access: {
-            scope: ["observer"]
-          }
-        },
+        auth: { access: { scope: ["observer", "microservice"] } },
         validate: {
           // payload: joi.object({
           //   symbol: joi

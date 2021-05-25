@@ -60,8 +60,7 @@ const init = async () => {
               open_time: {
                 $gte: Date.now() - getTimeDiff(155, config.interval)
               }
-            },
-            { open_time: { $lte: Date.now() } }
+            }
           ]
         });
 
@@ -77,8 +76,7 @@ const init = async () => {
               open_time: {
                 $gte: Date.now() - getTimeDiff(10, config.interval)
               }
-            },
-            { open_time: { $lte: Date.now() } }
+            }
           ]
         })
           .hint("symbol_1_open_time_1")

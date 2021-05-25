@@ -226,16 +226,14 @@ exports.persist = async function (request, h) {
     };
 
     if (
-      Date.now() - (last_signals_process_date || 0) >
-        signals_interval * milliseconds.seconds * 2 &&
+      Date.now() - (last_signals_process_date || 0) > signals_interval * 2 &&
       !!candles_persist_lock
     ) {
       await delAsync(`${candle.symbol}_candles_persist_lock`);
     }
 
     if (
-      Date.now() - (last_signals_process_date || 0) >
-        signals_interval * milliseconds.seconds &&
+      Date.now() - (last_signals_process_date || 0) > signals_interval &&
       !candles_persist_lock
     ) {
       await setAsync(`${candle.symbol}_candles_persist_lock`, true);
@@ -274,8 +272,7 @@ exports.persist = async function (request, h) {
       await delAsync(`${candle.symbol}_candles_persist_lock`);
 
       if (
-        Date.now() - (last_positions_process_date || 0) >
-          positions_interval * milliseconds.seconds &&
+        Date.now() - (last_positions_process_date || 0) > positions_interval &&
         !candles_persist_lock
       ) {
         await positions_processor_microservice.post(`?symbol=${candle.symbol}`);

@@ -17,8 +17,10 @@ module.exports = {
   zignaly_provider_key: process.env.ZIGNALY_PROVIDER_KEY,
   environment: process.env.NODE_ENV,
   position_percentage_size: process.env.POSITION_PERCENTAGE_SIZE,
-  signals_interval: +process.env.PROCESS_SIGNALS_INTERVAL,
-  positions_interval: +process.env.PROCESS_POSITIONS_INTERVAL,
+  signals_interval:
+    +process.env.PROCESS_SIGNALS_INTERVAL * milliseconds.seconds,
+  positions_interval:
+    +process.env.PROCESS_POSITIONS_INTERVAL * milliseconds.seconds,
   iron_secret: process.env.IRON_SECRET,
   binance_api_url: process.env.BINANCE_API_URL,
   binance_api_key: process.env.BINANCE_API_KEY,

@@ -400,8 +400,10 @@ const getATRStop = async (candles, ohlc) => {
   }
   const { high, low, close } = ohlc;
 
+  const [latest_candle] = candles.slice(-1);
+
   const parseValue = value => {
-    return toSymbolPrecision(value, candles[0].symbol);
+    return toSymbolPrecision(value, latest_candle.symbol);
   };
 
   const factor = 3;

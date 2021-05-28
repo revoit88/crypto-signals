@@ -314,7 +314,7 @@ exports.getCandlesFromBinance = async function (request, h) {
       request.server.plugins.mongoose.connection.model("Candle");
 
     if (!getBooleanValue(force)) {
-      const count = await CandleModel.count({
+      const count = await CandleModel.countDocuments({
         $and: [
           { exchange },
           { symbol },

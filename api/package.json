@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start app.js --name crypto-signals-api",
-    "stop": "pm2 stop crypto-signals-api && pm2 delete crypto-signals-api",
+    "start": "pm2 start app.js --name api",
+    "stop": "pm2 stop api && pm2 delete api",
     "restart": "npm stop && npm start"
   },
   "author": "",

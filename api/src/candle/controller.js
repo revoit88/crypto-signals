@@ -309,9 +309,24 @@ exports.persist = async function (request, h) {
 
 exports.getCandlesFromBinance = async function (request, h) {
   try {
-    const { symbol } = request.query;
+    const { symbol, force } = request.query;
     const CandleModel =
       request.server.plugins.mongoose.connection.model("Candle");
+
+    if (!getBooleanValue(force)) {
+      const count = await CandleModel.count({
+        $and: [
+          { exchange },
+          { symbol },
+          { interval },
+          { open_time: { $gte: Date.now() - getTimeDiff(160, interval) } }
+        ]
+      });
+
+      if (count >= 150) {
+        return h.response();
+      }
+    }
 
     const query = qs.stringify({
       symbol,

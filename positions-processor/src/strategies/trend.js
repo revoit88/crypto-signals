@@ -33,14 +33,17 @@ module.exports = db => {
       ]
     })
       .hint("symbol_1_open_time_1")
-      .sort({ open_time: 1 });
+      .sort({ open_time: 1 })
+      .lean();
 
     const [previous_candle, candle] = candles.slice(-2);
 
     try {
       const positions = await PositionModel.find({
         $and: [{ symbol }, { status: "open" }]
-      }).hint("symbol_1_status_1");
+      })
+        .hint("symbol_1_status_1")
+        .lean();
 
       if (!positions.length) {
         return;

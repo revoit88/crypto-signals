@@ -80,7 +80,8 @@ const init = async () => {
           ]
         })
           .hint("symbol_1_open_time_1")
-          .sort({ open_time: 1 });
+          .sort({ open_time: 1 })
+          .lean();
 
         let [sliced_last_candle] = candles.slice(-1);
         let last_candle = cloneObject(sliced_last_candle);
@@ -96,7 +97,8 @@ const init = async () => {
           ]
         })
           .hint("symbol_1_status_1_trigger_time_-1")
-          .sort({ trigger_time: -1 });
+          .sort({ trigger_time: -1 })
+          .lean();
 
         if (!open_signals.length) {
           const last_closed_signal = await SignalModel.findOne({
@@ -107,7 +109,8 @@ const init = async () => {
             ]
           })
             .hint("symbol_1_status_1_close_time_-1")
-            .sort({ close_time: -1 });
+            .sort({ close_time: -1 })
+            .lean();
 
           const last_open_position = await PositionModel.findOne({
             $and: [
@@ -117,7 +120,8 @@ const init = async () => {
             ]
           })
             .hint("symbol_1_status_1_open_time_-1")
-            .sort({ open_time: -1 });
+            .sort({ open_time: -1 })
+            .lean();
 
           const [triggered_signal] = calculateBuySignal(
             candles,
@@ -148,7 +152,9 @@ const init = async () => {
                     { exchange: open_signal.exchange },
                     { symbol: open_signal.symbol }
                   ]
-                }).hint("exchange_1_symbol_1");
+                })
+                  .hint("exchange_1_symbol_1")
+                  .lean();
 
                 if (
                   Number(last_candle.close_price) >=

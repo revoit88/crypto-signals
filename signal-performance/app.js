@@ -61,7 +61,9 @@ const init = async () => {
               {}
             )
           }
-        ).hint("symbol_1_status_1_close_time_-1");
+        )
+          .hint("symbol_1_status_1_close_time_-1")
+          .lean();
 
         if (!signals.length) {
           return h.response();

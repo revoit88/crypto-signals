@@ -18,7 +18,7 @@ const MarketSchema = new Schema(
     trading: { type: Boolean, default: false },
     broadcast_signals: { type: Boolean, default: true },
     send_to_profit_sharing: { type: Boolean, default: false },
-    use_main_account: { type: Boolean, default: true }
+    use_main_account: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

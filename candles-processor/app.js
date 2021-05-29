@@ -30,7 +30,8 @@ const init = async () => {
           id: { $in: candlesToUpdate }
         })
           .hint("id_1")
-          .sort({ open_time: 1 });
+          .sort({ open_time: 1 })
+          .lean();
 
         for (const candle of toUpdate) {
           const candles = await CandleModel.find({
@@ -45,7 +46,8 @@ const init = async () => {
             ]
           })
             .hint("symbol_1_open_time_1")
-            .sort({ open_time: 1 });
+            .sort({ open_time: 1 })
+            .lean();
 
           if (candles.length >= 150) {
             const ohlc = getOHLCValues(candles);

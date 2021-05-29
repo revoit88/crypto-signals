@@ -62,68 +62,36 @@ const getOHLCValues = array => {
   return ohlc;
 };
 
-/**
- *
- * @param {Array<Number[]>} data
- * @returns {Promise<Number>} Relative Strength Signal value
- */
-const getRSI = data => {
-  return new Promise(async (resolve, reject) => {
-    tulind.indicators.rsi.indicator(data, [14], async (err, [res]) => {
-      if (err) {
-        return reject(err);
-      }
-      const stoch = await getStochRSI(res);
-      return resolve({ rsi: validateValue(res[res.length - 1]), ...stoch });
-    });
-  });
-};
-const getBollingerBands = (data, last_price) => {
+const getBollingerBands = (data, parseFn = validateValue) => {
   return new Promise(async (resolve, reject) => {
     tulind.indicators.bbands.indicator(data, [20, 2], (err, res) => {
       if (err) {
         return reject(err);
       }
 
-      const getDirection = (array, index) => {
-        if (array[1][index - 1] > array[1][index]) {
+      const getDirection = array => {
+        const length = array.length - 1;
+        if (array[length - 1] > array[length]) {
           return "down";
         }
-        if (array[1][index - 1] < array[1][index]) {
+        if (array[length - 1] < array[length]) {
           return "up";
         }
         return "side";
       };
 
-      const x = res[0].map((i, index) => ({
-        bbands_lower: validateValue(i),
-        bbands_middle: validateValue(res[1][index]),
-        bbands_upper: validateValue(res[2][index]),
-        bbands_percent_b: validateValue((last_price - i) / (res[2][index] - i)),
-        bbands_bandwith: validateValue((res[2][index] - i) / res[1][index]),
-        bbands_deviation: validateValue((res[2][index] - res[1][index]) / 2),
-        bbands_deviation_percent: validateValue(
-          ((res[2][index] - res[1][index]) / res[1][index]) * 100
-        ),
-        bbands_direction: getDirection(res, index)
-      }));
-      return resolve(x.pop());
-    });
-  });
-};
+      const [bbabds_lower_result, bbands_middle_result, bbands_upper_result] =
+        res;
+      const [bbands_lower] = bbabds_lower_result.slice(-1);
+      const [bbands_middle] = bbands_middle_result.slice(-1);
+      const [bbands_upper] = bbands_upper_result.slice(-1);
 
-/**
- *
- * @param {Array<Number[]>} data
- * @returns {Promise<Number>} Williams %R value
- */
-const getWilliamsR = data => {
-  return new Promise(async (resolve, reject) => {
-    tulind.indicators.willr.indicator(data, [14], (err, [res]) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve(validateValue(res.pop()));
+      return resolve({
+        bbands_lower: parseFn(bbands_lower),
+        bbands_middle: parseFn(bbands_middle),
+        bbands_upper: parseFn(bbands_upper),
+        bbands_direction: getDirection(bbands_middle_result)
+      });
     });
   });
 };
@@ -133,7 +101,7 @@ const getWilliamsR = data => {
  * @param {Array<Number[]>} data
  * @returns {Promise<Number>} Exponential Moving Average value
  */
-const getEMA = (data, period = 5, all = false) => {
+const getEMA = (data, period = 5, all = false, parseFn = validateValue) => {
   return new Promise(async (resolve, reject) => {
     tulind.indicators.ema.indicator(data, [period], (err, [res]) => {
       if (err) {
@@ -142,7 +110,7 @@ const getEMA = (data, period = 5, all = false) => {
       if (all) {
         return resolve(res);
       }
-      return resolve(validateValue(res.pop()));
+      return resolve(parseFn(res.pop()));
     });
   });
 };
@@ -152,13 +120,13 @@ const getEMA = (data, period = 5, all = false) => {
  * @param {Array<Number[]>} data
  * @returns {Promise<Number>} Simple Moving Average value
  */
-const getSMA = (data, periods = 28) => {
+const getSMA = (data, periods = 28, parseFn = validateValue) => {
   return new Promise(async (resolve, reject) => {
     tulind.indicators.sma.indicator(data, [periods], (err, [res]) => {
       if (err) {
         return reject(err);
       }
-      return resolve(validateValue(res.pop()));
+      return resolve(parseFn(res.pop()));
     });
   });
 };
@@ -168,17 +136,22 @@ const getSMA = (data, periods = 28) => {
  * @param {Array<Number[]>} data
  * @returns {Promise<Number>} Average True Range value
  */
-const getATR = (data, periods = 14, return_sma = true) => {
+const getATR = (
+  data,
+  periods = 14,
+  return_sma = true,
+  parseFn = validateValue
+) => {
   return new Promise(async (resolve, reject) => {
     tulind.indicators.atr.indicator(data, [periods], async (err, [res]) => {
       if (err) {
         return reject(err);
       }
       if (!return_sma) {
-        return resolve(validateValue(res.pop()));
+        return resolve(parseFn(res.pop()));
       }
-      const sma = await getSMA([res], 28);
-      return resolve({ atr: validateValue(res.pop()), atr_sma: sma });
+      const sma = await getSMA([res], 28, parseFn);
+      return resolve({ atr: parseFn(res.pop()), atr_sma: sma });
     });
   });
 };
@@ -222,71 +195,21 @@ const getOBV = (data, return_sma = true) => {
   });
 };
 
-/**
- *
- * @param {Array<Number[]>} data
- * @returns {Promise<Number>} Parabolic SAR value
- */
-const getParabolicSAR = data => {
-  return new Promise(async (resolve, reject) => {
-    tulind.indicators.psar.indicator(data, [0.02, 0.2], (err, [res]) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve(validateValue(res.pop()));
-    });
-  });
-};
 
-const getMACD = data => {
+const getMACD = (data, parseFn = validateValue) => {
   return new Promise(async (resolve, reject) => {
     tulind.indicators.macd.indicator(data, [12, 26, 9], (err, res) => {
       if (err) {
         return reject(err);
       }
-      const x = res[0].map((i, index) => ({
-        macd: validateValue(i),
-        macd_signal: validateValue(res[1][index]),
-        macd_histogram: validateValue(res[2][index])
-      }));
-      return resolve(x.pop());
-    });
-  });
-};
-
-const getStochRSI = data => {
-  return new Promise(async (resolve, reject) => {
-    if (!data.length) {
-      return resolve(null);
-    }
-    tulind.indicators.stoch.indicator(
-      [data, data, data],
-      [14, 3, 3],
-      (err, res) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve({
-          stoch_rsi_k: validateValue(res[0].pop()),
-          stoch_rsi_d: validateValue(res[1].pop())
-        });
-      }
-    );
-  });
-};
-
-const getStochasticOscillator = data => {
-  return new Promise(async (resolve, reject) => {
-    if (!data.length) {
-      return resolve(null);
-    }
-    tulind.indicators.stoch.indicator(data, [14, 3, 3], (err, res) => {
-      if (err) {
-        return reject(err);
-      }
+      const [macd_result, signal_result, histogram_result] = res;
+      const [macd] = macd_result.slice(-1);
+      const [macd_signal] = signal_result.slice(-1);
+      const [macd_histogram] = histogram_result.slice(-1);
       return resolve({
-        stoch_k: validateValue(res[0].pop()),
-        stoch_d: validateValue(res[1].pop())
+        macd: parseFn(macd),
+        macd_signal: parseFn(macd_signal),
+        macd_histogram: parseFn(macd_histogram)
       });
     });
   });
@@ -335,7 +258,7 @@ const getDMI = (data, periods = 14) => {
  * @param {Candle[]} candles
  * @param {OHLC} ohlc
  */
-const getSupertrend = async (candles, ohlc) => {
+const getSupertrend = async (candles, ohlc, parseFn = validateValue) => {
   if (candles.length === 1) {
     return {};
   }
@@ -344,20 +267,22 @@ const getSupertrend = async (candles, ohlc) => {
   const factor = 3;
   const pd = 7;
 
-  const atr = await getATR([high, low, close], pd, false);
+  const atr = await getATR([high, low, close], pd, false, parseFn);
 
   const up = hl2[hl2.length - 1] - factor * atr;
   const dn = hl2[hl2.length - 1] + factor * atr;
 
-  const trend_up =
+  const trend_up = parseFn(
     close[close.length - 2] > candles[candles.length - 2]?.trend_up
       ? Math.max(up, candles[candles.length - 2]?.trend_up)
-      : up;
+      : up
+  );
 
-  const trend_down =
+  const trend_down = parseFn(
     close[close.length - 2] < candles[candles.length - 2]?.trend_down
       ? Math.min(dn, candles[candles.length - 2]?.trend_down)
-      : dn;
+      : dn
+  );
 
   const trend =
     close[close.length - 1] > candles[candles.length - 2]?.trend_down
@@ -369,7 +294,13 @@ const getSupertrend = async (candles, ohlc) => {
   return { trend, trend_up, trend_down };
 };
 
-const getCumulativeIndicator = async ({ candles, ohlc, fn, getter }) => {
+const getCumulativeIndicator = async ({
+  candles,
+  ohlc,
+  fn,
+  getter,
+  parseFn
+}) => {
   const [result] = await candles
     .reduce(async (p_acc, candle, index, array) => {
       const acc = await p_acc;
@@ -382,7 +313,7 @@ const getCumulativeIndicator = async ({ candles, ohlc, fn, getter }) => {
         {}
       );
 
-      const value = await fn(sliced_candles, sliced_ohlc);
+      const value = await fn(sliced_candles, sliced_ohlc, parseFn);
       return acc.concat({ ...candle, ...value });
     }, Promise.resolve([]))
     .then(r => r.slice(-1));
@@ -394,20 +325,16 @@ const getCumulativeIndicator = async ({ candles, ohlc, fn, getter }) => {
  * @param {Candle[]} candles
  * @param {OHLC} ohlc
  */
-const getATRStop = async (candles, ohlc) => {
+const getATRStop = async (candles, ohlc, parseFn = validateValue) => {
   if (candles.length === 1) {
     return {};
   }
   const { high, low, close } = ohlc;
 
-  const parseValue = value => {
-    return toSymbolPrecision(value, candles[0].symbol);
-  };
-
   const factor = 3;
   const pd = 5;
 
-  const atr = await getATR([high, low, close], pd, false);
+  const atr = await getATR([high, low, close], pd, false, parseFn);
   const loss = atr * factor;
 
   const [previous_candle] = candles.slice(-2);
@@ -416,23 +343,23 @@ const getATRStop = async (candles, ohlc) => {
   let atr_stop = 0;
 
   if (
-    current_close > parseValue(nz(previous_candle.atr_stop)) &&
-    previous_close > parseValue(nz(previous_candle.atr_stop))
+    current_close > parseFn(nz(previous_candle.atr_stop)) &&
+    previous_close > parseFn(nz(previous_candle.atr_stop))
   ) {
-    atr_stop = parseValue(
+    atr_stop = parseFn(
       Math.max(nz(previous_candle.atr_stop), current_close - loss)
     );
   } else if (
-    current_close < parseValue(nz(previous_candle.atr_stop)) &&
-    previous_close < parseValue(nz(previous_candle.atr_stop))
+    current_close < parseFn(nz(previous_candle.atr_stop)) &&
+    previous_close < parseFn(nz(previous_candle.atr_stop))
   ) {
-    atr_stop = parseValue(
+    atr_stop = parseFn(
       Math.min(nz(previous_candle.atr_stop), current_close + loss)
     );
-  } else if (current_close > parseValue(nz(previous_candle.atr_stop))) {
-    atr_stop = parseValue(current_close - loss);
+  } else if (current_close > parseFn(nz(previous_candle.atr_stop))) {
+    atr_stop = parseFn(current_close - loss);
   } else {
-    atr_stop = parseValue(current_close + loss);
+    atr_stop = parseFn(current_close + loss);
   }
 
   return { atr_stop };
@@ -463,12 +390,6 @@ const getCHATR = async (candles, ohlc) => {
   };
 };
 
-const promisify = (key, fn, args) => {
-  return new Promise(async resolve => {
-    return resolve({ [key]: await fn(...args) });
-  });
-};
-
 /**
  *
  * @param {OHLC} ohlc Values
@@ -477,14 +398,15 @@ const promisify = (key, fn, args) => {
 const getIndicatorsValues = (ohlc, candles) => {
   const { high, close, low, volume, hl2 } = ohlc;
   const [previous_candle, current_candle] = cloneObject(candles.slice(-2));
+  const parseValue = v => toSymbolPrecision(v, current_candle.symbol);
   return new Promise(async resolve => {
     const promises = [
-      getATR([high, low, close]),
+      getATR([high, low, close], undefined, undefined, parseValue),
       getOBV([close, volume]),
-      promisify("volume_sma", getSMA, [[volume], 28]),
+      getSMA([volume], 28).then(v => ({ volume_sma: v })),
       getDMI([high, low, close]),
-      getBollingerBands([close], current_candle.close_price),
-      getMACD([close]),
+      getBollingerBands([close], parseValue),
+      getMACD([close], parseValue),
       ...(!previous_candle.trend && !current_candle.trend
         ? [
             getCumulativeIndicator({
@@ -495,30 +417,33 @@ const getIndicatorsValues = (ohlc, candles) => {
                 trend_up,
                 trend_down
               }),
-              fn: getSupertrend
+              fn: getSupertrend,
+              parseFn: parseValue
             })
           ]
-        : [getSupertrend(candles, ohlc)]),
+        : [getSupertrend(candles, ohlc, parseValue)]),
       ...(!previous_candle.atr_stop && !current_candle.atr_stop
         ? [
             getCumulativeIndicator({
               candles,
               ohlc,
               getter: ({ atr_stop } = {}) => ({ atr_stop }),
-              fn: getATRStop
+              fn: getATRStop,
+              parseFn: parseValue
             })
           ]
-        : [getATRStop(candles, ohlc)]),
+        : [getATRStop(candles, ohlc, parseValue)]),
 
       getCHATR(candles, ohlc)
     ];
 
     const p = await Promise.all(promises);
     const result = p.reduce((acc, v) => ({ ...acc, ...v }), {});
+    const mesa_result = mesa(hl2);
     return resolve({
       ...result,
-      ...mesa(hl2)
-      // ...(await getMACD([close]))
+      mama: parseValue(mesa_result.mama),
+      fama: parseValue(mesa_result.fama)
     });
   });
 };

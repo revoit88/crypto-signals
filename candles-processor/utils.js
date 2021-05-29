@@ -403,7 +403,12 @@ const getATRStop = async (candles, ohlc) => {
   const [latest_candle] = candles.slice(-1);
 
   const parseValue = value => {
-    return toSymbolPrecision(value, latest_candle.symbol);
+    try {
+      return toSymbolPrecision(value, latest_candle.symbol);
+    } catch (error) {
+      console.log(candles.slice(-1));
+      throw error;
+    }
   };
 
   const factor = 3;
@@ -481,27 +486,10 @@ const getIndicatorsValues = (ohlc, candles) => {
   const [previous_candle, current_candle] = cloneObject(candles.slice(-2));
   return new Promise(async resolve => {
     const promises = [
-      // getRSI([close]),
-      // promisify("rsi", getRSI, [[close]]),
-      // promisify("will_r", getWilliamsR, [[high, low, close]]),
-      // promisify("ema_7", getEMA, [[close], 7]),
-      // promisify("ema_25", getEMA, [[close], 25]),
-      // promisify("ema_100", getEMA, [[close], 100]),
-      // promisify("sma", getSMA, [[close]]),
-      // promisify("atr_sma", getSMA, [
-      //   [await getATR([high, low, close], true)],
-      //   28
-      // ]),
       getATR([high, low, close]),
       getOBV([close, volume]),
       promisify("volume_sma", getSMA, [[volume], 28]),
-      // promisify("sma_50", getSMA, [[close], 50]),
-      // promisify("sma_100", getSMA, [[close], 100]),
-      // promisify("sma_200", getSMA, [[close], 200]),
-      // promisify("parabolic_sar", getParabolicSAR, [[high, low]]),
       getDMI([high, low, close]),
-      // getStochRSI(await getRSI([close], true)),
-      // getStochasticOscillator([high, close, low]),
       getBollingerBands([close], current_candle.close_price),
       getMACD([close]),
       ...(!previous_candle.trend && !current_candle.trend

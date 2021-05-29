@@ -371,19 +371,28 @@ const getSupertrend = async (candles, ohlc) => {
 
 const getCumulativeIndicator = async ({ candles, ohlc, fn, getter }) => {
   const [result] = await candles
-    .reduce(async (p_acc, candle, index, array) => {
-      const acc = await p_acc;
-      const sliced_candles = array.slice(0, index + 1).map(sliced => ({
-        ...sliced,
-        ...getter(acc.find(v => v.id === sliced.id) || {})
-      }));
-      const sliced_ohlc = Object.entries(ohlc).reduce(
-        (acc, [key, value]) => ({ ...acc, [key]: value.slice(0, index + 1) }),
-        {}
-      );
+    .reduce((p_acc, candle, index, array) => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const acc = await p_acc;
+          const sliced_candles = array.slice(0, index + 1).map(sliced => ({
+            ...sliced,
+            ...getter(acc.find(v => v.id === sliced.id) || {})
+          }));
+          const sliced_ohlc = Object.entries(ohlc).reduce(
+            (acc, [key, value]) => ({
+              ...acc,
+              [key]: value.slice(0, index + 1)
+            }),
+            {}
+          );
 
-      const value = await fn(sliced_candles, sliced_ohlc);
-      return acc.concat({ ...candle, ...value });
+          const value = await fn(sliced_candles, sliced_ohlc);
+          return resolve(acc.concat({ ...candle, ...value }));
+        } catch (error) {
+          return reject(error);
+        }
+      });
     }, Promise.resolve([]))
     .then(r => r.slice(-1));
   return result;

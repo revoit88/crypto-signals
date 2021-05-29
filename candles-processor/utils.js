@@ -14,6 +14,8 @@ const truncateDecimals = v => Number(Number(v).toFixed(4));
 const validateValue = value =>
   typeof value === "undefined" ? null : truncateDecimals(value);
 
+const invalidNumber = v => typeof v === "undefined" || v === null || isNaN(v);
+
 /**
  *
  * @param {Candle[]} array
@@ -108,7 +110,7 @@ const getEMA = (data, period = 5, all = false, parseFn = validateValue) => {
         return reject(err);
       }
       if (all) {
-        return resolve(res);
+        return resolve((res || []).map(v => parseFn(v)));
       }
       return resolve(parseFn(res.pop()));
     });
@@ -161,16 +163,16 @@ const getATR = (
  * @param {Array<Number[]>} data
  * @returns {Promise<Number>} Average True Range value
  */
-const getTR = (data, all = false) => {
+const getTR = (data, all = false, parseFn = validateValue) => {
   return new Promise(async (resolve, reject) => {
     tulind.indicators.tr.indicator(data, [], async (err, [res]) => {
       if (err) {
         return reject(err);
       }
       if (all) {
-        return resolve(res);
+        return resolve((res || []).map(v => parseFn(v)));
       }
-      return resolve(validateValue(res.pop()));
+      return resolve(parseFn(res.pop()));
     });
   });
 };
@@ -194,7 +196,6 @@ const getOBV = (data, return_sma = true) => {
     });
   });
 };
-
 
 const getMACD = (data, parseFn = validateValue) => {
   return new Promise(async (resolve, reject) => {
@@ -370,23 +371,23 @@ const getATRStop = async (candles, ohlc, parseFn = validateValue) => {
  * @param {Candle[]} candles
  * @param {OHLC} ohlc
  */
-const getCHATR = async (candles, ohlc) => {
+const getCHATR = async (candles, ohlc, parseFn) => {
   if (candles.length === 1) {
     return {};
   }
 
   const { high, low, close } = ohlc;
 
-  const tr = await getTR([high, low, close], true);
-  const tr_ema = await getEMA([tr], 19, true);
+  const tr = await getTR([high, low, close], true, parseFn);
+  const tr_ema = await getEMA([tr], 19, true, parseFn);
   const atrp = tr_ema
     .map((t, i) => [t, close[i]])
-    .map(([t, c]) => (t / c) * 100);
-  const avg = await getEMA([atrp], 28);
+    .map(([t, c]) => parseFn((t / c) * 100));
+  const avg = await getEMA([atrp], 28, undefined, parseFn);
 
   return {
-    ch_atr_ema: toFixedDecimal(nz(avg)),
-    ch_atr: toFixedDecimal(nz(atrp[atrp.length - 1]))
+    ch_atr_ema: nz(avg),
+    ch_atr: nz(atrp[atrp.length - 1])
   };
 };
 
@@ -398,7 +399,8 @@ const getCHATR = async (candles, ohlc) => {
 const getIndicatorsValues = (ohlc, candles) => {
   const { high, close, low, volume, hl2 } = ohlc;
   const [previous_candle, current_candle] = cloneObject(candles.slice(-2));
-  const parseValue = v => toSymbolPrecision(v, current_candle.symbol);
+  const parseValue = v =>
+    invalidNumber(v) ? null : toSymbolPrecision(v, current_candle.symbol);
   return new Promise(async resolve => {
     const promises = [
       getATR([high, low, close], undefined, undefined, parseValue),
@@ -434,7 +436,7 @@ const getIndicatorsValues = (ohlc, candles) => {
           ]
         : [getATRStop(candles, ohlc, parseValue)]),
 
-      getCHATR(candles, ohlc)
+      getCHATR(candles, ohlc, parseValue)
     ];
 
     const p = await Promise.all(promises);

@@ -402,7 +402,7 @@ exports.repeatClosePositions = async function (request, h) {
         signal: 1,
         _id: 1
       }
-    ).then(found => found.map(v => v.toJSON()));
+    ).lean();
 
     for (const position of positions) {
       await api.post(`/positions/broadcast`, {

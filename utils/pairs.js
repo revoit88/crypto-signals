@@ -155,7 +155,7 @@ module.exports = [
   { symbol: "WRXUSDT", priceTickSize: 0.00001, stepSize: 0.1 },
   { symbol: "HIVEUSDT", priceTickSize: 0.0001, stepSize: 0.01 },
   { symbol: "BLZUSDT", priceTickSize: 0.00001, stepSize: 0.1 },
-  { symbol: "SUNUSDT", priceTickSize: 0.001, stepSize: 0.001 },
+  { symbol: "SUNUSDT", priceTickSize: 0.00001, stepSize: 1 },
   { symbol: "GRTUSDT", priceTickSize: 0.00001, stepSize: 0.1 },
   { symbol: "TROYUSDT", priceTickSize: 0.0000001, stepSize: 1.0 },
   { symbol: "CELRUSDT", priceTickSize: 0.00001, stepSize: 0.1 },
@@ -216,5 +216,11 @@ module.exports = [
   { symbol: "POLSUSDT", priceTickSize: 0.001, stepSize: 0.01 },
   { symbol: "MDXUSDT", priceTickSize: 0.0001, stepSize: 0.01 },
   { symbol: "MASKUSDT", priceTickSize: 0.001, stepSize: 0.01 },
-  { symbol: "LPTUSDT", priceTickSize: 0.01, stepSize: 0.01 }
+  { symbol: "LPTUSDT", priceTickSize: 0.01, stepSize: 0.01 },
+  { symbol: "NUUSDT", priceTickSize: 0.0001, stepSize: 1.0 },
+  { symbol: "XVGUSDT", priceTickSize: 0.00001, stepSize: 1.0 },
+  { symbol: "ATAUSDT", priceTickSize: 0.00001, stepSize: 1.0 },
+  { symbol: "GTCUSDT", priceTickSize: 0.01, stepSize: 0.01 },
+  { symbol: "TORNUSDT", priceTickSize: 0.01, stepSize: 0.01 },
+  { symbol: "KEEPUSDT", priceTickSize: 0.0001, stepSize: 1.0 }
 ];

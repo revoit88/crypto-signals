@@ -4,7 +4,13 @@
   "description": "",
   "main": "config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "restart:api": "npm run restart --prefix ./api",
+    "restart:candles-processor": "npm run restart --prefix ./candles-processor",
+    "restart:positions-processor": "npm run restart --prefix ./positions-processor",
+    "restart:signals-performance": "npm run restart --prefix ./signal-performance",
+    "restart:signals-processor": "npm run restart --prefix ./signals-processor",
+    "restart:all": "npm run restart:api && npm run restart:candles-processor && npm run restart:candles-processor && npm run restart:positions-processor && npm run restart:signals-performance && npm run restart:signals-processor"
   },
   "author": "",
   "license": "ISC",

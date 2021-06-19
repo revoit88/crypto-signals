@@ -92,7 +92,7 @@ function getPercentageOfValue(value, percent) {
 /**
  *
  * @param {Number} candles Candles offset
- * @param {"1d"|"4h"|"1h"|"5m"|"1m"} interval Candles interval
+ * @param {"1d"|"4h"|"1h"|"15m"|"5m"|"1m"} interval Candles interval
  * @returns {Number} Time offset
  */
 function getTimeDiff(candles, interval) {
@@ -106,7 +106,7 @@ function getTimeDiff(candles, interval) {
   if (interval === "1h") {
     factor = milliseconds.hour;
   }
-  if (interval === "15min") {
+  if (interval === "15m") {
     factor = milliseconds.minute * 15;
   }
   if (interval === "5m") {

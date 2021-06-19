@@ -1,7 +1,11 @@
 "use strict";
 
 const mongoose = require("mongoose");
-const { pairs, validateNumber } = require("@crypto-signals/utils");
+const {
+  pairs,
+  validateNumber,
+  candle_intervals
+} = require("@crypto-signals/utils");
 const Schema = mongoose.Schema;
 
 const CandleSchema = new Schema(
@@ -10,7 +14,11 @@ const CandleSchema = new Schema(
       type: String,
       required: true,
       validate: value =>
-        String(value).match(/^(binance|kucoin)_.+_(1d|4h|1h|1m)_\d+$/)
+        String(value).match(
+          new RegExp(
+            `^(binance|kucoin)_.+_(${candle_intervals.join("|")})_\d+$`
+          )
+        )
     },
     exchange: {
       type: String,
@@ -32,7 +40,7 @@ const CandleSchema = new Schema(
     interval: {
       type: String,
       required: true,
-      validate: value => ["1d", "4h", "1h", "1m"].includes(value)
+      validate: value => candle_intervals.includes(value)
     },
     open_price: { type: Number, required: true, validate: validateNumber },
     close_price: { type: Number, required: true, validate: validateNumber },

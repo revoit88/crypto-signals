@@ -10,6 +10,8 @@ const milliseconds = {
   week: 36e5 * 24 * 7
 };
 
+const candle_intervals = ["1d", "4h", "1h", "15m", "1m"];
+
 /**
  *
  * @param {Array} array Initial array
@@ -237,6 +239,7 @@ const benchmark = (fn, text) => {
 module.exports = {
   pairs,
   milliseconds,
+  candle_intervals,
   splitArray,
   nz,
   cloneObject,

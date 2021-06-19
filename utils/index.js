@@ -106,6 +106,9 @@ function getTimeDiff(candles, interval) {
   if (interval === "1h") {
     factor = milliseconds.hour;
   }
+  if (interval === "15min") {
+    factor = milliseconds.minute * 15;
+  }
   if (interval === "5m") {
     factor = milliseconds.minute * 5;
   }

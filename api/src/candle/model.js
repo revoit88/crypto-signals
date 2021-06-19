@@ -16,7 +16,7 @@ const CandleSchema = new Schema(
       validate: value =>
         String(value).match(
           new RegExp(
-            `^(binance|kucoin)_.+_(${candle_intervals.join("|")})_\d+$`
+            `^(binance|kucoin)_.+_(${candle_intervals.join("|")})_\\d+$`
           )
         )
     },

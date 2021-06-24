@@ -222,5 +222,7 @@ module.exports = [
   { symbol: "ATAUSDT", priceTickSize: 0.00001, stepSize: 1.0 },
   { symbol: "GTCUSDT", priceTickSize: 0.01, stepSize: 0.01 },
   { symbol: "TORNUSDT", priceTickSize: 0.01, stepSize: 0.01 },
-  { symbol: "KEEPUSDT", priceTickSize: 0.0001, stepSize: 1.0 }
+  { symbol: "KEEPUSDT", priceTickSize: 0.0001, stepSize: 1.0 },
+  { symbol: "ERNUSDT", priceTickSize: 0.001, stepSize: 0.1 },
+  { symbol: "KLAYUSDT", priceTickSize: 0.0001, stepSize: 1 }
 ];

@@ -95,7 +95,9 @@ const CandleSchema = new Schema(
     sma_100: { type: Number, validate: validateNumber },
     sma_200: { type: Number, validate: validateNumber },
     ch_atr: { type: Number, validate: validateNumber },
-    ch_atr_ema: { type: Number, validate: validateNumber }
+    ch_atr_ema: { type: Number, validate: validateNumber },
+    is_pump: { type: Boolean, default: false },
+    is_dump: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

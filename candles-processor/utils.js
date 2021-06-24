@@ -391,6 +391,21 @@ const getCHATR = async (candles, ohlc, parseFn) => {
   };
 };
 
+function getPumpOrDump(ohlc) {
+  const pd = 33 / 100;
+  const { open, high, close, low } = ohlc;
+
+  const getCurrent = array => array[array.length - 1];
+
+  const change = getCurrent(high) - getCurrent(low);
+  const condition_2 = change / getCurrent(low) > pd;
+
+  return {
+    is_pump: getCurrent(close) > getCurrent(open) && condition_2,
+    is_dump: getCurrent(close) < getCurrent(open) && condition_2
+  };
+}
+
 /**
  *
  * @param {OHLC} ohlc Values
@@ -435,7 +450,6 @@ const getIndicatorsValues = (ohlc, candles) => {
             })
           ]
         : [getATRStop(candles, ohlc, parseValue)]),
-
       getCHATR(candles, ohlc, parseValue)
     ];
 
@@ -444,6 +458,7 @@ const getIndicatorsValues = (ohlc, candles) => {
     const mesa_result = mesa(hl2);
     return resolve({
       ...result,
+      ...getPumpOrDump(ohlc),
       mama: parseValue(mesa_result.mama),
       fama: parseValue(mesa_result.fama)
     });

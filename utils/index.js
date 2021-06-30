@@ -1,6 +1,6 @@
 const axios = require("axios");
 const crypto = require("crypto");
-const pairs = require("./pairs");
+const pairs = require("./btc_pairs");
 
 const milliseconds = {
   seconds: 1e3,

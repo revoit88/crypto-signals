@@ -33,5 +33,6 @@ module.exports = {
   positions_processor_microservice_url: process.env.POSITIONS_PROCESSOR_URL,
   candles_processor_microservice_url: process.env.CANDLES_PROCESSOR_URL,
   repeat_close_position_hours:
-    +process.env.REPEAT_CLOSE_POSITION_HOURS * milliseconds.hour
+    +process.env.REPEAT_CLOSE_POSITION_HOURS * milliseconds.hour,
+  quote_asset: process.env.QUOTE_ASSET
 };

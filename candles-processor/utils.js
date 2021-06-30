@@ -5,7 +5,6 @@ const { Candle, OHLC } = require("./src/interfaces");
 const {
   nz,
   toSymbolPrecision,
-  toFixedDecimal,
   cloneObject,
   milliseconds
 } = require("@crypto-signals/utils");

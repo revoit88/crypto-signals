@@ -3,6 +3,7 @@ const { binance } = require("../axios");
 const Mongoose = require("mongoose");
 const { parseOrder, parseAccountUpdate } = require("../utils");
 const { milliseconds } = require("@crypto-signals/utils");
+const { quote_asset } = require("@crypto-signals/config");
 
 module.exports = class Observer {
   /**
@@ -106,7 +107,7 @@ module.exports = class Observer {
             }
           }
           if (message.e === "outboundAccountPosition") {
-            const update = parseAccountUpdate(message);
+            const update = parseAccountUpdate(message, quote_asset);
             if (update) {
               await Account.findOneAndUpdate(
                 { id: "production" },

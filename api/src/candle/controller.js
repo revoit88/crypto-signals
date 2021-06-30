@@ -312,6 +312,8 @@ exports.getCandlesFromBinance = async function (request, h) {
     const { symbol, force } = request.query;
     const CandleModel =
       request.server.plugins.mongoose.connection.model("Candle");
+    const MarketModel =
+      request.server.plugins.mongoose.connection.model("Market");
 
     if (!getBooleanValue(force)) {
       const count = await CandleModel.countDocuments({
@@ -353,6 +355,17 @@ exports.getCandlesFromBinance = async function (request, h) {
         ]
       });
       await CandleModel.insertMany(processed);
+
+      const marketExists = await MarketModel.exists({
+        $and: [{ exchange }, { symbol }]
+      });
+
+      if (!marketExists) {
+        await MarketModel.create({
+          symbol,
+          last_price: processed[processed.length - 1].close_price
+        });
+      }
 
       await candles_processor_microservice.post(
         `?symbol=${symbol}`,

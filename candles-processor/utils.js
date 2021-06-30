@@ -332,7 +332,7 @@ const getATRStop = async (candles, ohlc, parseFn = validateValue) => {
   }
   const { high, low, close } = ohlc;
 
-  const factor = 3;
+  const factor = 3.5;
   const pd = 5;
 
   const atr = await getATR([high, low, close], pd, false, parseFn);

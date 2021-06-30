@@ -38,7 +38,7 @@ module.exports = db => {
               config.position_percentage_size
             )
           : config.position_minimum_buy_amount,
-        2
+        8
       );
 
       enough_balance = account.balance >= buy_amount;

@@ -4,7 +4,8 @@ const {
   zignaly_url,
   zignaly_provider_key,
   environment,
-  repeat_close_position_hours
+  repeat_close_position_hours,
+  position_percentage_size
 } = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 const {
@@ -279,7 +280,8 @@ exports.broadcast = async function (request, h) {
                 price: position.price,
                 signalId: position.signal,
                 orderType: "market",
-                buyTTL: 600
+                buyTTL: 600,
+                positionSizePercentage: position_percentage_size
               });
             } catch (error) {
               request.logger.error(error.toJSON());

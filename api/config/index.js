@@ -16,7 +16,7 @@ module.exports = {
   zignaly_url: process.env.ZIGNALY_URL,
   zignaly_provider_key: process.env.ZIGNALY_PROVIDER_KEY,
   environment: process.env.NODE_ENV,
-  position_percentage_size: process.env.POSITION_PERCENTAGE_SIZE,
+  position_percentage_size: process.env.PROFIT_SHARING_POSITION_PERCENTAGE_SIZE,
   signals_interval:
     +process.env.PROCESS_SIGNALS_INTERVAL * milliseconds.seconds,
   positions_interval:

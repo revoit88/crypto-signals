@@ -154,7 +154,7 @@ exports.findOpenPositions = async function (request, h) {
         { status: "open" },
         ...(querySymbols.length ? [{ symbol: { $in: querySymbols } }] : [])
       ]
-    }).then(result => result.map(p => p.toJSON()));
+    }).lean();
 
     const { kucoin_positions, binance_positions } = positions.reduce(
       (acc, position) => ({
@@ -180,7 +180,7 @@ exports.findOpenPositions = async function (request, h) {
           ]
         }
       ]
-    });
+    }).lean();
 
     return positions.map(p => {
       const market = markets.find(

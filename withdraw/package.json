@@ -1,0 +1,20 @@
+{
+  "name": "express-withdraw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "pm2 start app.js --name withdraw",
+    "stop": "pm2 stop withdraw && pm2 delete withdraw",
+    "restart": "npm stop && npm start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@crypto-signals/utils": "file:../utils",
+    "@crypto-signals/config": "file:./config",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "nodemailer": "^6.4.11"
+  }
+}

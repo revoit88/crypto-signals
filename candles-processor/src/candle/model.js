@@ -97,7 +97,9 @@ const CandleSchema = new Schema(
     ch_atr: { type: Number, validate: validateNumber },
     ch_atr_ema: { type: Number, validate: validateNumber },
     is_pump: { type: Boolean, default: false },
-    is_dump: { type: Boolean, default: false }
+    volume_trend: { type: Number, enum: [1, -1], validate: validateNumber },
+    volume_sma_150: { type: Number, validate: validateNumber },
+    historic_max: { type: Number, validate: validateNumber }
   },
   { timestamps: true }
 );

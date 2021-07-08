@@ -390,19 +390,48 @@ const getCHATR = async (candles, ohlc, parseFn) => {
   };
 };
 
-function getPumpOrDump(ohlc) {
-  const pd = 33 / 100;
-  const { open, high, close, low } = ohlc;
+async function getPumpOrDump(candles, ohlc, parseFn) {
+  const lookback = 150;
+  const threshold = 15; // % change to be considered a pump
+  const { volume } = ohlc;
+  const [previous_candle, current_candle] = candles.slice(-2);
 
-  const getCurrent = array => array[array.length - 1];
+  const mav = await getSMA([volume], lookback, parseFn); // Average volume within lookback period
+  const difference = mav - previous_candle.volume_sma_150; // Difference between average lookback period volume and latest candle
+  const increasing =
+    current_candle.close_price > previous_candle.close_price && difference > 0;
+  const vroc = increasing
+    ? difference * (100 / previous_candle.volume_sma_150)
+    : 0; // If it's increasing then set the rate, otherwise set it to 0
 
-  const change = getCurrent(high) - getCurrent(low);
-  const condition_2 = change / getCurrent(low) > pd;
-
+  // To normalise the data express the current rate of change as a % of the maximum rate of change the asset has ever had.
+  const firstVrocNormalizedValue = 10; // Because ICO coins generally kickoff trading with a lot of volatility
+  const historic_max =
+    vroc > previous_candle.historic_max ?? 0
+      ? vroc
+      : nz(previous_candle.historic_max, firstVrocNormalizedValue);
+  const vrocNormalized = (vroc / historic_max) * 100;
   return {
-    is_pump: getCurrent(close) > getCurrent(open) && condition_2,
-    is_dump: getCurrent(close) < getCurrent(open) && condition_2
+    is_pump: vrocNormalized >= threshold,
+    historic_max,
+    volume_sma_150: mav
   };
+}
+
+function getVolumeTrend(ohlc) {
+  const { open, close, volume } = ohlc;
+  const lookback = 14;
+
+  const length = volume.length - lookback;
+
+  const { up, down } = volume.slice(-lookback).reduce(
+    (acc, current, index) => {
+      const dir = close[length + index] > open[length + index] ? "up" : "down";
+      return { ...acc, [dir]: acc[dir] + current };
+    },
+    { up: 0, down: 0 }
+  );
+  return { volume_trend: up - down > 0 ? 1 : -1 };
 }
 
 /**
@@ -449,7 +478,8 @@ const getIndicatorsValues = (ohlc, candles) => {
             })
           ]
         : [getATRStop(candles, ohlc, parseValue)]),
-      getCHATR(candles, ohlc, parseValue)
+      getCHATR(candles, ohlc, parseValue),
+      getPumpOrDump(candles, ohlc, parseValue)
     ];
 
     const p = await Promise.all(promises);
@@ -459,7 +489,8 @@ const getIndicatorsValues = (ohlc, candles) => {
       ...result,
       ...getPumpOrDump(ohlc),
       mama: parseValue(mesa_result.mama),
-      fama: parseValue(mesa_result.fama)
+      fama: parseValue(mesa_result.fama),
+      ...getVolumeTrend(ohlc)
     });
   });
 };

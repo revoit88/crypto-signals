@@ -63,8 +63,11 @@ app.post("/withdraw-btc", async (req, res) => {
     }
 
     const getMessage = amount => {
+      if (amount < 0) {
+        return "Unable to withdraw. Not enough balance.";
+      }
       if (amount < estimated_network_fee * 10) {
-        return "Unable to withdraw. The amount is too low";
+        return "Unable to withdraw. The amount is too low.";
       }
       return `Withdrawal successfull.\nAmount: ${amount} BTC.`;
     };

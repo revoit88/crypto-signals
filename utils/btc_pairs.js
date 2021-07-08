@@ -271,5 +271,7 @@ module.exports = [
   { symbol: "TORNBTC", priceTickSize: 0.0000001, stepSize: 0.001 },
   { symbol: "BAKEBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
   { symbol: "KEEPBTC", priceTickSize: 0.00000001, stepSize: 1.0 },
-  { symbol: "KLAYBTC", priceTickSize: 0.00000001, stepSize: 1.0 }
+  { symbol: "KLAYBTC", priceTickSize: 0.00000001, stepSize: 1.0 },
+  { symbol: "BONDBTC", priceTickSize: 0.000001, stepSize: 0.01 },
+  { symbol: "MLNBTC", priceTickSize: 0.000001, stepSize: 0.01 }
 ];

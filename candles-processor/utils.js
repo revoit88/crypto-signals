@@ -487,7 +487,6 @@ const getIndicatorsValues = (ohlc, candles) => {
     const mesa_result = mesa(hl2);
     return resolve({
       ...result,
-      ...getPumpOrDump(ohlc),
       mama: parseValue(mesa_result.mama),
       fama: parseValue(mesa_result.fama),
       ...getVolumeTrend(ohlc)

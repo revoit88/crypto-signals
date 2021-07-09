@@ -1,3 +1,4 @@
+require("@crypto-signals/config");
 const { pairs, splitArray } = require("@crypto-signals/utils");
 module.exports = {
   apps: splitArray([], pairs, 25).map(pairs => ({

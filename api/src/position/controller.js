@@ -329,11 +329,9 @@ exports.getDaylyReport = async function (request, h) {
       month: item._id.month,
       day: item._id.day,
       total: item.total,
-      total_profit: Number(
-        Number(
-          item.positions.reduce((acc, current) => acc + current.profit, 0)
-        ).toFixed(2)
-      )
+      total_profit: +Number(
+        item.positions.reduce((acc, current) => acc + current.change, 0)
+      ).toFixed(2)
     }));
 
     return processed;

@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 const path = require("path");
-const { milliseconds } = require("@crypto-signals/utils");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+const { milliseconds } = require("@crypto-signals/utils");
 
 module.exports = {
   db_uri: process.env.DB_URI,

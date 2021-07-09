@@ -1,6 +1,11 @@
 const axios = require("axios");
 const crypto = require("crypto");
-const pairs = require("./btc_pairs");
+const path = require("path");
+const pairs = require(path.resolve(
+  __dirname,
+  "./",
+  `${String(process.env.QUOTE_ASSET).toLowerCase()}_pairs.js`
+));
 
 const milliseconds = {
   seconds: 1e3,

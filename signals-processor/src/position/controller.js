@@ -88,7 +88,8 @@ module.exports = db => {
         ...(signal.buy_order && { buy_order: signal.buy_order }),
         is_test: false,
         account_id: account._id,
-        last_stop_loss_update: Date.now()
+        last_stop_loss_update: Date.now(),
+        broadcast: signal.broadcast
       });
 
       await SignalModel.findByIdAndUpdate(signal._id, {

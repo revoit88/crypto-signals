@@ -34,5 +34,7 @@ module.exports = {
   candles_processor_microservice_url: process.env.CANDLES_PROCESSOR_URL,
   repeat_close_position_hours:
     +process.env.REPEAT_CLOSE_POSITION_HOURS * milliseconds.hour,
-  quote_asset: process.env.QUOTE_ASSET
+  quote_asset: process.env.QUOTE_ASSET,
+  cmc_api_url: process.env.CMC_API_URL,
+  cmc_api_key: process.env.CMC_API_KEY
 };

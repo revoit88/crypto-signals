@@ -84,5 +84,12 @@ module.exports = {
       handler: Controller.persist,
       options: { auth: { access: { scope: ["observer"] } } }
     });
+
+    server.route({
+      method: "post",
+      path: "/update-traded-markets",
+      handler: Controller.updateTradedMarkets,
+      options: { auth: { access: { scope: ["microservice"] } } }
+    });
   }
 };

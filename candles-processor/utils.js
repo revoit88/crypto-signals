@@ -448,9 +448,7 @@ const getIndicatorsValues = (ohlc, candles) => {
     const promises = [
       getATR([high, low, close], undefined, undefined, parseValue),
       getOBV([close, volume]),
-      getSMA([volume], 28).then(v => ({ volume_sma: v })),
       getDMI([high, low, close]),
-      getBollingerBands([close], parseValue),
       getMACD([close], parseValue),
       ...(!previous_candle.trend && !current_candle.trend
         ? [

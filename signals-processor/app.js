@@ -157,8 +157,7 @@ const init = async () => {
                   .lean();
 
                 if (
-                  Number(last_candle.close_price) >=
-                    open_signal.trailing_stop_buy &&
+                  +last_candle.close_price >= open_signal.trailing_stop_buy &&
                   !open_signal.trader_lock &&
                   !market.trader_lock
                 ) {
@@ -175,7 +174,8 @@ const init = async () => {
                         price: close_price,
                         close_candle: getPlainCandle(last_candle),
                         close_time: Date.now(),
-                        close_date: new Date()
+                        close_date: new Date(),
+                        broadcast: market.broadcast_signals
                       }
                     },
                     { new: true }

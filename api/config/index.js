@@ -16,7 +16,7 @@ module.exports = {
   zignaly_url: process.env.ZIGNALY_URL,
   zignaly_provider_key: process.env.ZIGNALY_PROVIDER_KEY,
   environment: process.env.NODE_ENV,
-  position_percentage_size: process.env.POSITION_PERCENTAGE_SIZE,
+  position_percentage_size: process.env.PROFIT_SHARING_POSITION_PERCENTAGE_SIZE,
   signals_interval:
     +process.env.PROCESS_SIGNALS_INTERVAL * milliseconds.seconds,
   positions_interval:
@@ -33,5 +33,8 @@ module.exports = {
   positions_processor_microservice_url: process.env.POSITIONS_PROCESSOR_URL,
   candles_processor_microservice_url: process.env.CANDLES_PROCESSOR_URL,
   repeat_close_position_hours:
-    +process.env.REPEAT_CLOSE_POSITION_HOURS * milliseconds.hour
+    +process.env.REPEAT_CLOSE_POSITION_HOURS * milliseconds.hour,
+  quote_asset: process.env.QUOTE_ASSET,
+  cmc_api_url: process.env.CMC_API_URL,
+  cmc_api_key: process.env.CMC_API_KEY
 };

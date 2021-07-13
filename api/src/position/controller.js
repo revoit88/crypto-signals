@@ -4,7 +4,7 @@ const {
   zignaly_url,
   zignaly_provider_key,
   environment,
-  repeat_close_position_hours
+  position_percentage_size
 } = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 const {
@@ -153,7 +153,7 @@ exports.findOpenPositions = async function (request, h) {
         { status: "open" },
         ...(querySymbols.length ? [{ symbol: { $in: querySymbols } }] : [])
       ]
-    }).then(result => result.map(p => p.toJSON()));
+    }).lean();
 
     const { kucoin_positions, binance_positions } = positions.reduce(
       (acc, position) => ({
@@ -179,7 +179,7 @@ exports.findOpenPositions = async function (request, h) {
           ]
         }
       ]
-    });
+    }).lean();
 
     return positions.map(p => {
       const market = markets.find(
@@ -279,7 +279,8 @@ exports.broadcast = async function (request, h) {
                 price: position.price,
                 signalId: position.signal,
                 orderType: "market",
-                buyTTL: 600
+                buyTTL: 600,
+                positionSizePercentage: position_percentage_size
               });
             } catch (error) {
               request.logger.error(error.toJSON());
@@ -327,11 +328,9 @@ exports.getDaylyReport = async function (request, h) {
       month: item._id.month,
       day: item._id.day,
       total: item.total,
-      total_profit: Number(
-        Number(
-          item.positions.reduce((acc, current) => acc + current.profit, 0)
-        ).toFixed(2)
-      )
+      total_profit: +Number(
+        item.positions.reduce((acc, current) => acc + current.change, 0)
+      ).toFixed(2)
     }));
 
     return processed;
@@ -388,11 +387,33 @@ exports.repeatClosePositions = async function (request, h) {
     const Position =
       request.server.plugins.mongoose.connection.model("Position");
 
+    let signals = [];
+
+    try {
+      const { data } = await axios.get(
+        `https://zignaly.com/new_api/provider_api/open_positions`,
+        { headers: { "x-provider-key": zignaly_provider_key } }
+      );
+
+      signals = (data || [])
+        .map(p => p.n)
+        .reduce((a, c) => [...new Set([...a, c])], []);
+
+      console.log(`Found ${(signals || []).length} open positions on zignaly`);
+    } catch (error) {
+      console.error(error);
+      signals = [];
+    }
+
+    if (!signals.length) {
+      return h.response();
+    }
+
     const positions = await Position.find(
       {
         $and: [
           { status: "closed" },
-          { close_time: { $gt: Date.now() - repeat_close_position_hours } }
+          { signal: { $in: signals.map(s => castToObjectId(s)) } }
         ]
       },
       {
@@ -403,6 +424,10 @@ exports.repeatClosePositions = async function (request, h) {
         _id: 1
       }
     ).lean();
+
+    if (!positions.length) {
+      return h.response();
+    }
 
     for (const position of positions) {
       await api.post(`/positions/broadcast`, {

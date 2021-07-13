@@ -59,7 +59,8 @@ const SignalSchema = new Schema(
     low1d: { type: Number },
     low3d: { type: Number },
     low7d: { type: Number },
-    low30d: { type: Number }
+    low30d: { type: Number },
+    broadcast: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

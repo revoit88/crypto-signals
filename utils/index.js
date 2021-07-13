@@ -1,6 +1,11 @@
 const axios = require("axios");
 const crypto = require("crypto");
-const pairs = require("./pairs");
+const path = require("path");
+const pairs = require(path.resolve(
+  __dirname,
+  "./",
+  `${String(process.env.QUOTE_ASSET).toLowerCase()}_pairs.js`
+));
 
 const milliseconds = {
   seconds: 1e3,
@@ -166,11 +171,10 @@ function getBinanceInstance(env) {
     "/api/v3/order",
     "/api/v3/allOrders",
     "/api/v3/account",
-    "/wapi/v3/withdraw.html",
-    "/wapi/v3/withdrawHistory.html",
     "/sapi/v1/asset/dust",
     "/sapi/v1/capital/withdraw/apply",
-    "/sapi/v1/capital/withdraw/history"
+    "/sapi/v1/capital/withdraw/history",
+    "/sapi/v1/asset/assetDetail"
   ];
 
   binance.interceptors.request.use(

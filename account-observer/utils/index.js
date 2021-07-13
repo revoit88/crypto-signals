@@ -21,10 +21,10 @@ function parseOrder(order) {
   };
 }
 
-function parseAccountUpdate(update) {
-  const [usdt] = (update.B || []).filter(b => (b || {}).a === "USDT");
-  if (usdt) {
-    return +usdt.f;
+function parseAccountUpdate(update, quote_asset) {
+  const [asset] = (update.B || []).filter(b => (b || {}).a === quote_asset);
+  if (asset) {
+    return +asset.f;
   }
   return null;
 }

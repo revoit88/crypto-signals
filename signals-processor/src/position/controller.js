@@ -38,7 +38,7 @@ module.exports = db => {
               config.position_percentage_size
             )
           : config.position_minimum_buy_amount,
-        2
+        8
       );
 
       enough_balance = account.balance >= buy_amount;
@@ -88,7 +88,8 @@ module.exports = db => {
         ...(signal.buy_order && { buy_order: signal.buy_order }),
         is_test: false,
         account_id: account._id,
-        last_stop_loss_update: Date.now()
+        last_stop_loss_update: Date.now(),
+        broadcast: signal.broadcast
       });
 
       await SignalModel.findByIdAndUpdate(signal._id, {

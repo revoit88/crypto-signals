@@ -1,6 +1,13 @@
 const Boom = require("@hapi/boom");
-const { milliseconds } = require("@crypto-signals/utils");
-const { exchange } = require("@crypto-signals/config");
+const axios = require("axios");
+const { milliseconds, getTimeDiff } = require("@crypto-signals/utils");
+const {
+  exchange,
+  quote_asset,
+  interval,
+  cmc_api_key,
+  cmc_api_url
+} = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 
 exports.updateById = async function (request, h) {
@@ -155,6 +162,72 @@ exports.persist = async function (request, h) {
     return h.response();
   } catch (error) {
     console.error(error);
+    return Boom.internal();
+  }
+};
+
+exports.updateTradedMarkets = async function (request, h) {
+  const MarketModel =
+    request.server.plugins.mongoose.connection.model("Market");
+  const CandleModel =
+    request.server.plugins.mongoose.connection.model("Candle");
+  try {
+    const all_markets = await MarketModel.find({}).lean();
+
+    const { data: cmc_response } = await axios.get(
+      `${cmc_api_url}/v1/cryptocurrency/listings/latest?limit=200`,
+      { headers: { "X-CMC_PRO_API_KEY": cmc_api_key } }
+    );
+
+    const markets = all_markets.map(m => m.symbol);
+    const getSymbol = ({ symbol }) => (symbol === "MIOTA" ? "IOTA" : symbol);
+    const cmc_symbols = cmc_response.data.map(
+      item => `${getSymbol(item)}${quote_asset}`
+    );
+
+    let pairs_to_trade = [];
+
+    for (const current_cmc_symbol of cmc_symbols) {
+      if (pairs_to_trade.length < 150) {
+        const candle_count = await CandleModel.countDocuments({
+          $and: [
+            { symbol: current_cmc_symbol },
+            { open_time: { $gte: Date.now() - getTimeDiff(155, interval) } }
+          ]
+        });
+        if (markets.includes(current_cmc_symbol) && candle_count >= 150) {
+          pairs_to_trade = [
+            ...new Set(pairs_to_trade.concat(current_cmc_symbol))
+          ];
+        }
+      }
+    }
+
+    const updates = all_markets.reduce((acc, market) => {
+      const send =
+        pairs_to_trade.includes(market.symbol) && !market.broadcast_signals;
+      const dont_send =
+        !pairs_to_trade.includes(market.symbol) && market.broadcast_signals;
+      if (send || dont_send) {
+        return acc.concat({
+          updateOne: {
+            filter: { symbol: market.symbol },
+            update: {
+              $set: { broadcast_signals: !!send, use_main_account: !!send }
+            }
+          }
+        });
+      }
+      return acc;
+    }, []);
+
+    if (updates.length) {
+      await MarketModel.bulkWrite(updates, { ordered: false });
+    }
+
+    return h.response();
+  } catch (error) {
+    request.server.logger.error(error);
     return Boom.internal();
   }
 };

@@ -39,11 +39,12 @@ module.exports = (candles, last_signal, last_open_position) => {
     previousCandle.mama > previousCandle.fama &&
     currentCandle.trend === 1 &&
     currentCandle.mama > currentCandle.fama &&
-    currentCandle.close_price > currentCandle.bbands_middle;
+    previousCandle.volume_trend === 1 &&
+    currentCandle.volume_trend === 1;
 
-  const notPumpOrDump = !(currentCandle.is_pump || currentCandle.is_dump);
+  const notPump = !(currentCandle.is_pump || previousCandle.is_pump);
 
-  return volume && volatile && trending && di && macd && notPumpOrDump
+  return volume && volatile && trending && di && macd && notPump
     ? {
         exchange: currentCandle.exchange,
         symbol: currentCandle.symbol,

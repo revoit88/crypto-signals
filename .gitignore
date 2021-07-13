@@ -7,5 +7,6 @@ positions-processor/node_modules
 signal-performance/node_modules
 signals-processor/node_modules
 trader/node_modules
+withdraw/node_modules
 .env
 node_modules

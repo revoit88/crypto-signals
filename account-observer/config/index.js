@@ -9,5 +9,6 @@ module.exports = {
   exchange: process.env.EXCHANGE,
   interval: process.env.INTERVAL,
   host: process.env.CANDLES_PROCESSOR_HOST || "localhost",
-  port: +process.env.CANDLES_PROCESSOR_PORT || 8080
+  port: +process.env.CANDLES_PROCESSOR_PORT || 8080,
+  quote_asset: process.env.QUOTE_ASSET
 };

@@ -66,10 +66,10 @@ module.exports = db => {
             if (
               (previous_candle.atr_stop < previous_candle.open_price &&
                 previous_candle.atr_stop < candle.atr_stop &&
-                candle.open_price < candle.atr_stop) ||
+                candle.close_price < candle.atr_stop) ||
               (previous_candle.atr_stop > previous_candle.open_price &&
                 candle.open_price < candle.atr_stop &&
-                candle.close_price < position.stop_loss)
+                candle.close_price < candle.atr_stop)
             ) {
               return {
                 position,

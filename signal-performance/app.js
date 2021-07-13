@@ -78,14 +78,14 @@ const init = async () => {
                 ...acc,
                 ...days.reduce((daysAcc, [time, prop]) => {
                   return signal.close_time + time > now &&
-                    change > signal[`high${prop}d`] &&
+                    change > (signal[`high${prop}d`] ?? 0) &&
                     change > (acc[`high${prop}d`] ?? 0)
                     ? { ...daysAcc, [`high${prop}d`]: change }
                     : daysAcc;
                 }, {}),
                 ...days.reduce((daysAcc, [time, prop]) => {
                   return signal.close_time + time > now &&
-                    change < signal[`low${prop}d`] &&
+                    change < (signal[`low${prop}d`] ?? 0) &&
                     change < (acc[`low${prop}d`] ?? 0)
                     ? { ...daysAcc, [`low${prop}d`]: change }
                     : daysAcc;

@@ -56,6 +56,16 @@ const CandleSchema = new Schema(
       required: true,
       validate: validateNumber
     },
+    high1d: { type: Number, default: 0 },
+    high3d: { type: Number, default: 0 },
+    high7d: { type: Number, default: 0 },
+    high30d: { type: Number, default: 0 },
+    high90d: { type: Number, default: 0 },
+    low1d: { type: Number, default: 0 },
+    low3d: { type: Number, default: 0 },
+    low7d: { type: Number, default: 0 },
+    low30d: { type: Number, default: 0 },
+    low90d: { type: Number, default: 0 },
     amplitude: { type: Number, validate: validateNumber },
     change: { type: Number, validate: validateNumber },
     rsi: { type: Number, validate: validateNumber },
@@ -97,7 +107,9 @@ const CandleSchema = new Schema(
     ch_atr: { type: Number, validate: validateNumber },
     ch_atr_ema: { type: Number, validate: validateNumber },
     is_pump: { type: Boolean, default: false },
-    is_dump: { type: Boolean, default: false }
+    volume_trend: { type: Number, enum: [1, -1], validate: validateNumber },
+    volume_sma_150: { type: Number, validate: validateNumber },
+    historic_max: { type: Number, validate: validateNumber }
   },
   { timestamps: true }
 );

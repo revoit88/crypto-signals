@@ -6,7 +6,7 @@ const {
   toSymbolStepPrecision,
   getChange
 } = require("@crypto-signals/utils");
-const { exchange } = require("@crypto-signals/config");
+const { exchange, quote_asset } = require("@crypto-signals/config");
 
 exports.getUpdatedBalance = async function (request, h) {
   try {
@@ -18,23 +18,23 @@ exports.getUpdatedBalance = async function (request, h) {
 
     const { data: account } = await accountPromise;
 
-    const [usdt] = account.balances.filter(item => item.asset === "USDT");
+    const [asset] = account.balances.filter(item => item.asset === quote_asset);
     const balances = account.balances
       .reduce((acc, current) => {
         return +current.free || +current.locked ? acc.concat(current) : acc;
       }, [])
-      .filter(item => item.asset !== "USDT");
+      .filter(item => item.asset !== quote_asset);
 
     const markets = await Market.find({
       $and: [
         { exchange },
-        { symbol: { $in: balances.map(b => `${b.asset}USDT`) } }
+        { symbol: { $in: balances.map(b => `${b.asset}${quote_asset}`) } }
       ]
     }).hint("exchange_1_symbol_1");
 
     const { total } = balances.reduce(
       (acc, item) => {
-        const pairString = `${item.asset}USDT`;
+        const pairString = `${item.asset}${quote_asset}`;
         const market = markets.find(m => m.symbol === pairString);
         if (!market) {
           return acc;
@@ -42,21 +42,21 @@ exports.getUpdatedBalance = async function (request, h) {
         const value = Number(
           Number(
             (+item.free + +item.locked) * (market || {}).last_price
-          ).toFixed(2)
+          ).toFixed(8)
         );
         return {
           pairs: acc.pairs.concat({ symbol: pairString, value }),
-          total: Number(Number(acc.total + value).toFixed(2))
+          total: Number(Number(acc.total + value).toFixed(8))
         };
       },
       { pairs: [], total: 0 }
     );
 
-    const totalUSDT = +Number(+usdt.free + +usdt.locked + total).toFixed(2);
+    const totalAsset = +Number(+asset.free + +asset.locked + total).toFixed(8);
 
     await Account.findOneAndUpdate(
       { id: "production" },
-      { $set: { total_balance: totalUSDT, balance: Number(usdt.free) } },
+      { $set: { total_balance: totalAsset, balance: Number(asset.free) } },
       { new: true }
     );
 
@@ -141,8 +141,9 @@ exports.getExchangeInfoProcessed = async function (request, h) {
       .filter(
         symbol =>
           !!symbol.isSpotTradingAllowed &&
-          symbol.quoteAsset === "USDT" &&
-          !!symbol.quoteOrderQtyMarketAllowed
+          symbol.quoteAsset === quote_asset &&
+          !!symbol.quoteOrderQtyMarketAllowed &&
+          symbol.status === "TRADING"
       )
       .map(item => ({
         symbol: item.symbol,

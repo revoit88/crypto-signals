@@ -4,7 +4,6 @@ const {
   zignaly_url,
   zignaly_provider_key,
   environment,
-  repeat_close_position_hours,
   position_percentage_size
 } = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
@@ -388,11 +387,33 @@ exports.repeatClosePositions = async function (request, h) {
     const Position =
       request.server.plugins.mongoose.connection.model("Position");
 
+    let signals = [];
+
+    try {
+      const { data } = await axios.get(
+        `https://zignaly.com/new_api/provider_api/open_positions`,
+        { headers: { "x-provider-key": zignaly_provider_key } }
+      );
+
+      signals = (data || [])
+        .map(p => p.n)
+        .reduce((a, c) => [...new Set([...a, c])], []);
+
+      console.log(`Found ${(signals || []).length} open positions on zignaly`);
+    } catch (error) {
+      console.error(error);
+      signals = [];
+    }
+
+    if (!signals.length) {
+      return h.response();
+    }
+
     const positions = await Position.find(
       {
         $and: [
           { status: "closed" },
-          { close_time: { $gt: Date.now() - repeat_close_position_hours } }
+          { signal: { $in: signals.map(s => castToObjectId(s)) } }
         ]
       },
       {
@@ -403,6 +424,10 @@ exports.repeatClosePositions = async function (request, h) {
         _id: 1
       }
     ).lean();
+
+    if (!positions.length) {
+      return h.response();
+    }
 
     for (const position of positions) {
       await api.post(`/positions/broadcast`, {

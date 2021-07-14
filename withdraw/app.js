@@ -4,6 +4,7 @@ const {
   reserved_amount,
   estimated_network_fee,
   btc_address,
+  eth_address,
   port
 } = require("@crypto-signals/config");
 const { nz } = require("@crypto-signals/utils");
@@ -70,6 +71,75 @@ app.post("/withdraw-btc", async (req, res) => {
         return "Unable to withdraw. The amount is too low.";
       }
       return `Withdrawal successfull.\nAmount: ${amount} BTC.`;
+    };
+
+    await sendMail(getMessage(amount_to_withdraw));
+    return res.send({ success: true });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ msg: "Internal Server Error" });
+  }
+});
+
+app.post("/withdraw-eth", async (req, res) => {
+  try {
+    console.log(`=== Withdrawing ETH @ ${new Date().toUTCString()} ===`);
+
+    if (!eth_address) {
+      throw new Error("The ETH address is not defined.");
+    }
+
+    if (!req.query.amount) {
+      throw new Error("The amount to withdraw is not defined.");
+    }
+
+    const accountPromise = binance.get("/api/v3/account");
+    const ethStatusPromise = binance.get(
+      "/sapi/v1/asset/assetDetail?asset=ETH"
+    );
+
+    const { data: account } = await accountPromise;
+    const { data: eth_status } = await ethStatusPromise;
+
+    const [eth] = account.balances.filter(item => item.asset === "ETH");
+    const free_eth = +eth.free;
+
+    const withdraw_fee = +eth_status.ETH.withdrawFee;
+    const minimum_amount_to_withdraw = +eth_status.ETH.minWithdrawAmount;
+
+    const amount_to_withdraw = +req.query.amount;
+
+    if (
+      amount_to_withdraw <= free_eth &&
+      amount_to_withdraw > minimum_amount_to_withdraw &&
+      amount_to_withdraw > withdraw_fee
+    ) {
+      const withdrawQuery = qs.stringify({
+        coin: "ETH",
+        network: "ETH",
+        address: eth_address,
+        amount: amount_to_withdraw
+      });
+
+      const { data: withdrawResult } = await binance.post(
+        `/sapi/v1/capital/withdraw/apply?${withdrawQuery}`
+      );
+
+      console.log("withdrawResult: ", withdrawResult);
+      // if (!withdrawResult.success) {
+      //   console.error(withdrawResult.msg);
+      //   return res.status(500).send(withdrawResult);
+      // }
+    }
+
+    const getMessage = amount => {
+      if (amount < 0) {
+        return "Unable to withdraw. Not enough balance.";
+      }
+      if (amount < estimated_network_fee * 10) {
+        return "Unable to withdraw. The amount is too low.";
+      }
+      return `Withdrawal successfull.\nAmount: ${amount} ETH.`;
     };
 
     await sendMail(getMessage(amount_to_withdraw));

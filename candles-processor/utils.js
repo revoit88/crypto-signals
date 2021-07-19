@@ -132,6 +132,26 @@ const getSMA = (data, periods = 28, parseFn = validateValue) => {
   });
 };
 
+const getRMA = async (data, periods, validateFn) => {
+  const alpha = 1 / periods;
+  let sum = await data.reduce(async (prev, current, index, array) => {
+    try {
+      const acc = await prev;
+      const [previous] = acc.slice(-1);
+      const nan = isNaN(previous);
+      const src = array.slice(0, index + 1);
+      const sum = nan
+        ? await getSMA([src], periods, validateFn)
+        : validateFn(alpha * current + (1 - alpha) * nz(previous));
+
+      return Promise.resolve(acc.concat(sum));
+    } catch (error) {
+      console.error(error);
+    }
+  }, Promise.resolve([]));
+  return sum;
+};
+
 /**
  *
  * @param {Array<Number[]>} data
@@ -370,19 +390,19 @@ const getATRStop = async (candles, ohlc, parseFn = validateValue) => {
  * @param {Candle[]} candles
  * @param {OHLC} ohlc
  */
-const getCHATR = async (candles, ohlc, parseFn) => {
+const getCHATR = async (candles, ohlc, validateFn) => {
   if (candles.length === 1) {
     return {};
   }
 
   const { high, low, close } = ohlc;
 
-  const tr = await getTR([high, low, close], true, parseFn);
-  const tr_ema = await getEMA([tr], 19, true, parseFn);
-  const atrp = tr_ema
+  const tr = await getTR([high, low, close], true, validateFn);
+  const rma = await getRMA(tr, 10, validateFn);
+  const atrp = rma
     .map((t, i) => [t, close[i]])
-    .map(([t, c]) => parseFn((t / c) * 100));
-  const avg = await getEMA([atrp], 28, undefined, parseFn);
+    .map(([t, c]) => validateFn((t / c) * 100));
+  const avg = await getEMA([atrp], 28, undefined, validateFn);
 
   return {
     ch_atr_ema: nz(avg),

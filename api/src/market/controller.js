@@ -175,7 +175,7 @@ exports.updateTradedMarkets = async function (request, h) {
     const all_markets = await MarketModel.find({}).lean();
 
     const { data: cmc_response } = await axios.get(
-      `${cmc_api_url}/v1/cryptocurrency/listings/latest?limit=300`,
+      `${cmc_api_url}/v1/cryptocurrency/listings/latest?limit=200`,
       { headers: { "X-CMC_PRO_API_KEY": cmc_api_key } }
     );
 
@@ -188,7 +188,7 @@ exports.updateTradedMarkets = async function (request, h) {
     let pairs_to_trade = [];
 
     for (const current_cmc_symbol of cmc_symbols) {
-      if (pairs_to_trade.length < 150) {
+      if (pairs_to_trade.length < 100) {
         const candle_count = await CandleModel.countDocuments({
           $and: [
             { symbol: current_cmc_symbol },

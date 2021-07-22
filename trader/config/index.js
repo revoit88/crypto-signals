@@ -9,5 +9,6 @@ module.exports = {
   host: process.env.TRADER_HOST || "localhost",
   port: +process.env.TRADER_PORT || 8080,
   environment: process.env.NODE_ENV,
-  iron_secret: process.env.IRON_SECRET
+  iron_secret: process.env.IRON_SECRET,
+  minimum_order_size: +process.env.BINANCE_MINIMUM_ORDER_SIZE
 };

@@ -4,7 +4,7 @@ const {
   toSymbolStepPrecision,
   milliseconds
 } = require("@crypto-signals/utils");
-const { exchange } = require("@crypto-signals/config");
+const { exchange, minimum_order_size } = require("@crypto-signals/config");
 const qs = require("querystring");
 
 const MAX_REQUESTS = 95;
@@ -448,7 +448,10 @@ exports.createMarketOrder = async function (request, h) {
     return h.response();
   }
 
-  if (Number((buy_order || {}).executedQty) * symbol_market.last_price < 10) {
+  if (
+    Number((buy_order || {}).executedQty) * symbol_market.last_price <=
+    minimum_order_size
+  ) {
     await PositionModel.findOneAndUpdate(
       { id: positionId },
       { $set: { trader_lock: false } }

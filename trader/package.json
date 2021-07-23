@@ -13,7 +13,6 @@
     "@crypto-signals/config": "file:./config",
     "@hapi/hapi": "^20.0.1",
     "@hapi/iron": "^6.0.0",
-    "@hapi/nes": "^12.0.4",
     "dotenv": "^8.2.0",
     "hapi-pino": "^8.3.0",
     "joi": "^17.2.1",

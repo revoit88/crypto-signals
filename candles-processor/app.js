@@ -37,7 +37,6 @@ const init = async () => {
           const candles = await CandleModel.find({
             $and: [
               { symbol },
-              { interval: config.interval },
               {
                 open_time: {
                   $gte: candle.open_time - getTimeDiff(155, config.interval)

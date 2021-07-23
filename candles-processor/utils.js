@@ -400,7 +400,7 @@ const getCHATR = async (candles, ohlc, validateFn) => {
   const tr = await getTR([high, low, close], true, validateFn);
   const rma = await getRMA(tr, 10, validateFn);
   const atrp = rma.map((t, i) => [t, close[i]]).map(([t, c]) => (t / c) * 100);
-  const avg = await getEMA([atrp], 28, undefined, parseFn);
+  const avg = await getEMA([atrp], 28, undefined, validateFn);
 
   return {
     ch_atr_ema: +Number(nz(avg)).toFixed(4),

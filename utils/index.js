@@ -32,7 +32,10 @@ const splitArray = (array = [], remaining = [], number) => {
   return array.concat([items]);
 };
 
-const nz = (v, d) => (isNaN(v) ? d ?? 0 : v);
+const invalidNumber = v =>
+  typeof v === "undefined" || v === null || v === Infinity || isNaN(v);
+
+const nz = (v, d) => (invalidNumber(v) ? d ?? 0 : v);
 
 const cloneObject = obj => (obj ? JSON.parse(JSON.stringify(obj)) : obj);
 

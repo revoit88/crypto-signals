@@ -399,43 +399,56 @@ const getCHATR = async (candles, ohlc, validateFn) => {
 
   const tr = await getTR([high, low, close], true, validateFn);
   const rma = await getRMA(tr, 10, validateFn);
-  const atrp = rma
-    .map((t, i) => [t, close[i]])
-    .map(([t, c]) => validateFn((t / c) * 100));
-  const avg = await getEMA([atrp], 28, undefined, validateFn);
+  const atrp = rma.map((t, i) => [t, close[i]]).map(([t, c]) => (t / c) * 100);
+  const avg = await getEMA([atrp], 28, undefined, parseFn);
 
   return {
-    ch_atr_ema: nz(avg),
-    ch_atr: nz(atrp[atrp.length - 1])
+    ch_atr_ema: +Number(nz(avg)).toFixed(4),
+    ch_atr: +Number(nz(atrp[atrp.length - 1])).toFixed(4)
   };
 };
 
-async function getPumpOrDump(candles, ohlc, parseFn) {
+async function getPumpOrDump(ohlc) {
   const lookback = 150;
   const threshold = 15; // % change to be considered a pump
-  const { volume } = ohlc;
-  const [previous_candle, current_candle] = candles.slice(-2);
+  const { volume, close } = ohlc;
 
-  const mav = await getSMA([volume], lookback, parseFn); // Average volume within lookback period
-  const difference = mav - previous_candle.volume_sma_150; // Difference between average lookback period volume and latest candle
-  const increasing =
-    current_candle.close_price > previous_candle.close_price && difference > 0;
-  const vroc = increasing
-    ? difference * (100 / previous_candle.volume_sma_150)
-    : 0; // If it's increasing then set the rate, otherwise set it to 0
+  let { is_pump } = await volume.reduce(async (prev, _, index, array) => {
+    try {
+      const acc = await prev;
+      const [prev_mav] = acc.mav.slice(-1);
+      const [prev_historic_max] = acc.historic_max.slice(-1);
+      const src = array.slice(0, index + 1);
+      if (src.length < 2) {
+        return acc;
+      }
+      const [previous_close = 0, current_close = 0] = close
+        .slice(0, index + 1)
+        .slice(-2);
+      const mav = await getSMA([src], lookback);
+      const difference = nz(mav) - nz(prev_mav);
+      const increasing = current_close > previous_close && difference > 0;
+      const vroc =
+        increasing && nz(prev_mav) !== 0 ? difference * (100 / prev_mav) : 0;
+      const firstVrocNormalizedValue = 10;
+      const historic_max =
+        vroc > nz(prev_historic_max)
+          ? vroc
+          : nz(prev_historic_max, firstVrocNormalizedValue);
+      const vrocNormalized =
+        nz(historic_max) !== 0 ? (vroc / historic_max) * 100 : 0;
 
-  // To normalise the data express the current rate of change as a % of the maximum rate of change the asset has ever had.
-  const firstVrocNormalizedValue = 10; // Because ICO coins generally kickoff trading with a lot of volatility
-  const historic_max =
-    vroc > previous_candle.historic_max ?? 0
-      ? vroc
-      : nz(previous_candle.historic_max, firstVrocNormalizedValue);
-  const vrocNormalized = (vroc / historic_max) * 100;
-  return {
-    is_pump: vrocNormalized >= threshold,
-    historic_max,
-    volume_sma_150: mav
-  };
+      return Promise.resolve({
+        is_pump: acc.is_pump.concat(vrocNormalized >= threshold),
+        historic_max: acc.historic_max.concat(historic_max),
+        mav: acc.mav.concat(nz(mav))
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, Promise.resolve({ mav: [], historic_max: [], is_pump: [] }));
+  const [current_value] = is_pump.slice(-1);
+  return { is_pump: current_value };
 }
 
 function getVolumeTrend(ohlc) {
@@ -497,7 +510,7 @@ const getIndicatorsValues = (ohlc, candles) => {
           ]
         : [getATRStop(candles, ohlc, parseValue)]),
       getCHATR(candles, ohlc, parseValue),
-      getPumpOrDump(candles, ohlc, parseValue)
+      getPumpOrDump(ohlc)
     ];
 
     const p = await Promise.all(promises);

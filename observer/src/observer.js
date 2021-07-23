@@ -17,9 +17,7 @@ module.exports = class Observer {
   async init() {
     try {
       console.log(
-        `Observer for ${this.exchange}|${this.symbol.join(
-          "-"
-        )} started at ${new Date().toUTCString()}.`
+        `Observer for ${this.exchange} started at ${new Date().toUTCString()}.`
       );
 
       this.client = new ws(
@@ -30,9 +28,7 @@ module.exports = class Observer {
 
       this.client.on("open", () => {
         console.log(
-          `${new Date().toISOString()} | ${this.symbol}@${
-            this.exchange
-          } | Connection open.`
+          `${new Date().toISOString()} | ${this.exchange} | Connection open.`
         );
         this.client.send(
           JSON.stringify({
@@ -88,9 +84,7 @@ module.exports = class Observer {
 
       this.client.on("close", async (...args) => {
         console.log(
-          `${new Date().toISOString()} | Stream for ${this.symbol}@${
-            this.exchange
-          } closed.`
+          `${new Date().toISOString()} | Stream for ${this.exchange} closed.`
         );
         console.log(args);
         await this.init();

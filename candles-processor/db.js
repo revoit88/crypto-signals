@@ -11,8 +11,7 @@ module.exports = {
     try {
       const db = await Mongoose.createConnection(options.db_uri, {
         useNewUrlParser: true,
-        useUnifiedTopology: true,
-        maxPoolSize: 75
+        useUnifiedTopology: true
       });
 
       require("./src/candle/model")(db);

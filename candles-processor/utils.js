@@ -399,14 +399,12 @@ const getCHATR = async (candles, ohlc, validateFn) => {
 
   const tr = await getTR([high, low, close], true, validateFn);
   const rma = await getRMA(tr, 10, validateFn);
-  const atrp = rma
-    .map((t, i) => [t, close[i]])
-    .map(([t, c]) => validateFn((t / c) * 100));
-  const avg = await getEMA([atrp], 28, undefined, validateFn);
+  const atrp = rma.map((t, i) => [t, close[i]]).map(([t, c]) => (t / c) * 100);
+  const avg = await getEMA([atrp], 28, undefined, parseFn);
 
   return {
-    ch_atr_ema: nz(avg),
-    ch_atr: nz(atrp[atrp.length - 1])
+    ch_atr_ema: +Number(nz(avg)).toFixed(4),
+    ch_atr: +Number(nz(atrp[atrp.length - 1])).toFixed(4)
   };
 };
 

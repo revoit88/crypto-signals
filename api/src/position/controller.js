@@ -2,7 +2,8 @@ const Boom = require("@hapi/boom");
 const axios = require("axios");
 const {
   zignaly_url,
-  zignaly_provider_key,
+  zignaly_provider_key_1,
+  zignaly_provider_key_2,
   environment,
   position_percentage_size
 } = require("@crypto-signals/config");
@@ -215,6 +216,17 @@ exports.broadcast = async function (request, h) {
       $and: [{ exchange: position.exchange }, { symbol: position.symbol }]
     }).hint("exchange_1_symbol_1");
 
+    const providers = [
+      {
+        key: zignaly_provider_key_1,
+        exchange: "zignaly"
+      },
+      {
+        key: zignaly_provider_key_2,
+        exchange: "binance"
+      }
+    ];
+
     if (position.type === "exit") {
       request.logger.info(
         `${new Date().toISOString()} | SELL | ${position.exchange}@${
@@ -224,26 +236,21 @@ exports.broadcast = async function (request, h) {
 
       if (environment === "production") {
         //broadcast sell signal
-        const promises = []
-          .concat({
-            key: zignaly_provider_key,
-            exchange: "zignaly"
-          })
-          .map(async to => {
-            try {
-              await axios.post(zignaly_url, {
-                key: to.key,
-                exchange: to.exchange,
-                type: "exit",
-                pair: position.symbol,
-                orderType: "market",
-                price: position.price,
-                signalId: position.signal
-              });
-            } catch (error) {
-              request.logger.error(error.toJSON());
-            }
-          });
+        const promises = providers.map(async to => {
+          try {
+            await axios.post(zignaly_url, {
+              key: to.key,
+              exchange: to.exchange,
+              type: "exit",
+              pair: position.symbol,
+              sellTTL: 300,
+              price: position.price,
+              signalId: position.signal
+            });
+          } catch (error) {
+            request.logger.error(error.toJSON());
+          }
+        });
 
         await Promise.all(promises);
       }
@@ -258,17 +265,7 @@ exports.broadcast = async function (request, h) {
 
       if (environment === "production") {
         // send to zignaly
-        const promises = []
-          .concat(
-            !!zignaly_provider_key
-              ? [
-                  {
-                    key: zignaly_provider_key,
-                    exchange: "zignaly"
-                  }
-                ]
-              : []
-          )
+        const promises = providers
           .map(async to => {
             try {
               await axios.post(zignaly_url, {
@@ -387,22 +384,29 @@ exports.repeatClosePositions = async function (request, h) {
     const Position =
       request.server.plugins.mongoose.connection.model("Position");
 
+    const keys = [zignaly_provider_key_1, zignaly_provider_key_2];
+
     let signals = [];
 
-    try {
-      const { data } = await axios.get(
-        `https://zignaly.com/new_api/provider_api/open_positions`,
-        { headers: { "x-provider-key": zignaly_provider_key } }
-      );
+    for (const key of keys) {
+      try {
+        const { data } = await axios.get(
+          `https://zignaly.com/new_api/provider_api/open_positions`,
+          { headers: { "x-provider-key": key } }
+        );
 
-      signals = (data || [])
-        .map(p => p.n)
-        .reduce((a, c) => [...new Set([...a, c])], []);
+        const open_positions = (data || []).map(p => p.n);
 
-      console.log(`Found ${(signals || []).length} open positions on zignaly`);
-    } catch (error) {
-      console.error(error);
-      signals = [];
+        signals = signals
+          .concat(open_positions)
+          .reduce((a, c) => [...new Set([...a, c])], []);
+
+        console.log(
+          `Found ${(open_positions || []).length} open positions on zignaly`
+        );
+      } catch (error) {
+        console.error(error);
+      }
     }
 
     if (!signals.length) {

@@ -14,7 +14,8 @@ module.exports = {
   allowed_pairs: pairs.map(p => p.symbol),
   telegram_token: process.env.TELEGRAM_TOKEN,
   zignaly_url: process.env.ZIGNALY_URL,
-  zignaly_provider_key: process.env.ZIGNALY_PROVIDER_KEY,
+  zignaly_provider_key_1: process.env.ZIGNALY_PROVIDER_KEY_1,
+  zignaly_provider_key_2: process.env.ZIGNALY_PROVIDER_KEY_2,
   environment: process.env.NODE_ENV,
   position_percentage_size: process.env.PROFIT_SHARING_POSITION_PERCENTAGE_SIZE,
   signals_interval:

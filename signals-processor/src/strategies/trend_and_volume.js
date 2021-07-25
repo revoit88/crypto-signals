@@ -3,7 +3,7 @@ const { toSymbolPrecision } = require("@crypto-signals/utils");
  *
  * @param {Candle[]} candles
  */
-module.exports = (candles, last_signal, last_open_position) => {
+module.exports = (candles, _, last_open_position) => {
   const [previousCandle = {}, currentCandle = {}] = candles.slice(-2);
 
   const volume = currentCandle.obv > currentCandle.obv_ema;
@@ -12,11 +12,9 @@ module.exports = (candles, last_signal, last_open_position) => {
 
   const highest_price = Math.max(
     0,
-    ...[
-      (last_signal || {}).price,
-      last_open_position?.buy_price,
-      last_open_position?.sell_price
-    ].filter(notFalsy => notFalsy)
+    ...[last_open_position?.buy_price, last_open_position?.sell_price].filter(
+      notFalsy => notFalsy
+    )
   );
 
   if (
@@ -31,8 +29,12 @@ module.exports = (candles, last_signal, last_open_position) => {
     (currentCandle.macd > 0 || currentCandle.macd_histogram > 0);
 
   const di =
+    currentCandle.adx > 20 &&
     currentCandle.plus_di > 25 &&
     currentCandle.plus_di > currentCandle.minus_di;
+
+  const above_ema = currentCandle.close_price > currentCandle.ema_50;
+  const upward_slope = !candles.slice(-3).some(c => c.ema_50_slope === -1);
 
   const trending =
     previousCandle.trend === 1 &&
@@ -40,7 +42,9 @@ module.exports = (candles, last_signal, last_open_position) => {
     currentCandle.trend === 1 &&
     currentCandle.mama > currentCandle.fama &&
     previousCandle.volume_trend === 1 &&
-    currentCandle.volume_trend === 1;
+    currentCandle.volume_trend === 1 &&
+    above_ema &&
+    upward_slope;
 
   const notPump =
     !(currentCandle.is_pump || previousCandle.is_pump) &&

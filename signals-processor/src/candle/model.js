@@ -85,9 +85,7 @@ const CandleSchema = new Schema(
     atr: { type: Number, validate: validateNumber },
     atr_stop: { type: Number, validate: validateNumber },
     atr_sma: { type: Number, validate: validateNumber },
-    ema_7: { type: Number, validate: validateNumber },
-    ema_25: { type: Number, validate: validateNumber },
-    ema_100: { type: Number, validate: validateNumber },
+    ema_50: { type: Number, validate: validateNumber },
     volume_sma: { type: Number, validate: validateNumber },
     event_time: { type: Number, validate: validateNumber },
     is_test: { type: Boolean, default: false },
@@ -108,8 +106,7 @@ const CandleSchema = new Schema(
     ch_atr_ema: { type: Number, validate: validateNumber },
     is_pump: { type: Boolean, default: false },
     volume_trend: { type: Number, enum: [1, -1], validate: validateNumber },
-    volume_sma_150: { type: Number, validate: validateNumber },
-    historic_max: { type: Number, validate: validateNumber }
+    ema_50_slope: { type: Number, enum: [1, -1], validate: validateNumber }
   },
   { timestamps: true }
 );

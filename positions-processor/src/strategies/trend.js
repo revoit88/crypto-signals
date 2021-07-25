@@ -1,7 +1,11 @@
 "use strict";
 
 const Mongoose = require("mongoose");
-const { toSymbolPrecision, getTimeDiff } = require("@crypto-signals/utils");
+const {
+  toSymbolPrecision,
+  getTimeDiff,
+  milliseconds
+} = require("@crypto-signals/utils");
 const { exchange, interval } = require("@crypto-signals/config");
 
 /**
@@ -63,13 +67,39 @@ module.exports = db => {
               });
             }
 
-            if (
+            const sell_condition =
               (previous_candle.atr_stop < previous_candle.open_price &&
                 previous_candle.atr_stop < candle.atr_stop &&
                 candle.close_price < candle.atr_stop) ||
               (previous_candle.atr_stop > previous_candle.open_price &&
                 candle.open_price < candle.atr_stop &&
-                candle.close_price < candle.atr_stop)
+                candle.close_price < candle.atr_stop);
+
+            if (sell_condition && !position.stop_loss_trigger_time) {
+              return await PositionModel.findByIdAndUpdate(position._id, {
+                $set: { stop_loss_trigger_time: Date.now() }
+              });
+            }
+
+            const five_minutes_passed =
+              position.stop_loss_trigger_time &&
+              Date.now() - position.stop_loss_trigger_time >
+                milliseconds.minute * 5;
+
+            if (
+              five_minutes_passed &&
+              !sell_condition &&
+              position.stop_loss_trigger_time
+            ) {
+              return await PositionModel.findByIdAndUpdate(position._id, {
+                $unset: { stop_loss_trigger_time: true }
+              });
+            }
+
+            if (
+              five_minutes_passed &&
+              sell_condition &&
+              position.stop_loss_trigger_time
             ) {
               return {
                 position,

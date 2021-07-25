@@ -100,7 +100,7 @@ const getBollingerBands = (data, parseFn = validateValue) => {
 /**
  *
  * @param {Array<Number[]>} data
- * @returns {Promise<Number>} Exponential Moving Average value
+ * @returns {Promise<Number>|Promise<Number[]>} Exponential Moving Average value
  */
 const getEMA = (data, period = 5, all = false, parseFn = validateValue) => {
   return new Promise(async (resolve, reject) => {
@@ -467,6 +467,19 @@ function getVolumeTrend(ohlc) {
   return { volume_trend: up - down > 0 ? 1 : -1 };
 }
 
+async function getEMASlope(ohlc, parseFn) {
+  const { hl2 } = ohlc;
+  const periods = 50;
+
+  const ema = await getEMA([hl2], periods, true, parseFn);
+  const slopes = ema.map((v, i, array) => {
+    const previous = nz(array[i - 1]);
+    return nz(v / previous) > 1 ? 1 : -1;
+  });
+
+  return { ema_50: ema.slice(-1)[0], ema_50_slope: slopes.slice(-1)[0] };
+}
+
 /**
  *
  * @param {OHLC} ohlc Values
@@ -483,6 +496,7 @@ const getIndicatorsValues = (ohlc, candles) => {
       getOBV([close, volume]),
       getDMI([high, low, close]),
       getMACD([close], parseValue),
+      getEMASlope(ohlc, parseValue),
       ...(!previous_candle.trend && !current_candle.trend
         ? [
             getCumulativeIndicator({

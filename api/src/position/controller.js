@@ -223,7 +223,7 @@ exports.broadcast = async function (request, h) {
       },
       {
         key: zignaly_provider_key_2,
-        exchange: "binance"
+        exchange: "zignaly"
       }
     ];
 

@@ -1,4 +1,4 @@
-const Mongoose = require("mongoose");
+const MongooseTypes = require("mongoose").Types;
 const tulind = require("tulind");
 const mesa = require("./mesa");
 const { Candle, OHLC } = require("./src/interfaces");
@@ -621,7 +621,7 @@ const buildCandlesData = ({ candles, symbol, interval }) => {
 };
 
 const castToObjectId = id =>
-  typeof id === "string" ? Mongoose.Types.ObjectId(id) : id;
+  typeof id === "string" ? MongooseTypes.ObjectId(id) : id;
 
 module.exports = {
   getOHLCValues,

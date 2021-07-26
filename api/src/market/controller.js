@@ -180,7 +180,11 @@ exports.updateTradedMarkets = async function (request, h) {
     );
 
     const markets = all_markets.map(m => m.symbol);
-    const getSymbol = ({ symbol }) => (symbol === "MIOTA" ? "IOTA" : symbol);
+    const ds = {
+      MIOTA: "IOTA",
+      XVG: "BQX"
+    };
+    const getSymbol = ({ symbol }) => ds[symbol] || symbol;
     const cmc_symbols = cmc_response.data.map(
       item => `${getSymbol(item)}${quote_asset}`
     );

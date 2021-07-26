@@ -2,7 +2,6 @@ const app = require("express")();
 const qs = require("querystring");
 const {
   reserved_amount,
-  estimated_network_fee,
   btc_address,
   eth_address,
   port
@@ -67,7 +66,7 @@ app.post("/withdraw-btc", async (req, res) => {
       if (amount < 0) {
         return "Unable to withdraw. Not enough balance.";
       }
-      if (amount < estimated_network_fee * 10) {
+      if (amount < withdraw_fee * 10) {
         return "Unable to withdraw. The amount is too low.";
       }
       return `Withdrawal successfull.\nAmount: ${amount} BTC.`;
@@ -136,7 +135,7 @@ app.post("/withdraw-eth", async (req, res) => {
       if (amount < 0) {
         return "Unable to withdraw. Not enough balance.";
       }
-      if (amount < estimated_network_fee * 10) {
+      if (amount < withdraw_fee * 10) {
         return "Unable to withdraw. The amount is too low.";
       }
       return `Withdrawal successfull.\nAmount: ${amount} ETH.`;

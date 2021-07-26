@@ -136,12 +136,13 @@ exports.cancelUnfilledOrders = async function (request, h) {
 exports.getExchangeInfoProcessed = async function (request, h) {
   try {
     const { data } = await binance.get("/api/v3/exchangeInfo");
+    const request_quote_asset = request.query.quote_asset;
 
     const processed = data.symbols
       .filter(
         symbol =>
           !!symbol.isSpotTradingAllowed &&
-          symbol.quoteAsset === quote_asset &&
+          symbol.quoteAsset === (request_quote_asset ?? quote_asset) &&
           !!symbol.quoteOrderQtyMarketAllowed &&
           symbol.status === "TRADING"
       )

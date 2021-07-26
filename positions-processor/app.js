@@ -56,12 +56,14 @@ const init = async () => {
                   candle.symbol
                 );
 
+                const sell_price = toSymbolPrecision(
+                  candle.close_price,
+                  candle.symbol
+                );
+
                 await PositionModel.findByIdAndUpdate(position._id, {
                   $set: {
-                    sell_price: toSymbolPrecision(
-                      candle.close_price,
-                      candle.symbol
-                    ),
+                    sell_price,
                     close_date: new Date(),
                     close_time: Date.now(),
                     status: "closed",
@@ -77,7 +79,7 @@ const init = async () => {
                   .broadcast("positions", {
                     exchange: position.exchange,
                     symbol: position.symbol,
-                    price: position.sell_price,
+                    price: sell_price,
                     signal: position.signal.toString(),
                     type: "exit",
                     _id: position._id.toString()

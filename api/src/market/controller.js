@@ -175,7 +175,7 @@ exports.updateTradedMarkets = async function (request, h) {
     const all_markets = await MarketModel.find({}).lean();
 
     const { data: cmc_response } = await axios.get(
-      `${cmc_api_url}/v1/cryptocurrency/listings/latest?limit=200`,
+      `${cmc_api_url}/v1/cryptocurrency/listings/latest?limit=300`,
       { headers: { "X-CMC_PRO_API_KEY": cmc_api_key } }
     );
 

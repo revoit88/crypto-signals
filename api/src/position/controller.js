@@ -5,7 +5,8 @@ const {
   zignaly_provider_key_1,
   zignaly_provider_key_2,
   environment,
-  position_percentage_size
+  position_percentage_size,
+  repeat_close_position_hours
 } = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 const {
@@ -383,6 +384,17 @@ exports.repeatClosePositions = async function (request, h) {
   try {
     const Position =
       request.server.plugins.mongoose.connection.model("Position");
+
+    const closed_positions = await Position.countDocuments({
+      $and: [
+        { status: "closed" },
+        { close_time: { $gt: Date.now() - repeat_close_position_hours } }
+      ]
+    });
+
+    if (!closed_positions) {
+      return h.response();
+    }
 
     const keys = [zignaly_provider_key_1, zignaly_provider_key_2];
 

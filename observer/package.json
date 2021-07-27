@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test node app",
-    "start": "node app",
+    "start": "npm run pm2:start",
+    "stop": "npm run pm2:stop-and-delete",
+    "restart": "npm run pm2:stop-and-restart",
     "pm2:start": "pm2 start ecosystem.config.js",
     "pm2:stop": "pm2 stop ecosystem.config.js",
     "pm2:restart": "pm2 restart ecosystem.config.js",

@@ -35,6 +35,9 @@ module.exports = (candles, _, last_open_position) => {
 
   const above_ema = currentCandle.close_price > currentCandle.ema_50;
   const upward_slope = !candles.slice(-3).some(c => c.ema_50_slope === -1);
+  const green_candles = !candles
+    .slice(-2)
+    .some(c => c.close_price < c.open_price);
 
   const trending =
     previousCandle.trend === 1 &&
@@ -44,7 +47,8 @@ module.exports = (candles, _, last_open_position) => {
     previousCandle.volume_trend === 1 &&
     currentCandle.volume_trend === 1 &&
     above_ema &&
-    upward_slope;
+    upward_slope &&
+    green_candles;
 
   const notPump =
     !(currentCandle.is_pump || previousCandle.is_pump) &&

@@ -192,7 +192,7 @@ exports.updateTradedMarkets = async function (request, h) {
     let pairs_to_trade = [];
 
     for (const current_cmc_symbol of cmc_symbols) {
-      if (pairs_to_trade.length < 100) {
+      if (pairs_to_trade.length < 150) {
         const candle_count = await CandleModel.countDocuments({
           $and: [
             { symbol: current_cmc_symbol },

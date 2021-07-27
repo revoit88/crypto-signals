@@ -400,10 +400,6 @@ exports.repeatClosePositions = async function (request, h) {
         signals = signals
           .concat(open_positions)
           .reduce((a, c) => [...new Set([...a, c])], []);
-
-        console.log(
-          `Found ${(open_positions || []).length} open positions on zignaly`
-        );
       } catch (error) {
         console.error(error);
       }

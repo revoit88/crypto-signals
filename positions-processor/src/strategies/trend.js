@@ -76,7 +76,7 @@ module.exports = db => {
                 candle.close_price < candle.atr_stop);
 
             if (sell_condition && !position.stop_loss_trigger_time) {
-              return await PositionModel.findByIdAndUpdate(position._id, {
+              await PositionModel.findByIdAndUpdate(position._id, {
                 $set: { stop_loss_trigger_time: Date.now() }
               });
             }
@@ -91,7 +91,7 @@ module.exports = db => {
               !sell_condition &&
               position.stop_loss_trigger_time
             ) {
-              return await PositionModel.findByIdAndUpdate(position._id, {
+              await PositionModel.findByIdAndUpdate(position._id, {
                 $unset: { stop_loss_trigger_time: true }
               });
             }

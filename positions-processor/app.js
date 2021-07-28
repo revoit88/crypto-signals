@@ -39,7 +39,7 @@ const init = async () => {
           for (const result of results) {
             const { position, candle, sell_trigger } = result ?? {};
             try {
-              if (result) {
+              if (position) {
                 const account = await AccountModel.findById(
                   position.account_id
                 );

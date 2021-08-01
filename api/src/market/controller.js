@@ -173,36 +173,57 @@ exports.updateTradedMarkets = async function (request, h) {
     request.server.plugins.mongoose.connection.model("Candle");
   try {
     const all_markets = await MarketModel.find({}).lean();
-
-    const { data: cmc_response } = await axios.get(
+    const cmc_promise = axios.get(
       `${cmc_api_url}/v1/cryptocurrency/listings/latest?limit=300`,
       { headers: { "X-CMC_PRO_API_KEY": cmc_api_key } }
     );
+
+    const coingecko_promise = axios.get(
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=USD&order=market_cap_desc&per_page=250&page=1&sparkline=false`
+    );
+
+    const { data: cmc_response } = await cmc_promise;
+    const { data: coingecko_response } = await coingecko_promise;
+
+    const grouped_response = cmc_response.data
+      .map(item => ({
+        symbol: item.symbol,
+        rank: item.cmc_rank
+      }))
+      .concat(
+        coingecko_response.map(item => ({
+          symbol: String(item.symbol).toUpperCase(),
+          rank: item.market_cap_rank
+        }))
+      )
+      .sort((a, b) => a.rank - b.rank)
+      .reduce((a, c) => {
+        const exists = a.indexOf(c.symbol) !== -1;
+        return exists ? a : a.concat(c.symbol);
+      }, []);
 
     const markets = all_markets.map(m => m.symbol);
     const ds = {
       MIOTA: "IOTA",
       XVG: "BQX"
     };
-    const getSymbol = ({ symbol }) => ds[symbol] || symbol;
-    const cmc_symbols = cmc_response.data.map(
+    const getSymbol = symbol => ds[symbol] || symbol;
+    const all_symbols = grouped_response.map(
       item => `${getSymbol(item)}${quote_asset}`
     );
 
     let pairs_to_trade = [];
 
-    for (const current_cmc_symbol of cmc_symbols) {
+    for (const current_symbol of all_symbols) {
       if (pairs_to_trade.length < 150) {
         const candle_count = await CandleModel.countDocuments({
           $and: [
-            { symbol: current_cmc_symbol },
+            { symbol: current_symbol },
             { open_time: { $gte: Date.now() - getTimeDiff(155, interval) } }
           ]
         });
-        if (markets.includes(current_cmc_symbol) && candle_count >= 150) {
-          pairs_to_trade = [
-            ...new Set(pairs_to_trade.concat(current_cmc_symbol))
-          ];
+        if (markets.includes(current_symbol) && candle_count >= 150) {
+          pairs_to_trade = [...new Set(pairs_to_trade.concat(current_symbol))];
         }
       }
     }

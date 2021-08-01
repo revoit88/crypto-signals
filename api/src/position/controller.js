@@ -6,7 +6,8 @@ const {
   zignaly_provider_key_2,
   environment,
   position_percentage_size,
-  repeat_close_position_hours
+  repeat_close_position_hours,
+  exchange
 } = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 const {
@@ -146,47 +147,28 @@ exports.findOpenPositions = async function (request, h) {
     const MarketModel =
       request.server.plugins.mongoose.connection.model("Market");
 
-    const querySymbols = (request.query.symbol || "")
+    const querySymbols = (request.query.symbol ?? "")
       .split(",")
       .filter(notEmpty => notEmpty);
 
     const positions = await Position.find({
       $and: [
-        { status: "open" },
-        ...(querySymbols.length ? [{ symbol: { $in: querySymbols } }] : [])
+        { exchange },
+        ...(querySymbols.length ? [{ symbol: { $in: querySymbols } }] : []),
+        { status: "open" }
       ]
-    }).lean();
-
-    const { kucoin_positions, binance_positions } = positions.reduce(
-      (acc, position) => ({
-        ...acc,
-        [`${position.exchange}_positions`]:
-          acc[`${position.exchange}_positions`].concat(position)
-      }),
-      { kucoin_positions: [], binance_positions: [] }
-    );
+    })
+      .hint("exchange_1_symbol_1_status_1")
+      .lean();
 
     const markets = await MarketModel.find({
-      $or: [
-        {
-          $and: [
-            { exchange: "binance" },
-            { symbol: { $in: binance_positions.map(s => s.symbol) } }
-          ]
-        },
-        {
-          $and: [
-            { exchange: "kucoin" },
-            { symbol: { $in: kucoin_positions.map(s => s.symbol) } }
-          ]
-        }
-      ]
-    }).lean();
+      $and: [{ exchange }, { symbol: { $in: positions.map(s => s.symbol) } }]
+    })
+      .hint("exchange_1_symbol_1")
+      .lean();
 
     return positions.map(p => {
-      const market = markets.find(
-        market => market.symbol === p.symbol && market.exchange === p.exchange
-      );
+      const market = markets.find(market => market.symbol === p.symbol);
       return {
         _id: p._id,
         price: p.buy_price,

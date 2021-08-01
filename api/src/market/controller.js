@@ -205,7 +205,7 @@ exports.updateTradedMarkets = async function (request, h) {
     const markets = all_markets.map(m => m.symbol);
     const ds = {
       MIOTA: "IOTA",
-      XVG: "BQX"
+      VGX: "BQX"
     };
     const getSymbol = symbol => ds[symbol] || symbol;
     const all_symbols = grouped_response.map(

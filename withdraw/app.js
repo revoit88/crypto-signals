@@ -13,17 +13,21 @@ const { sendMail } = require("./mailer");
 app.post("/withdraw-btc", async (req, res) => {
   try {
     console.log(`=== Withdrawing BTC @ ${new Date().toUTCString()} ===`);
-    const accountPromise = binance.get("/api/v3/account");
-    const pricesPromise = binance.get("/api/v3/ticker/price");
-    const btcStatusPromise = binance.get(
-      "/sapi/v1/asset/assetDetail?asset=BTC"
-    );
-    const positionsPromise = api.get("/positions/open");
 
-    const { data: account } = await accountPromise;
-    const { data: prices } = await pricesPromise;
-    const { data: positions } = await positionsPromise;
-    const { data: btc_status } = await btcStatusPromise;
+    const [accountPromise, pricesPromise, btcStatusPromise, positionsPromise] =
+      await Promise.allSettled([
+        binance.get("/api/v3/account"),
+        binance.get("/api/v3/ticker/price"),
+        binance.get("/sapi/v1/asset/assetDetail?asset=BTC"),
+        api.get("/positions/open")
+      ]).catch(e => {
+        throw e;
+      });
+
+    const { data: account } = accountPromise;
+    const { data: prices } = pricesPromise;
+    const { data: positions } = positionsPromise;
+    const { data: btc_status } = btcStatusPromise;
 
     const totalBTCInPositions = positions.reduce((acc, position) => {
       const [market_ticker] = prices.filter(p => p.symbol === position.symbol);

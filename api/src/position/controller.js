@@ -167,21 +167,26 @@ exports.findOpenPositions = async function (request, h) {
       .hint("exchange_1_symbol_1")
       .lean();
 
-    return positions.map(p => {
-      const market = markets.find(market => market.symbol === p.symbol);
-      return {
-        _id: p._id,
-        price: p.buy_price,
-        exchange: p.exchange,
-        symbol: p.symbol,
-        time: p.open_time,
-        last_market_price: market.last_price,
-        last_market_price_update: new Date(market.updatedAt).getTime(),
-        trailing_stop_loss_armed: p.trailing_stop_loss_armed,
-        stop_loss: p.stop_loss,
-        trailing_stop_loss: p.trailing_stop_loss
-      };
-    });
+    return positions
+      .map(p => {
+        const market = markets.find(market => market.symbol === p.symbol);
+        if (!market) {
+          return;
+        }
+        return {
+          _id: p._id,
+          price: p.buy_price,
+          exchange: p.exchange,
+          symbol: p.symbol,
+          time: p.open_time,
+          last_market_price: market.last_price,
+          last_market_price_update: new Date(market.updatedAt).getTime(),
+          trailing_stop_loss_armed: p.trailing_stop_loss_armed,
+          stop_loss: p.stop_loss,
+          trailing_stop_loss: p.trailing_stop_loss
+        };
+      })
+      .filter(notNull => notNull);
   } catch (error) {
     request.logger.error(error);
     return Boom.internal();

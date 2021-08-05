@@ -50,10 +50,7 @@ module.exports = (candles, _, last_open_position) => {
     upward_slope &&
     green_candles;
 
-  const notPump =
-    !(currentCandle.is_pump || previousCandle.is_pump) &&
-    previousCandle.atr_stop < previousCandle.open_price &&
-    currentCandle.atr_stop < currentCandle.open_price;
+  const notPump = !(currentCandle.is_pump || previousCandle.is_pump);
 
   return volume && volatile && trending && di && macd && notPump
     ? {

@@ -68,12 +68,13 @@ module.exports = db => {
             }
 
             const sell_condition =
-              (previous_candle.atr_stop < previous_candle.open_price &&
+              ((previous_candle.atr_stop < previous_candle.open_price &&
                 previous_candle.atr_stop < candle.atr_stop &&
                 candle.close_price < candle.atr_stop) ||
-              (previous_candle.atr_stop > previous_candle.open_price &&
-                candle.open_price < candle.atr_stop &&
-                candle.close_price < candle.atr_stop);
+                (previous_candle.atr_stop > previous_candle.open_price &&
+                  candle.open_price < candle.atr_stop &&
+                  candle.close_price < candle.atr_stop)) &&
+              candle.trend === -1;
 
             if (sell_condition && !position.stop_loss_trigger_time) {
               await PositionModel.findByIdAndUpdate(position._id, {

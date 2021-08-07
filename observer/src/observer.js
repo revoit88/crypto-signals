@@ -12,6 +12,10 @@ module.exports = class Observer {
     this.exchange = exchange;
     this.symbol = symbol.split(",");
     this.interval = interval;
+    this.ws_id = process.pid;
+    this.subscriptionParams = symbol.split(",").map(
+      v => `${String(v).toLowerCase()}@kline_${interval}`
+    );
   }
 
   async init() {
@@ -33,10 +37,8 @@ module.exports = class Observer {
         this.client.send(
           JSON.stringify({
             method: "SUBSCRIBE",
-            params: this.symbol.map(
-              v => `${String(v).toLowerCase()}@kline_${this.interval}`
-            ),
-            id: process.pid
+            params: this.subscriptionParams,
+            id: this.ws_id
           }),
           error => {
             if (error) {
@@ -88,6 +90,21 @@ module.exports = class Observer {
         );
         console.log(args);
         await this.init();
+      });
+
+      process.on("SIGINT", () => {
+        this.client.send(
+          JSON.stringify({
+            method: "UNSUBSCRIBE",
+            params: this.subscriptionParams,
+            id: this.ws_id
+          }),
+          error => {
+            if (error) {
+              throw error;
+            }
+          }
+        );
       });
     } catch (error) {
       throw error;

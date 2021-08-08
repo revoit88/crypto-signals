@@ -153,12 +153,18 @@ module.exports = [
   { symbol: "TLMBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "ARBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "MDXBTC", priceTickSize: 0.00000001, stepSize: 0.01 },
+  { symbol: "ICPBTC", priceTickSize: 0.000001, stepSize: 0.01 },
   { symbol: "LPTBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "AGIXBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "NUBTC", priceTickSize: 0.00000001, stepSize: 0.01 },
+  { symbol: "GTCBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "BAKEBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
+  { symbol: "KEEPBTC", priceTickSize: 0.00000001, stepSize: 1.0 },
   { symbol: "KLAYBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "BONDBTC", priceTickSize: 0.000001, stepSize: 0.01 },
   { symbol: "MLNBTC", priceTickSize: 0.000001, stepSize: 0.01 },
+  { symbol: "C98BTC", priceTickSize: 0.00000001, stepSize: 1.0 },
+  { symbol: "CLVBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "QNTBTC", priceTickSize: 0.000001, stepSize: 0.001 },
   { symbol: "FLOWBTC", priceTickSize: 0.0000001, stepSize: 0.01 }
 ];

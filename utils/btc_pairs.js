@@ -85,6 +85,7 @@ module.exports = [
   { symbol: "OGNBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "WRXBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "LTOBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "COTIBTC", priceTickSize: 0.00000001, stepSize: 1.0 },
   { symbol: "SOLBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "CTSIBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "HIVEBTC", priceTickSize: 0.00000001, stepSize: 1 },
@@ -121,6 +122,7 @@ module.exports = [
   { symbol: "AVAXBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "HNTBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "ORNBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
+  { symbol: "UTKBTC", priceTickSize: 0.00000001, stepSize: 1.0 },
   { symbol: "XVSBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "ALPHABTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "AAVEBTC", priceTickSize: 0.000001, stepSize: 0.01 },
@@ -146,11 +148,14 @@ module.exports = [
   { symbol: "CKBBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "LITBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "FXSBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
+  { symbol: "DODOBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "CAKEBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "PHABTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "ALICEBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
+  { symbol: "PERPBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "CFXBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "TLMBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
+  { symbol: "MIRBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "ARBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "MDXBTC", priceTickSize: 0.00000001, stepSize: 0.01 },
   { symbol: "ICPBTC", priceTickSize: 0.000001, stepSize: 0.01 },
@@ -166,5 +171,6 @@ module.exports = [
   { symbol: "C98BTC", priceTickSize: 0.00000001, stepSize: 1.0 },
   { symbol: "CLVBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "QNTBTC", priceTickSize: 0.000001, stepSize: 0.001 },
-  { symbol: "FLOWBTC", priceTickSize: 0.0000001, stepSize: 0.01 }
+  { symbol: "FLOWBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
+  { symbol: "MINABTC", priceTickSize: 0.00000001, stepSize: 0.1 }
 ];

@@ -30,13 +30,26 @@ module.exports = db => {
     if (!!use_main_account) {
       const account = await AccountModel.findOne({
         id: "production"
-      }).hint("id_1");
+      })
+        .hint("id_1")
+        .lean();
+
+      const positions = await PositionModel.find({
+        $and: [{ status: "open" }, { buy_order: { $exists: true } }]
+      })
+        .select({ "buy_order.cummulativeQuoteQty": 1 })
+        .lean();
+
+      const invested = positions.reduce(
+        (acc, pos) => acc + +(pos?.buy_order?.cummulativeQuoteQty ?? 0),
+        0
+      );
+
+      const balance = account.balance + invested;
+
       buy_amount = toFixedDecimal(
-        config.position_percentage_size && account.total_balance
-          ? getPercentageOfValue(
-              account.total_balance,
-              config.position_percentage_size
-            )
+        config.position_percentage_size && balance
+          ? getPercentageOfValue(balance, config.position_percentage_size)
           : config.position_minimum_buy_amount,
         8
       );

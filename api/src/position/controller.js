@@ -16,6 +16,11 @@ const {
 } = require("@crypto-signals/utils");
 const { api } = require("../../utils/axios");
 
+const PROVIDERS = [
+  { key: zignaly_provider_key_1, exchange: "zignaly" },
+  { key: zignaly_provider_key_2, exchange: "zignaly" }
+].filter(v => !!v.key);
+
 exports.create = async function (request, h) {
   try {
     const SignalModel =
@@ -204,17 +209,6 @@ exports.broadcast = async function (request, h) {
       $and: [{ exchange: position.exchange }, { symbol: position.symbol }]
     }).hint("exchange_1_symbol_1");
 
-    const providers = [
-      {
-        key: zignaly_provider_key_1,
-        exchange: "zignaly"
-      },
-      {
-        key: zignaly_provider_key_2,
-        exchange: "zignaly"
-      }
-    ];
-
     if (position.type === "exit") {
       request.logger.info(
         `${new Date().toISOString()} | SELL | ${position.exchange}@${
@@ -224,7 +218,7 @@ exports.broadcast = async function (request, h) {
 
       if (environment === "production") {
         //broadcast sell signal
-        const promises = providers.map(async to => {
+        const promises = PROVIDERS.map(async to => {
           try {
             await axios.post(zignaly_url, {
               key: to.key,
@@ -253,24 +247,23 @@ exports.broadcast = async function (request, h) {
 
       if (environment === "production") {
         // send to zignaly
-        const promises = providers
-          .map(async to => {
-            try {
-              await axios.post(zignaly_url, {
-                key: to.key,
-                exchange: to.exchange,
-                type: "entry",
-                pair: position.symbol,
-                price: position.price,
-                signalId: position.signal,
-                orderType: "market",
-                buyTTL: 600,
-                positionSizePercentage: position_percentage_size
-              });
-            } catch (error) {
-              request.logger.error(error.toJSON());
-            }
-          })
+        const promises = PROVIDERS.map(async to => {
+          try {
+            await axios.post(zignaly_url, {
+              key: to.key,
+              exchange: to.exchange,
+              type: "entry",
+              pair: position.symbol,
+              price: position.price,
+              signalId: position.signal,
+              orderType: "market",
+              buyTTL: 600,
+              positionSizePercentage: position_percentage_size
+            });
+          } catch (error) {
+            request.logger.error(error.toJSON());
+          }
+        })
           // add signals promises for other services eg cryptohopper, 3commas
           .concat([]);
 
@@ -383,15 +376,13 @@ exports.repeatClosePositions = async function (request, h) {
       return h.response();
     }
 
-    const keys = [zignaly_provider_key_1, zignaly_provider_key_2];
-
     let signals = [];
 
-    for (const key of keys) {
+    for (const provider of PROVIDERS) {
       try {
         const { data } = await axios.get(
           `https://zignaly.com/new_api/provider_api/open_positions`,
-          { headers: { "x-provider-key": key } }
+          { headers: { "x-provider-key": provider.key } }
         );
 
         const open_positions = (data || []).map(p => p.n);

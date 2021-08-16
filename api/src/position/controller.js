@@ -1,14 +1,6 @@
 const Boom = require("@hapi/boom");
 const axios = require("axios");
-const {
-  zignaly_url,
-  zignaly_provider_key_1,
-  zignaly_provider_key_2,
-  environment,
-  position_percentage_size,
-  repeat_close_position_hours,
-  exchange
-} = require("@crypto-signals/config");
+const config = require("@crypto-signals/config");
 const { castToObjectId } = require("../../utils");
 const {
   orderAlphabetically,
@@ -17,8 +9,8 @@ const {
 const { api } = require("../../utils/axios");
 
 const PROVIDERS = [
-  { key: zignaly_provider_key_1, exchange: "zignaly" },
-  { key: zignaly_provider_key_2, exchange: "zignaly" }
+  { key: config.zignaly_provider_key_1, exchange: "zignaly" },
+  { key: config.zignaly_provider_key_2, exchange: "zignaly" }
 ].filter(v => !!v.key);
 
 exports.create = async function (request, h) {
@@ -158,7 +150,7 @@ exports.findOpenPositions = async function (request, h) {
 
     const positions = await Position.find({
       $and: [
-        { exchange },
+        { exchange: config.exchange },
         ...(querySymbols.length ? [{ symbol: { $in: querySymbols } }] : []),
         { status: "open" }
       ]
@@ -167,7 +159,10 @@ exports.findOpenPositions = async function (request, h) {
       .lean();
 
     const markets = await MarketModel.find({
-      $and: [{ exchange }, { symbol: { $in: positions.map(s => s.symbol) } }]
+      $and: [
+        { exchange: config.exchange },
+        { symbol: { $in: positions.map(s => s.symbol) } }
+      ]
     })
       .hint("exchange_1_symbol_1")
       .lean();
@@ -216,11 +211,11 @@ exports.broadcast = async function (request, h) {
         } @ ${position.price} | ${position.signal}`
       );
 
-      if (environment === "production") {
+      if (config.environment === "production") {
         //broadcast sell signal
         const promises = PROVIDERS.map(async to => {
           try {
-            await axios.post(zignaly_url, {
+            await axios.post(config.zignaly_url, {
               key: to.key,
               exchange: to.exchange,
               type: "exit",
@@ -245,11 +240,11 @@ exports.broadcast = async function (request, h) {
         } @ ${position.price} | ${position.signal}`
       );
 
-      if (environment === "production") {
+      if (config.environment === "production") {
         // send to zignaly
         const promises = PROVIDERS.map(async to => {
           try {
-            await axios.post(zignaly_url, {
+            await axios.post(config.zignaly_url, {
               key: to.key,
               exchange: to.exchange,
               type: "entry",
@@ -258,7 +253,7 @@ exports.broadcast = async function (request, h) {
               signalId: position.signal,
               orderType: "market",
               buyTTL: 600,
-              positionSizePercentage: position_percentage_size
+              positionSizePercentage: config.position_percentage_size
             });
           } catch (error) {
             request.logger.error(error.toJSON());
@@ -368,7 +363,7 @@ exports.repeatClosePositions = async function (request, h) {
     const closed_positions = await Position.countDocuments({
       $and: [
         { status: "closed" },
-        { close_time: { $gt: Date.now() - repeat_close_position_hours } }
+        { close_time: { $gt: Date.now() - config.repeat_close_position_hours } }
       ]
     });
 

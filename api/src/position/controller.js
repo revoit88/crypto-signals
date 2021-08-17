@@ -253,7 +253,7 @@ exports.broadcast = async function (request, h) {
               price: position.price,
               signalId: position.signal,
               orderType: config.zignaly_buy_order_type ?? "market",
-              sellTTL: config.zignaly_buy_order_ttl ?? 600,
+              buyTTL: config.zignaly_buy_order_ttl ?? 600,
               positionSizePercentage: config.position_percentage_size
             });
           } catch (error) {

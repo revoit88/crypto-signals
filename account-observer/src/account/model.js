@@ -3,20 +3,9 @@
 const { api_url } = require("@crypto-signals/config");
 const { api } = require("../../axios");
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { AccountModel } = require("@crypto-signals/utils/models");
 
-const AccountSchema = new Schema(
-  {
-    id: { type: String },
-    balance: { type: Number },
-    total_balance: { type: Number },
-    type: { type: String },
-    last_order_error: { type: Number },
-    spot_account_listen_key: { type: String },
-    last_spot_account_listen_key_update: { type: Number, default: 0 }
-  },
-  { timestamps: true }
-);
+const AccountSchema = AccountModel(mongoose);
 
 function broadcastAccountUpdate(account) {
   if (api_url) {

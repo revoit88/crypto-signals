@@ -1,18 +1,9 @@
 "use strict";
 
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { AccountModel } = require("@crypto-signals/utils/models");
 
-const AccountSchema = new Schema(
-  {
-    id: { type: String },
-    total_balance: { type: Number },
-    balance: { type: Number },
-    type: { type: String },
-    create_order_after: { type: Number }
-  },
-  { timestamps: true }
-);
+const AccountSchema = AccountModel(mongoose);
 /**
  *
  * @param {mongoose.Connection} db

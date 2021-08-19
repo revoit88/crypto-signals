@@ -220,8 +220,10 @@ exports.broadcast = async function (request, h) {
               exchange: to.exchange,
               type: "exit",
               pair: position.symbol,
-              orderType: config.zignaly_sell_order_type ?? "limit",
-              sellTTL: config.zignaly_sell_order_ttl ?? 300,
+              ...(config.zignaly_sell_order_type && {
+                orderType: config.zignaly_sell_order_type
+              }),
+              sellTTL: config.zignaly_sell_order_ttl || 300,
               price: position.price,
               signalId: position.signal
             });
@@ -252,8 +254,8 @@ exports.broadcast = async function (request, h) {
               pair: position.symbol,
               price: position.price,
               signalId: position.signal,
-              orderType: config.zignaly_buy_order_type ?? "market",
-              buyTTL: config.zignaly_buy_order_ttl ?? 600,
+              orderType: config.zignaly_buy_order_type || "market",
+              buyTTL: config.zignaly_buy_order_ttl || 600,
               positionSizePercentage: config.position_percentage_size
             });
           } catch (error) {

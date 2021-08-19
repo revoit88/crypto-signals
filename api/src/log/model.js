@@ -1,9 +1,9 @@
 "use strict";
 
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { LogModel } = require("@crypto-signals/utils/models");
 
-const LogSchema = new Schema({}, { timestamps: true, strict: false });
+const LogSchema = LogModel(mongoose);
 /**
  *
  * @param {mongoose.Connection} db

@@ -230,7 +230,15 @@ exports.broadcast = async function (request, h) {
           } catch (error) {
             request.logger.error(error.toJSON());
           }
-        });
+        }).concat(
+          config.discord_microservice_url
+            ? [
+                axios.post(
+                  `${config.discord_microservice_url}/position-closed?id=${position._id}`
+                )
+              ]
+            : []
+        );
 
         await Promise.all(promises);
       }

@@ -1,0 +1,22 @@
+{
+  "name": "discord",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "pm2 start app.js --name discord",
+    "stop": "pm2 stop discord && pm2 delete discord",
+    "restart": "npm stop && npm start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@crypto-signals/config": "file:./config",
+    "@crypto-signals/utils": "file:../utils",
+    "@hapi/hapi": "^20.1.5",
+    "axios": "^0.21.1",
+    "date-fns": "^2.23.0",
+    "dotenv": "^10.0.0",
+    "mongoose": "^5.13.7"
+  }
+}

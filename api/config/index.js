@@ -41,5 +41,6 @@ module.exports = {
     +process.env.REPEAT_CLOSE_POSITION_HOURS * milliseconds.hour,
   quote_asset: process.env.QUOTE_ASSET,
   cmc_api_url: process.env.CMC_API_URL,
-  cmc_api_key: process.env.CMC_API_KEY
+  cmc_api_key: process.env.CMC_API_KEY,
+  discord_microservice_url: process.env.DISCORD_MICROSERVICE_URL
 };

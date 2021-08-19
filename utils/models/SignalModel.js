@@ -16,7 +16,7 @@ module.exports = (mongoose, config = {}) => {
       symbol: {
         type: String,
         required: true,
-        validate: value => pairs.includes(value)
+        validate: value => pairs.map(p => p.symbol).includes(value)
       },
       interval: {
         type: String,

@@ -13,7 +13,7 @@ module.exports = (mongoose, config = {}) => {
       symbol: {
         type: String,
         required: true,
-        validate: value => pairs.includes(value)
+        validate: value => pairs.map(p => p.symbol).includes(value)
       },
       open_time: { type: Number, required: true, validate: validateNumber },
       close_time: { type: Number, validate: validateNumber },

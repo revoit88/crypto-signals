@@ -27,7 +27,7 @@ module.exports = (mongoose, config = {}) => {
       type: { type: String, required: true, enum: ["buy", "sell"] },
       date: { type: Date, required: true },
       close_date: { type: Date },
-      drop_price: { type: Number, required: true, validate: validateNumber },
+      drop_price: { type: Number, validate: validateNumber },
       trigger: { type: String, required: true },
       status: {
         type: String,

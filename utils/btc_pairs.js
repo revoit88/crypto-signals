@@ -7,7 +7,6 @@ module.exports = [
   { symbol: "QTUMBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "OMGBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "ZRXBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "BQXBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "KNCBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "FUNBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "IOTABTC", priceTickSize: 0.00000001, stepSize: 1 },
@@ -172,5 +171,6 @@ module.exports = [
   { symbol: "CLVBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "QNTBTC", priceTickSize: 0.000001, stepSize: 0.001 },
   { symbol: "FLOWBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
-  { symbol: "MINABTC", priceTickSize: 0.00000001, stepSize: 0.1 }
+  { symbol: "MINABTC", priceTickSize: 0.00000001, stepSize: 0.1 },
+  { symbol: "VGXBTC", priceTickSize: 0.00000001, stepSize: 0.1 }
 ];

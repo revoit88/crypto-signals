@@ -55,7 +55,6 @@ const init = async () => {
           )})**
 Total Signals: ${positions.length}
 Total Wins: ${winningSignals}
-Total Profit: ${totalProfit}%
 Average Profit Per Signal: ${averageProfit}%
           `;
 

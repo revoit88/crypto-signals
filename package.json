@@ -11,7 +11,8 @@
     "restart:signals-performance": "npm run restart --prefix ./signal-performance",
     "restart:signals-processor": "npm run restart --prefix ./signals-processor",
     "restart:trader": "npm run restart --prefix ./trader",
-    "restart:all": "npm run restart:api && npm run restart:candles-processor && npm run restart:candles-processor && npm run restart:positions-processor && npm run restart:signals-performance && npm run restart:signals-processor && npm run restart:trader"
+    "restart:discord": "npm run restart --prefix ./discord",
+    "restart:all": "npm run restart:api && npm run restart:candles-processor && npm run restart:positions-processor && npm run restart:signals-performance && npm run restart:signals-processor && npm run restart:trader && npm run restart:discord"
   },
   "author": "",
   "license": "ISC",

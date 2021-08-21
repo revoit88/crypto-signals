@@ -16,6 +16,7 @@ module.exports = {
   zignaly_url: process.env.ZIGNALY_URL,
   zignaly_provider_key_1: process.env.ZIGNALY_PROVIDER_KEY_1,
   zignaly_provider_key_2: process.env.ZIGNALY_PROVIDER_KEY_2,
+  zignaly_provider_key_3: process.env.ZIGNALY_PROVIDER_KEY_3,
   zignaly_buy_order_type: process.env.ZIGNALY_BUY_ORDER_TYPE,
   zignaly_buy_order_ttl: +process.env.ZIGNALY_BUY_ORDER_TTL,
   zignaly_sell_order_type: process.env.ZIGNALY_SELL_ORDER_TYPE,

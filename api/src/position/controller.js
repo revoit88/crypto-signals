@@ -10,7 +10,8 @@ const { api } = require("../../utils/axios");
 
 const PROVIDERS = [
   { key: config.zignaly_provider_key_1, exchange: "zignaly" },
-  { key: config.zignaly_provider_key_2, exchange: "zignaly" }
+  { key: config.zignaly_provider_key_2, exchange: "zignaly" },
+  { key: config.zignaly_provider_key_3, exchange: "zignaly" },
 ].filter(v => !!v.key);
 
 exports.create = async function (request, h) {

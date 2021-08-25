@@ -67,6 +67,10 @@ module.exports = db => {
               });
             }
 
+            const downwards_ema_slope =
+              previous_candle.ema_50_slope === -1 && candle.ema_50_slope === -1;
+            const downwards_trend = candle.trend === -1;
+
             const sell_condition =
               ((previous_candle.atr_stop < previous_candle.open_price &&
                 previous_candle.atr_stop < candle.atr_stop &&
@@ -74,7 +78,7 @@ module.exports = db => {
                 (previous_candle.atr_stop > previous_candle.open_price &&
                   candle.open_price < candle.atr_stop &&
                   candle.close_price < candle.atr_stop)) &&
-              candle.trend === -1;
+              (downwards_ema_slope || downwards_trend);
 
             if (sell_condition && !position.stop_loss_trigger_time) {
               await PositionModel.findByIdAndUpdate(position._id, {

@@ -210,28 +210,24 @@ function getBooleanValue(value) {
 }
 
 function buildCandles({ candles, exchange, symbol, interval }) {
-  return candles.reduce(
-    (acc, current) =>
-      acc.concat({
-        exchange,
-        symbol,
-        interval,
-        id: `${exchange}_${symbol}_${interval}_${cloneObject(current[0])}`,
-        event_time: Number(cloneObject(current[0])),
-        open_time: Number(cloneObject(current[0])),
-        close_time: Number(cloneObject(current[6])),
-        open_price: Number(cloneObject(current[1])),
-        close_price: Number(cloneObject(current[4])),
-        high_price: Number(cloneObject(current[2])),
-        low_price: Number(cloneObject(current[3])),
-        base_asset_volume: Number(cloneObject(current[5])),
-        number_of_trades: Number(cloneObject(current[8])),
-        is_closed: new Date().getTime() > Number(cloneObject(current[6])),
-        quote_asset_volume: Number(cloneObject(current[7])),
-        date: new Date(Number(cloneObject(current[0]))).toISOString()
-      }),
-    []
-  );
+  return candles.map(current => ({
+    exchange,
+    symbol,
+    interval,
+    id: `${exchange}_${symbol}_${interval}_${cloneObject(current[0])}`,
+    event_time: +cloneObject(current[0]),
+    open_time: +cloneObject(current[0]),
+    close_time: +cloneObject(current[6]),
+    open_price: +cloneObject(current[1]),
+    close_price: +cloneObject(current[4]),
+    high_price: +cloneObject(current[2]),
+    low_price: +cloneObject(current[3]),
+    base_asset_volume: +cloneObject(current[5]),
+    number_of_trades: +cloneObject(current[8]),
+    is_closed: new Date().getTime() > +cloneObject(current[6]),
+    quote_asset_volume: +cloneObject(current[7]),
+    date: new Date(+cloneObject(current[0])).toISOString()
+  }));
 }
 
 const benchmark = (fn, text) => {

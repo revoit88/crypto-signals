@@ -13,10 +13,12 @@ const { binance, api } = require("./axios");
 const { sendMail } = require("./mailer");
 
 app.use(async (req, res, next) => {
-  const connection = await mongoose.createConnection(db_uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
+  const connection = await mongoose
+    .createConnection(db_uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    })
+    .asPromise();
   require("./src/position/model")(connection);
   req.app.mongoose = connection;
   next();

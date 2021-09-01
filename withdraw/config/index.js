@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 module.exports = {
+  db_uri: process.env.DB_URI,
   email_from: process.env.MAILER_FROM,
   email_to: process.env.MAILER_TO,
   mailer_host: process.env.MAILER_HOST,

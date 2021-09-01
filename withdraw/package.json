@@ -15,6 +15,7 @@
     "@crypto-signals/utils": "file:../utils",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "mongoose": "^6.0.4",
     "nodemailer": "^6.6.3"
   }
 }

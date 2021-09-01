@@ -1,33 +1,47 @@
 const app = require("express")();
 const qs = require("querystring");
+const mongoose = require("mongoose");
 const {
   reserved_amount,
   btc_address,
   eth_address,
-  port
+  port,
+  db_uri
 } = require("@crypto-signals/config");
 const { nz } = require("@crypto-signals/utils");
 const { binance, api } = require("./axios");
 const { sendMail } = require("./mailer");
 
+app.use(async (req, res, next) => {
+  const connection = await mongoose.createConnection(db_uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+  require("./src/position/model")(connection);
+  req.app.mongoose = connection;
+  next();
+});
+
 app.post("/withdraw-btc", async (req, res) => {
   try {
     console.log(`=== Withdrawing BTC @ ${new Date().toUTCString()} ===`);
+
+    const PositionModel = req.app.mongoose.model("Position");
     const accountPromise = binance.get("/api/v3/account");
-    const pricesPromise = binance.get("/api/v3/ticker/price");
     const btcStatusPromise = binance.get(
       "/sapi/v1/asset/assetDetail?asset=BTC"
     );
-    const positionsPromise = api.get("/positions/open");
 
     const { data: account } = await accountPromise;
-    const { data: prices } = await pricesPromise;
-    const { data: positions } = await positionsPromise;
     const { data: btc_status } = await btcStatusPromise;
 
+    const positions = await PositionModel.find(
+      { $and: [{ status: "open" }, { buy_order: { $exists: true } }] },
+      { "buy_order.cummulativeQuoteQty": 1 }
+    );
+
     const totalBTCInPositions = positions.reduce((acc, position) => {
-      const [market_ticker] = prices.filter(p => p.symbol === position.symbol);
-      return acc + nz(position.buy_amount * +market_ticker.price);
+      return acc + nz(+position.buy_order.cummulativeQuoteQty);
     }, 0);
 
     const [btc] = account.balances.filter(item => item.asset === "BTC");

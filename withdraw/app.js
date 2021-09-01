@@ -86,7 +86,8 @@ app.post("/withdraw-btc", async (req, res) => {
       return `Withdrawal successfull.\nAmount: ${amount} BTC.`;
     };
 
-    await sendMail(getMessage(amount_to_withdraw));
+    console.log(getMessage(amount_to_withdraw));
+    // await sendMail(getMessage(amount_to_withdraw));
     return res.send({ success: true });
   } catch (error) {
     console.error(error);

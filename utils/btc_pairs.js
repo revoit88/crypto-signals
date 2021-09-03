@@ -7,21 +7,21 @@ module.exports = [
   { symbol: "QTUMBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
   { symbol: "OMGBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
   { symbol: "ZRXBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "KNCBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
-  { symbol: "FUNBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "KNCBTC", priceTickSize: 0.00000001, stepSize: 0.1 }, //
+  { symbol: "FUNBTC", priceTickSize: 0.00000001, stepSize: 1 }, //
   { symbol: "IOTABTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "LINKBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "XVGBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "MTLBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "EOSBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
   { symbol: "SNTBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "ETCBTC", priceTickSize: 0.000001, stepSize: 0.01 },
+  { symbol: "ETCBTC", priceTickSize: 0.000001, stepSize: 0.01 }, // remove
   { symbol: "ZECBTC", priceTickSize: 0.000001, stepSize: 0.001 },
   { symbol: "BNTBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "DASHBTC", priceTickSize: 0.000001, stepSize: 0.001 },
-  { symbol: "BTGBTC", priceTickSize: 0.000001, stepSize: 0.01 },
-  { symbol: "TRXBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "POWRBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "BTGBTC", priceTickSize: 0.000001, stepSize: 0.01 }, // remove
+  { symbol: "TRXBTC", priceTickSize: 0.00000001, stepSize: 1 }, // remove
+  { symbol: "POWRBTC", priceTickSize: 0.00000001, stepSize: 1 }, // remove
   { symbol: "ARKBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "XRPBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "ENJBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
@@ -31,12 +31,12 @@ module.exports = [
   { symbol: "BTSBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "LSKBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "MANABTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "BCDBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
+  { symbol: "BCDBTC", priceTickSize: 0.00000001, stepSize: 0.1 }, // remove
   { symbol: "ADABTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "XLMBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "WAVESBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "ICXBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "ELFBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "ELFBTC", priceTickSize: 0.00000001, stepSize: 1 }, // remove
   { symbol: "RLCBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "IOSTBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "STEEMBTC", priceTickSize: 0.00000001, stepSize: 1 },
@@ -67,7 +67,7 @@ module.exports = [
   { symbol: "ONEBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "FTMBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "ALGOBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "DOGEBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "DOGEBTC", priceTickSize: 0.00000001, stepSize: 1 }, // remove
   { symbol: "ANKRBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "TOMOBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "CHZBTC", priceTickSize: 0.00000001, stepSize: 1 },
@@ -78,7 +78,7 @@ module.exports = [
   { symbol: "STXBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "KAVABTC", priceTickSize: 0.0000001, stepSize: 0.1 },
   { symbol: "BCHBTC", priceTickSize: 0.00001, stepSize: 0.001 },
-  { symbol: "VITEBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "VITEBTC", priceTickSize: 0.00000001, stepSize: 1 }, // remove
   { symbol: "FTTBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "OGNBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "WRXBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
@@ -86,7 +86,7 @@ module.exports = [
   { symbol: "COTIBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "SOLBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "CTSIBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "HIVEBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "HIVEBTC", priceTickSize: 0.00000001, stepSize: 1 }, // remove
   { symbol: "CHRBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "STMXBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "DGBBTC", priceTickSize: 0.00000001, stepSize: 1 },
@@ -95,7 +95,7 @@ module.exports = [
   { symbol: "SNXBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
   { symbol: "MKRBTC", priceTickSize: 0.00001, stepSize: 0.0001 },
   { symbol: "RUNEBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
-  { symbol: "FIOBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "FIOBTC", priceTickSize: 0.00000001, stepSize: 1 }, // remove
   { symbol: "BALBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "YFIBTC", priceTickSize: 0.0001, stepSize: 0.00001 },
   { symbol: "SRMBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
@@ -108,12 +108,12 @@ module.exports = [
   { symbol: "LUNABTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "RSRBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "PAXGBTC", priceTickSize: 0.00001, stepSize: 0.0001 },
-  { symbol: "SUSHIBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
+  { symbol: "SUSHIBTC", priceTickSize: 0.0000001, stepSize: 0.1 }, // remove
   { symbol: "YFIIBTC", priceTickSize: 0.0001, stepSize: 0.0001 },
   { symbol: "KSMBTC", priceTickSize: 0.000001, stepSize: 0.001 },
   { symbol: "EGLDBTC", priceTickSize: 0.000001, stepSize: 0.01 },
   { symbol: "UMABTC", priceTickSize: 0.0000001, stepSize: 0.1 },
-  { symbol: "BELBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
+  { symbol: "BELBTC", priceTickSize: 0.00000001, stepSize: 0.1 }, // remove
   { symbol: "WINGBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "UNIBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "OXTBTC", priceTickSize: 0.00000001, stepSize: 1 },
@@ -127,7 +127,7 @@ module.exports = [
   { symbol: "NEARBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "FILBTC", priceTickSize: 0.000001, stepSize: 0.01 },
   { symbol: "INJBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
-  { symbol: "AERGOBTC", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "AERGOBTC", priceTickSize: 0.00000001, stepSize: 1 }, // remove
   { symbol: "AUDIOBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "CTKBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "AKROBTC", priceTickSize: 0.00000001, stepSize: 1 },
@@ -138,35 +138,35 @@ module.exports = [
   { symbol: "SUSDBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "GLMBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "GRTBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "1INCHBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
+  { symbol: "1INCHBTC", priceTickSize: 0.00000001, stepSize: 0.1 }, // ?
   { symbol: "REEFBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "CELOBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "RIFBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "BTCSTBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
+  { symbol: "BTCSTBTC", priceTickSize: 0.0000001, stepSize: 0.01 }, // ?
   { symbol: "CKBBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "LITBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "FXSBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "DODOBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
-  { symbol: "CAKEBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
+  { symbol: "CAKEBTC", priceTickSize: 0.0000001, stepSize: 0.01 }, // remove
   { symbol: "PHABTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "ALICEBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "PERPBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "CFXBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "TLMBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "MIRBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
-  { symbol: "ICPBTC", priceTickSize: 0.000001, stepSize: 0.01 },
+  { symbol: "ICPBTC", priceTickSize: 0.000001, stepSize: 0.01 }, // remove
   { symbol: "ARBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "MDXBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "LPTBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "AGIXBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "NUBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "GTCBTC", priceTickSize: 0.0000001, stepSize: 0.1 },
-  { symbol: "BAKEBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
+  { symbol: "BAKEBTC", priceTickSize: 0.00000001, stepSize: 0.1 }, // ?
   { symbol: "KEEPBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "KLAYBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
+  { symbol: "KLAYBTC", priceTickSize: 0.00000001, stepSize: 0.1 }, // remove
   { symbol: "BONDBTC", priceTickSize: 0.0000001, stepSize: 0.01 },
   { symbol: "MLNBTC", priceTickSize: 0.000001, stepSize: 0.001 },
-  { symbol: "C98BTC", priceTickSize: 0.00000001, stepSize: 0.1 },
+  { symbol: "C98BTC", priceTickSize: 0.00000001, stepSize: 0.1 }, // remove
   { symbol: "CLVBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "QNTBTC", priceTickSize: 0.000001, stepSize: 0.001 },
   { symbol: "FLOWBTC", priceTickSize: 0.0000001, stepSize: 0.01 },

@@ -43,7 +43,7 @@ exports.create = async function (request, h) {
       end_time: end,
       total_trades: positions.length,
       total_wins: positions.filter(p => p.change > 0).length,
-      average_profit: +Number(
+      average_change: +Number(
         positions.reduce((a, c) => a + c.change, 0) / positions.length || 0
       ).toFixed(2)
     };
@@ -52,7 +52,6 @@ exports.create = async function (request, h) {
 
     return h.response();
   } catch (error) {
-    console.error(error);
     request.logger.error(error);
     return Boom.internal();
   }

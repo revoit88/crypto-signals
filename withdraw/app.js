@@ -47,7 +47,8 @@ app.post("/withdraw-btc", async (req, res) => {
     }, 0);
 
     const [btc] = account.balances.filter(item => item.asset === "BTC");
-    const total_btc = +btc.free + totalBTCInPositions;
+    const free_btc = +btc.free;
+    const total_btc = free_btc + totalBTCInPositions;
 
     const withdraw_fee = +btc_status.BTC.withdrawFee;
     const minimum_amount_to_withdraw = +btc_status.BTC.minWithdrawAmount;
@@ -58,7 +59,8 @@ app.post("/withdraw-btc", async (req, res) => {
 
     if (
       amount_to_withdraw > minimum_amount_to_withdraw &&
-      amount_to_withdraw > withdraw_fee * 10
+      amount_to_withdraw > withdraw_fee * 10 &&
+      amount_to_withdraw <= free_btc
     ) {
       const withdrawQuery = qs.stringify({
         coin: "BTC",
@@ -84,6 +86,9 @@ app.post("/withdraw-btc", async (req, res) => {
       }
       if (amount < withdraw_fee * 10) {
         return "Unable to withdraw. The amount is too low.";
+      }
+      if (amount > free_btc) {
+        return "Insufficient balance available";
       }
       return `Withdrawal successfull.\nAmount: ${amount} BTC.`;
     };

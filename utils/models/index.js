@@ -4,6 +4,7 @@ const LogModel = require("./LogModel");
 const MarketModel = require("./MarketModel");
 const OrderModel = require("./OrderModel");
 const PositionModel = require("./PositionModel");
+const ReportModel = require("./ReportModel");
 const SignalModel = require("./SignalModel");
 const TelegramModel = require("./TelegramModel");
 
@@ -14,6 +15,7 @@ module.exports = {
   MarketModel,
   OrderModel,
   PositionModel,
+  ReportModel,
   SignalModel,
   TelegramModel
 };

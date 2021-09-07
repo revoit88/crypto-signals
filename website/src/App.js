@@ -3,6 +3,7 @@ import Home from "./views/home";
 import Reports from "./views/reports";
 import Pairs from "./views/pairs";
 import About from "./views/about";
+import Layout from "./layout/Layout";
 
 const routes = [
   { path: "/", exact: true, component: Home, id: "home-route" },
@@ -14,17 +15,19 @@ const routes = [
 function App() {
   return (
     <BrowserRouter>
-      <Switch>
-        {routes.map(route => (
-          <Route
-            path={route.path}
-            exact={!!route.exact}
-            component={route.component}
-            key={route.id}
-          />
-        ))}
-        <Redirect to="/" />
-      </Switch>
+      <Layout>
+        <Switch>
+          {routes.map(route => (
+            <Route
+              path={route.path}
+              exact={!!route.exact}
+              component={route.component}
+              key={route.id}
+            />
+          ))}
+          <Redirect to="/" />
+        </Switch>
+      </Layout>
     </BrowserRouter>
   );
 }

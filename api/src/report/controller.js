@@ -82,14 +82,26 @@ exports.getReportPositions = async function (request, h) {
     const PositionModel =
       request.server.plugins.mongoose.connection.model("Position");
     const id = request.params.id;
-    const limit = request.query.limit ?? 0;
+    const limit = +request.query.limit ?? 0;
     const offset = +request.query.offset ?? 0;
+    const symbol = request.query.symbol;
     const report = await ReportModel.findById(castToObjectId(id)).lean();
+
+    const count = await PositionModel.countDocuments({
+      $and: [
+        { close_time: { $gte: report.start_time } },
+        { close_time: { $lte: report.end_time } },
+        { status: "closed" },
+        ...(symbol ? [{ symbol }] : [])
+      ]
+    });
+
     const positions = await PositionModel.find({
       $and: [
         { close_time: { $gte: report.start_time } },
         { close_time: { $lte: report.end_time } },
-        { status: "closed" }
+        { status: "closed" },
+        ...(symbol ? [{ symbol }] : [])
       ]
     })
       .select({
@@ -100,11 +112,12 @@ exports.getReportPositions = async function (request, h) {
         sell_price: true,
         change: true
       })
+      .sort({ open_time: -1 })
       .limit(limit)
       .skip(offset)
       .lean();
 
-    return positions;
+    return h.response(positions).header("x-total-count", count);
   } catch (error) {
     request.logger.error(error);
     return Boom.internal();

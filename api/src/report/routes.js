@@ -15,8 +15,8 @@ module.exports = {
 
     server.route({
       method: "GET",
-      path: "/{id}/positions",
-      handler: Controller.downloadReport,
+      path: "/{id}/signals",
+      handler: Controller.getReportPositions,
       options: {
         auth: { access: { scope: ["website"] } },
         validate: { params: { id: joi.string().hex().length(24).required() } }

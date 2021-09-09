@@ -22,6 +22,7 @@ module.exports = {
       require("./src/market/model")(db);
       require("./src/log/model")(db);
       require("./src/order/model")(db);
+      require("./src/report/model")(db);
       console.log("imported all models");
       server.expose("connection", db);
     } catch (error) {

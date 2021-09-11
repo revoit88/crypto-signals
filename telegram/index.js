@@ -33,7 +33,7 @@ app.post("/signals/broadcast", async (req, res) => {
   try {
     const channel_id = config.channel_id;
     const position_id = req.body._id;
-    const signal_type = req.body.signal_type;
+    const signal_type = req.body.type;
 
     if (!channel_id) {
       throw new Error("Channel ID is not defined");

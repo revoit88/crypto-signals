@@ -8,11 +8,9 @@ module.exports = {
   interval: process.env.INTERVAL,
   db_uri: process.env.DB_URI,
   redis_uri: process.env.REDIS_URI,
-  telegram_api_url: process.env.TELEGRAM_API_URL,
   host: process.env.API_HOST || "localhost",
   port: +process.env.API_PORT || 8080,
   allowed_pairs: pairs.map(p => p.symbol),
-  telegram_token: process.env.TELEGRAM_TOKEN,
   zignaly_url: process.env.ZIGNALY_URL,
   zignaly_provider_key_1: process.env.ZIGNALY_PROVIDER_KEY_1,
   zignaly_provider_key_2: process.env.ZIGNALY_PROVIDER_KEY_2,
@@ -43,5 +41,6 @@ module.exports = {
   quote_asset: process.env.QUOTE_ASSET,
   cmc_api_url: process.env.CMC_API_URL,
   cmc_api_key: process.env.CMC_API_KEY,
-  discord_microservice_url: process.env.DISCORD_MICROSERVICE_URL
+  discord_microservice_url: process.env.DISCORD_MICROSERVICE_URL,
+  telegram_bot_url: process.env.TELEGRAM_BOT_URL
 };

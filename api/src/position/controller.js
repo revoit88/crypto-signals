@@ -1,18 +1,12 @@
 const Boom = require("@hapi/boom");
 const axios = require("axios");
 const config = require("@crypto-signals/config");
-const { castToObjectId } = require("../../utils");
+const { castToObjectId, getTelegramBotRequest } = require("../../utils");
 const {
   orderAlphabetically,
   toSymbolPrecision
 } = require("@crypto-signals/utils");
 const { api } = require("../../utils/axios");
-
-const PROVIDERS = [
-  { key: config.zignaly_provider_key_1, exchange: "zignaly" },
-  { key: config.zignaly_provider_key_2, exchange: "zignaly" },
-  { key: config.zignaly_provider_key_3, exchange: "zignaly" },
-].filter(v => !!v.key);
 
 exports.create = async function (request, h) {
   try {
@@ -214,32 +208,10 @@ exports.broadcast = async function (request, h) {
 
       if (config.environment === "production") {
         //broadcast sell signal
-        const promises = PROVIDERS.map(async to => {
-          try {
-            await axios.post(config.zignaly_url, {
-              key: to.key,
-              exchange: to.exchange,
-              type: "exit",
-              pair: position.symbol,
-              ...(config.zignaly_sell_order_type && {
-                orderType: config.zignaly_sell_order_type
-              }),
-              sellTTL: config.zignaly_sell_order_ttl || 300,
-              price: position.price,
-              signalId: position.signal
-            });
-          } catch (error) {
-            request.logger.error(error.toJSON());
-          }
-        }).concat(
-          config.discord_microservice_url
-            ? [
-                axios.post(
-                  `${config.discord_microservice_url}/position-closed?id=${position._id}`
-                )
-              ]
-            : []
-        );
+        const promises = []
+          .concat(getTelegramBotRequest(position, config)) //telegram
+          .concat([]) //discord
+          .concat([]); //other providers
 
         await Promise.all(promises);
       }
@@ -254,23 +226,9 @@ exports.broadcast = async function (request, h) {
 
       if (config.environment === "production") {
         // send to zignaly
-        const promises = PROVIDERS.map(async to => {
-          try {
-            await axios.post(config.zignaly_url, {
-              key: to.key,
-              exchange: to.exchange,
-              type: "entry",
-              pair: position.symbol,
-              price: position.price,
-              signalId: position.signal,
-              orderType: config.zignaly_buy_order_type || "market",
-              buyTTL: config.zignaly_buy_order_ttl || 600,
-              positionSizePercentage: config.position_percentage_size
-            });
-          } catch (error) {
-            request.logger.error(error.toJSON());
-          }
-        })
+        const promises = []
+          .concat(getTelegramBotRequest(position, config)) //telegram
+          .concat([]) //discord
           // add signals promises for other services eg cryptohopper, 3commas
           .concat([]);
 

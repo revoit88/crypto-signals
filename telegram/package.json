@@ -1,0 +1,23 @@
+{
+  "name": "telegram",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2 start index.js --name telegram",
+    "stop": "pm2 stop telegram && pm2 delete telegram",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "restart": "npm stop && npm start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@crypto-signals/config": "file:./config",
+    "@crypto-signals/utils": "file:../utils",
+    "axios": "^0.21.4",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^6.0.5",
+    "telegraf": "^3.38.0"
+  }
+}

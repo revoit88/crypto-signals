@@ -57,7 +57,9 @@ module.exports = (mongoose, config = {}) => {
       negative_change: { type: Boolean, default: false },
       unlocked_tsl_multiplier: { type: Number, default: 0 },
       last_stop_loss_update: { type: Number, default: 0 },
-      broadcast: { type: Boolean, default: false }
+      broadcast: { type: Boolean, default: false },
+      entry_signal_telegram_message_id: { type: Number },
+      entry_signal_discord_message_id: { type: Number }
     },
     { timestamps: true, ...config }
   );

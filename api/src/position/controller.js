@@ -209,7 +209,7 @@ exports.broadcast = async function (request, h) {
       if (config.environment === "production") {
         //broadcast sell signal
         const promises = []
-          //.concat(getTelegramBotRequest(position, config)) //telegram
+          .concat(getTelegramBotRequest(position, config)) //telegram
           .concat([]) //discord
           .concat([]); //other providers
 
@@ -227,7 +227,7 @@ exports.broadcast = async function (request, h) {
       if (config.environment === "production") {
         // send to zignaly
         const promises = []
-         // .concat(getTelegramBotRequest(position, config)) //telegram
+          .concat(getTelegramBotRequest(position, config)) //telegram
           .concat([]) //discord
           // add signals promises for other services eg cryptohopper, 3commas
           .concat([]);

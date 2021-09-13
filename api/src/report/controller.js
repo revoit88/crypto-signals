@@ -25,10 +25,20 @@ exports.create = async function (request, h) {
       return h.response();
     }
 
+    await Position.deleteMany({
+      $and: [
+        { status: "closed" },
+        { $or: [{ broadcast: false }, { broadcast: { $exists: false } }] },
+        { close_time: { $gte: start } },
+        { close_time: { $lte: end } }
+      ]
+    });
+
     const positions = await Position.find(
       {
         $and: [
           { status: "closed" },
+          { broadcast: true },
           { close_time: { $gte: start } },
           { close_time: { $lte: end } }
         ]
@@ -89,18 +99,18 @@ exports.getReportPositions = async function (request, h) {
 
     const count = await PositionModel.countDocuments({
       $and: [
+        { status: "closed" },
         { close_time: { $gte: report.start_time } },
         { close_time: { $lte: report.end_time } },
-        { status: "closed" },
         ...(symbol ? [{ symbol }] : [])
       ]
     });
 
     const positions = await PositionModel.find({
       $and: [
+        { status: "closed" },
         { close_time: { $gte: report.start_time } },
         { close_time: { $lte: report.end_time } },
-        { status: "closed" },
         ...(symbol ? [{ symbol }] : [])
       ]
     })

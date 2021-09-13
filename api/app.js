@@ -96,6 +96,10 @@ const init = async () => {
     {
       plugin: require("./src/log/routes"),
       routes: { prefix: "/logs" }
+    },
+    {
+      plugin: require("./src/report/routes"),
+      routes: { prefix: "/reports" }
     }
   ]);
 

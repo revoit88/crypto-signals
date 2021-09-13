@@ -1,6 +1,6 @@
 const Boom = require("@hapi/boom");
 const {
-  signals_performance_microservice,
+  // signals_performance_microservice,
   positions_processor_microservice,
   signals_processor_microservice,
   candles_processor_microservice,
@@ -264,10 +264,10 @@ exports.persist = async function (request, h) {
           `?symbol=${candle.symbol}`,
           toUpdate.map(c => c.id)
         );
-        await signals_performance_microservice.post(
-          `?symbol=${candle.symbol}`,
-          toUpdate
-        );
+        // await signals_performance_microservice.post(
+        //   `?symbol=${candle.symbol}`,
+        //   toUpdate
+        // );
       }
       await delAsync(`${candle.symbol}_candles_persist_lock`);
 

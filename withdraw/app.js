@@ -53,9 +53,9 @@ app.post("/withdraw-btc", async (req, res) => {
     const withdraw_fee = +btc_status.BTC.withdrawFee;
     const minimum_amount_to_withdraw = +btc_status.BTC.minWithdrawAmount;
 
-    const amount_to_withdraw = +Number(
-      total_btc - (reserved_amount + withdraw_fee)
-    ).toFixed(8);
+    const amount_to_withdraw =
+      req.query.amount ??
+      +Number(total_btc - (reserved_amount + withdraw_fee)).toFixed(8);
 
     if (
       amount_to_withdraw > minimum_amount_to_withdraw &&

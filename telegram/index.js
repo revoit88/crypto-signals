@@ -60,10 +60,9 @@ app.post("/signals/broadcast", async (req, res) => {
     const getMessage = (signal_type, position) => {
       const price =
         position[`${signal_type === "entry" ? "buy" : "sell"}_price`];
-      return `Signal type: ${String(signal_type).toUpperCase()}
+      return `Signal type: ${signal_type === "entry" ? "BUY" : "SELL"}
 Pair: ${String(position.symbol).replace("BTC", "/BTC")}
-Price: ₿${getPriceAsString(price)}
-`.concat(signal_type === "exit" ? `Estimated profit: ${position.change}%` : "");
+Price: ₿${getPriceAsString(price)}`;
     };
 
     if (!!position.broadcast) {
@@ -89,6 +88,10 @@ Price: ₿${getPriceAsString(price)}
 
   return res.send();
 });
+
+// monthly report message
+
+// donations
 
 app.listen(config.port || 3000, () => {
   console.log(`Telegram bot running on port ${config.port || 3000}!`);

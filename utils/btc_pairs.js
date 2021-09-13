@@ -57,7 +57,6 @@ module.exports = [
   { symbol: "ONEBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "FTMBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "ALGOBTC", priceTickSize: 0.00000001, stepSize: 1 },
-  { symbol: "DOGEBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "ANKRBTC", priceTickSize: 0.00000001, stepSize: 1 },
   { symbol: "TOMOBTC", priceTickSize: 0.00000001, stepSize: 0.1 },
   { symbol: "CHZBTC", priceTickSize: 0.00000001, stepSize: 1 },

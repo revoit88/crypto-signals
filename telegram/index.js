@@ -89,6 +89,26 @@ Price: ₿${getPriceAsString(price)}`;
   return res.send();
 });
 
+// send message
+app.post("/message/broadcast", async (req, res) => {
+  try {
+    const channel_id = config.channel_id;
+    const message = req.body.message;
+
+    if (!channel_id) {
+      throw new Error("Channel ID is not defined");
+    }
+    if (!message) {
+      throw new Error("No message to broadcast");
+    }
+    await bot.telegram.sendMessage(channel_id, message);
+  } catch (error) {
+    console.error(error);
+  }
+
+  return res.send();
+});
+
 // monthly report message
 
 // donations

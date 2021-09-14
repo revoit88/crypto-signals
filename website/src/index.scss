@@ -1,0 +1,140 @@
+@charset "utf-8";
+
+$primary: #022140 !default;
+$color-secondary: #265077 !default;
+
+$link: $color-secondary;
+$body-background-color: $primary;
+$dark: $color-secondary;
+$fullhd-enabled: false;
+$widescreen-enabled: false;
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
+@import "../node_modules/bulma/sass/utilities/_all.sass";
+@import "../node_modules/bulma/sass/base/_all.sass";
+@import "../node_modules/bulma/sass/helpers/_all.sass";
+@import "../node_modules/bulma/sass/components/pagination.sass";
+@import "../node_modules/bulma/sass/components/navbar.sass";
+@import "../node_modules/bulma/sass/elements/box.sass";
+@import "../node_modules/bulma/sass/elements/button.sass";
+@import "../node_modules/bulma/sass/elements/container.sass";
+@import "../node_modules/bulma/sass/elements/notification.sass";
+@import "../node_modules/bulma/sass/elements/table.sass";
+@import "../node_modules/bulma/sass/elements/content.sass";
+@import "../node_modules/bulma/sass/elements/title.sass";
+@import "../node_modules/bulma/sass/elements/other.sass";
+@import "../node_modules/bulma/sass/form/shared.sass";
+@import "../node_modules/bulma/sass/form/tools.sass";
+@import "../node_modules/bulma/sass/form/input-textarea.sass";
+@import "../node_modules/bulma/sass/form/select.sass";
+@import "../node_modules/bulma/sass/grid/columns.sass";
+
+.block:not(:last-child) {
+  margin-bottom: 1.5rem;
+}
+
+.retry-message {
+  text-align: center;
+  height: 300px;
+  padding: 5rem;
+}
+
+.retry-message > p {
+  color: $danger;
+}
+
+.retry-message > p > span {
+  color: $link;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.loading-container {
+  text-align: center;
+  height: 300px;
+  padding: 100px 0px;
+}
+
+.lds-ripple {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ripple div {
+  position: absolute;
+  border: 4px solid $link;
+  opacity: 1;
+  border-radius: 50%;
+  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+.lds-ripple div:nth-child(2) {
+  animation-delay: -0.5s;
+}
+@keyframes lds-ripple {
+  0% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    top: 0px;
+    left: 0px;
+    width: 72px;
+    height: 72px;
+    opacity: 0;
+  }
+}
+
+.buttons > button {
+  width: calc((100% - 0.5rem - 1px) / 2);
+}
+
+.main-content {
+  min-height: calc(100vh - 3.25rem - 12rem - 1.5rem);
+  margin-bottom: 5rem;
+  margin-top: 3rem;
+}
+
+.table-border-top {
+  border-top: #dbdbdb solid thin;
+}
+
+.pagination-button {
+  background-color: white;
+  cursor: pointer;
+}
+
+.footer-margin {
+  margin-top: 3rem;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltip-text {
+  visibility: hidden;
+  width: 250px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -125px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  background-color: $grey-dark;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+}

@@ -3,6 +3,8 @@ import Box from "../../components/Box";
 import Column from "../../layout/Column";
 import Row from "../../layout/Row";
 import { monthNames } from "../../utils";
+import { Link } from "react-router-dom";
+import Button from "@crypto-signals/components/Button";
 
 const ReportBox = ({ report, showLink }) => {
   const getColor = value =>
@@ -31,7 +33,11 @@ const ReportBox = ({ report, showLink }) => {
           </p>
         </Column>
         {showLink ? (
-          <Column className="has-text-centered">Details</Column>
+          <Column className="has-text-centered">
+            <Link to={`/reports?year=${report.year}&month=${report.month}`}>
+              <Button text="Details" className="is-link" />
+            </Link>
+          </Column>
         ) : null}
       </Row>
     </Box>

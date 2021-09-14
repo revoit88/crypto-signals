@@ -60,7 +60,7 @@ app.post("/signals/broadcast", async (req, res) => {
     const getMessage = (signal_type, position) => {
       const price =
         position[`${signal_type === "entry" ? "buy" : "sell"}_price`];
-      return `Signal type: ${signal_type === "entry" ? "BUY" : "SELL"}
+      return `Signal type: ${String(signal_type).toUpperCase()}
 Pair: ${String(position.symbol).replace("BTC", "/BTC")}
 Price: ₿${getPriceAsString(price)}`;
     };

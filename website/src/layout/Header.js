@@ -5,9 +5,16 @@ const Header = () => {
   const links = [
     { to: "/", text: "Home" },
     { to: "/reports", text: "Reports" },
-    { to: "/pairs", text: "Pairs" },
-    { to: "/about", text: "About" },
-    { to: "/disclaimer", text: "Disclaimer" }
+    {
+      isDropdown: true,
+      text: "More",
+      children: [
+        { to: "/pairs", text: "Pairs" },
+        { to: "/about", text: "About" },
+        { to: "/disclaimer", text: "Disclaimer" },
+        { to: "/contact", text: "Contact" }
+      ]
+    }
   ];
   return (
     <nav
@@ -31,16 +38,30 @@ const Header = () => {
 
         <div id="navbar-burger" className="navbar-menu">
           <div className="navbar-end">
-            {links.map((link, index) => (
-              <NavLink
-                exact
-                to={link.to}
-                className="navbar-item has-text-white"
-                activeClassName="is-active"
-                key={`navbar-link-${index}`}>
-                {link.text}
-              </NavLink>
-            ))}
+            {links.map((link, index) =>
+              !link.isDropdown ? (
+                <NavLink
+                  exact
+                  to={link.to}
+                  className="navbar-item has-text-white"
+                  activeClassName="is-active"
+                  key={`navbar-link-${index}`}>
+                  {link.text}
+                </NavLink>
+              ) : (
+                <div class="navbar-item has-dropdown is-hoverable">
+                  <NavLink to="#" className="navbar-link" >More</NavLink>
+
+                  <div class="navbar-dropdown">
+                    {link.children.map(lnk => (
+                      <NavLink to={lnk.to} className="navbar-item">
+                        {lnk.text}
+                      </NavLink>
+                    ))}
+                  </div>
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>

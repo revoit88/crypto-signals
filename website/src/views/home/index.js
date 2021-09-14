@@ -39,7 +39,7 @@ const Home = () => {
         {!loadingReports &&
           !errorLoadingReports &&
           reports &&
-          reports.map(report => <ReportBox key={report._id} report={report} />)}
+          reports.map(report => <ReportBox key={report._id} report={report} showLink />)}
       </Block>
     </>
   );

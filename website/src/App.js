@@ -13,6 +13,7 @@ const routes = [
   { path: "/pairs",  component: Pairs, id: "pairs-route" },
   { path: "/about",  component: About, id: "about-route" },
   { path: "/disclaimer",  component: Disclaimer, id: "disclaimer-route" },
+  { path: "/contact",  component: Disclaimer, id: "contact-route" },
 ];
 
 function App() {

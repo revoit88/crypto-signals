@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 
-function goToTelegram() {
+function goToTelegram(closeModal) {
   window.open("https://t.me/jjscryptosignals", "_blank");
+  if (typeof closeModal === "function") {
+    closeModal();
+  }
 }
 const Modal = ({ show, closeModal }) => {
   const [state, setState] = useState({ disclaimer: false, about: false });
@@ -54,8 +57,8 @@ const Modal = ({ show, closeModal }) => {
         </section>
         <footer className="modal-card-foot">
           <button
-            className="button is-success"
-            onClick={goToTelegram}
+            className="button is-primary"
+            onClick={goToTelegram.bind(null, closeModal)}
             disabled={!state.about || !state.disclaimer}>
             Join
           </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import Box from "../../components/Box";
 import Row from "../../layout/Row";
@@ -6,6 +6,8 @@ import Column from "../../layout/Column";
 import useHttp from "../../hooks/useHttp";
 import { monthNames } from "../../utils";
 import ReportsTable from "./ReportsTable";
+import Loading from "@crypto-signals/components/Loading";
+import RetryMessage from "@crypto-signals/components/RetryMessage";
 
 const getColor = value => (value > 0 ? "has-text-success" : "has-text-danger");
 const getReportValue = report => `${report.month}_${report.year}`;
@@ -19,7 +21,7 @@ const Reports = () => {
   const location = useLocation();
   const queryParameters = new URLSearchParams(location.search);
   const selectedReportFromParams = queryParameters.get("report") ?? "";
-  const selectedPair = queryParameters.get("pair") ?? "";
+  // const selectedPair = queryParameters.get("pair") ?? "";
   const {
     isLoading: loadingReports,
     hasError: errorLoadingReports,
@@ -30,28 +32,16 @@ const Reports = () => {
     isLoading: loadingReportPositions,
     hasError: errorLoadingReportPositions,
     data: reportPositions,
-    get: getReportPositions,
-    headers: reportPositionsHeaders
+    get: getReportPositions
   } = useHttp();
-  // const {
-  //   isLoading: loadingPairs,
-  //   hasError: errorLoadingPairs,
-  //   data: pairs,
-  //   get: getMarketPairs
-  // } = useHttp();
 
-  useEffect(() => {
-    const getAllReports = async () => {
-      await getReports("/reports");
-    };
-
-    getAllReports();
+  const getAllReports = useCallback(async () => {
+    await getReports("/reports");
   }, [getReports]);
 
-  // useEffect(() => {
-  //   const getPairs = async () => await getMarketPairs(`/markets/active`);
-  //   getPairs();
-  // }, [getMarketPairs]);
+  useEffect(() => {
+    getAllReports();
+  }, [getAllReports]);
 
   const onSelect = (parameter, event) => {
     queryParameters.set(parameter, event.target.value);
@@ -80,31 +70,41 @@ const Reports = () => {
       <div className="content is-normal">
         <h3>Results</h3>
 
-        <div className="field is-horizontal">
-          <label className="field-label is-normal">Available Reports</label>
-          <div className="field-body">
-            <div className="field is-narrow">
-              <div className="control">
-                <div className="select is-fullwidth">
-                  <select
-                    onChange={onSelect.bind(null, "report")}
-                    value={selectedReportFromParams}>
-                    <option value="" disabled>
-                      Select report
-                    </option>
-                    {(reports ?? []).map(report => (
-                      <option
-                        value={getReportValue(report)}
-                        key={getReportValue(report)}>
-                        {getReportName(report)}
+        {!loadingReports && errorLoadingReports ? (
+          <RetryMessage retry={getAllReports} />
+        ) : (
+          <div className="field is-horizontal">
+            <label className="field-label is-normal">Available Reports</label>
+            <div className="field-body">
+              <div className="field is-narrow">
+                <div className="control">
+                  <div
+                    className={"select is-fullwidth".concat(
+                      loadingReports ? " is-loading" : ""
+                    )}>
+                    <select
+                      onChange={onSelect.bind(null, "report")}
+                      value={selectedReportFromParams}
+                      disabled={loadingReports}>
+                      <option value="" disabled>
+                        {loadingReports
+                          ? "Loading reports..."
+                          : "Select Report"}
                       </option>
-                    ))}
-                  </select>
+                      {(reports ?? []).map(report => (
+                        <option
+                          value={getReportValue(report)}
+                          key={getReportValue(report)}>
+                          {getReportName(report)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {selectedReport && (
           <div className="content">
@@ -139,7 +139,13 @@ const Reports = () => {
           </div>
         )}
         <div className="content">
-          <ReportsTable positions={reportPositions} />
+          {loadingReportPositions && <Loading />}
+          {!loadingReportPositions && errorLoadingReportPositions && (
+            <RetryMessage retry={getPositions} />
+          )}
+          {!loadingReportPositions &&
+            !errorLoadingReportPositions &&
+            reportPositions && <ReportsTable positions={reportPositions} />}
         </div>
       </div>
     </Box>

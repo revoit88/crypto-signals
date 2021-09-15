@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 const Header = () => {
   const links = [
     { to: "/", text: "Home" },
-    { to: "/reports", text: "Reports" },
+    { to: "/results", text: "Results" },
     {
       isDropdown: true,
       text: "More",
@@ -49,12 +49,16 @@ const Header = () => {
                   {link.text}
                 </NavLink>
               ) : (
-                <div class="navbar-item has-dropdown is-hoverable">
-                  <NavLink to="#" className="navbar-link" >More</NavLink>
+                <div
+                  className="navbar-item has-dropdown is-hoverable"
+                  key={`navbar-link-${index}`}>
+                  <NavLink to="#" className="navbar-link">
+                    More
+                  </NavLink>
 
-                  <div class="navbar-dropdown">
+                  <div className="navbar-dropdown">
                     {link.children.map(lnk => (
-                      <NavLink to={lnk.to} className="navbar-item">
+                      <NavLink to={lnk.to} className="navbar-item" key={lnk.to}>
                         {lnk.text}
                       </NavLink>
                     ))}

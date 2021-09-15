@@ -4,6 +4,8 @@ import Block from "@crypto-signals/components/Block";
 import Box from "@crypto-signals/components/Box";
 import Loading from "@crypto-signals/components/Loading";
 import RetryMessage from "@crypto-signals/components/RetryMessage";
+import Button from "@crypto-signals/components/Button";
+import { Row, Column } from "@crypto-signals/layout";
 import ReportBox from "./ReportBox";
 
 const Home = () => {
@@ -24,6 +26,19 @@ const Home = () => {
 
   return (
     <>
+      <section className="hero is-large is-primary">
+        <div className="hero-body">
+          <Row>
+            <Column>
+              <p className="title">JJ's Crypto Signals</p>
+              <p className="subtitle">Algorithm Driven Signals</p>
+            </Column>
+            <Column className="is-align-self-center has-text-centered">
+              <Button text="Join Free" className="is-large" />
+            </Column>
+          </Row>
+        </div>
+      </section>
       <h1
         className="is-size-2 has-text-centered has-text-white"
         style={{ paddingBottom: "1rem" }}>
@@ -39,7 +54,9 @@ const Home = () => {
         {!loadingReports &&
           !errorLoadingReports &&
           reports &&
-          reports.map(report => <ReportBox key={report._id} report={report} showLink />)}
+          reports.map(report => (
+            <ReportBox key={report._id} report={report} showLink />
+          ))}
       </Block>
     </>
   );

@@ -18,7 +18,7 @@ const ReportBox = ({ report, showLink }) => {
 
       <Row>
         <Column className="has-text-centered">
-          <p className="heading">Trades</p>
+          <p className="heading">Closed Trades</p>
           <p className="title"> {report.total_trades}</p>
         </Column>
         <Column className="has-text-centered">
@@ -27,14 +27,13 @@ const ReportBox = ({ report, showLink }) => {
         </Column>
         <Column className="has-text-centered">
           <p className="heading"> Average Profit</p>
-          <p className={`title ${getColor(report.average_change)} `}>
-            {" "}
+          <p className={`title ${getColor(report.average_change)}`}>
             {report.average_change}%
           </p>
         </Column>
         {showLink ? (
-          <Column className="has-text-centered">
-            <Link to={`/reports?year=${report.year}&month=${report.month}`}>
+          <Column className="has-text-centered is-align-self-center">
+            <Link to={`/results?report=${report.month}_${report.year}`}>
               <Button text="Details" className="is-link" />
             </Link>
           </Column>

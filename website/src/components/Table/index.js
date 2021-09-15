@@ -1,5 +1,7 @@
 import React from "react";
 
+const SHOW_FOOTER_THRESHOLD = 5;
+
 function Table({ columns = [], data = [] }) {
   return (
     <div className="table-container">
@@ -9,8 +11,7 @@ function Table({ columns = [], data = [] }) {
           "is-fullwidth",
           "is-hoverable",
           "table-border-top"
-        ].join(" ")}
-      >
+        ].join(" ")}>
         <thead>
           <tr>
             {columns.map((column, index) => (
@@ -28,8 +29,7 @@ function Table({ columns = [], data = [] }) {
                     ...(column.className && {
                       className: column.className(row, column.name)
                     })
-                  }}
-                >
+                  }}>
                   {!!column.render && typeof column.render === "function"
                     ? column.render(row[column.name])
                     : row[column.name]}
@@ -38,13 +38,15 @@ function Table({ columns = [], data = [] }) {
             </tr>
           ))}
         </tbody>
-        <tfoot>
-          <tr>
-            {columns.map((column, index) => (
-              <th key={`table-footer-${index}`}>{column.label}</th>
-            ))}
-          </tr>
-        </tfoot>
+        {data.length > SHOW_FOOTER_THRESHOLD && (
+          <tfoot>
+            <tr>
+              {columns.map((column, index) => (
+                <th key={`table-footer-${index}`}>{column.label}</th>
+              ))}
+            </tr>
+          </tfoot>
+        )}
       </table>
     </div>
   );

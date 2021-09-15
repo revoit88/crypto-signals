@@ -20,7 +20,7 @@ const Modal = ({ show, closeModal }) => {
         </header>
         <section className="modal-card-body">
           <div>
-            <label class="checkbox">
+            <label className="checkbox">
               <input
                 type="checkbox"
                 onChange={tickCheckbox.bind(null, "disclaimer")}
@@ -36,7 +36,7 @@ const Modal = ({ show, closeModal }) => {
             </label>
           </div>
           <div>
-            <label class="checkbox">
+            <label className="checkbox">
               <input
                 type="checkbox"
                 onChange={tickCheckbox.bind(null, "about")}

@@ -9,24 +9,24 @@ const columns = [
   { name: "symbol", label: "Pair" },
   {
     name: "open_time",
-    label: "Buy Date",
+    label: "Entry Date",
     render: v => (
       <Tooltip text={new Date(v).toUTCString()}>
         {new Date(v).toLocaleString({}, { hour12: false })}
       </Tooltip>
     )
   },
-  { name: "buy_price", label: "Buy Price", render: renderPrice },
+  { name: "buy_price", label: "Entry Price", render: renderPrice },
   {
     name: "close_time",
-    label: "Sell Date",
+    label: "Exit Date",
     render: v => (
       <Tooltip text={new Date(v).toUTCString()}>
         {new Date(v).toLocaleString({}, { hour12: false })}
       </Tooltip>
     )
   },
-  { name: "sell_price", label: "Sell Price", render: renderPrice },
+  { name: "sell_price", label: "Exit Price", render: renderPrice },
   {
     name: "change",
     label: "Estimated Profit",

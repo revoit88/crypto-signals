@@ -91,5 +91,12 @@ module.exports = {
       handler: Controller.updateTradedMarkets,
       options: { auth: { access: { scope: ["microservice"] } } }
     });
+
+    server.route({
+      method: "get",
+      path: "/active",
+      handler: Controller.getActiveMarkets,
+      options: { auth: { access: { scope: ["website"] } } }
+    });
   }
 };

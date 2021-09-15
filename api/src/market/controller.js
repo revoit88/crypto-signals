@@ -253,3 +253,19 @@ exports.updateTradedMarkets = async function (request, h) {
     return Boom.internal();
   }
 };
+
+exports.getActiveMarkets = async function (request, h) {
+  const Market = request.server.plugins.mongoose.connection.model("Market");
+
+  try {
+    const markets = await Market.find({
+      $and: [{ exchange }, { broadcast_signals: true }]
+    })
+      .select({ symbol: true })
+      .lean();
+    return markets.map(({ symbol }) => symbol);
+  } catch (error) {
+    request.server.logger.error(error);
+    return Boom.internal();
+  }
+};

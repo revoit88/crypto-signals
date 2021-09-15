@@ -8,13 +8,17 @@ import { monthNames } from "../../utils";
 import ReportsTable from "./ReportsTable";
 
 const getColor = value => (value > 0 ? "has-text-success" : "has-text-danger");
+const getReportValue = report => `${report.month}_${report.year}`;
+const getReportName = report =>
+  `${monthNames[report.month - 1]} ${report.year}`;
+const findReport = (reports = [], selected = "") =>
+  reports.find(r => `${r.month}_${r.year}` === selected);
 
 const Reports = () => {
   const history = useHistory();
   const location = useLocation();
   const queryParameters = new URLSearchParams(location.search);
-  const selectedYear = queryParameters.get("year") ?? "";
-  const selectedMonth = queryParameters.get("month") ?? "";
+  const selectedReportFromParams = queryParameters.get("report") ?? "";
   const selectedPair = queryParameters.get("pair") ?? "";
   const {
     isLoading: loadingReports,
@@ -29,12 +33,12 @@ const Reports = () => {
     get: getReportPositions,
     headers: reportPositionsHeaders
   } = useHttp();
-  const {
-    isLoading: loadingPairs,
-    hasError: errorLoadingPairs,
-    data: pairs,
-    get: getMarketPairs
-  } = useHttp();
+  // const {
+  //   isLoading: loadingPairs,
+  //   hasError: errorLoadingPairs,
+  //   data: pairs,
+  //   get: getMarketPairs
+  // } = useHttp();
 
   useEffect(() => {
     const getAllReports = async () => {
@@ -44,121 +48,102 @@ const Reports = () => {
     getAllReports();
   }, [getReports]);
 
-  useEffect(() => {
-    const getPairs = async () => await getMarketPairs(`/markets/active`);
-    getPairs();
-  }, [getMarketPairs]);
-
-  const groupedReports = useMemo(
-    () =>
-      (reports ?? []).reduce((acc, report) => {
-        return {
-          ...acc,
-          [report.year]: { ...acc[report.year], [report.month]: report }
-        };
-      }, {}),
-    [reports]
-  );
-  const availableYears = [...new Set((reports ?? []).map(r => r.year))];
-
-  const getAvailableMonthsFromYear = useCallback(
-    year => {
-      if (!year) {
-        return [];
-      }
-      const months = Object.keys(groupedReports[year] ?? {})
-        .sort((a, b) => +a - +b)
-        .reverse()
-        .map(month => [month, monthNames[month - 1]]);
-      return months;
-    },
-    [groupedReports]
-  );
+  // useEffect(() => {
+  //   const getPairs = async () => await getMarketPairs(`/markets/active`);
+  //   getPairs();
+  // }, [getMarketPairs]);
 
   const onSelect = (parameter, event) => {
     queryParameters.set(parameter, event.target.value);
-    if (parameter === "year") {
-      queryParameters.set("month", "");
-    }
     history.replace(`${location.pathname}?${queryParameters.toString()}`);
   };
 
   const getPositions = useCallback(async () => {
-    const report = groupedReports[selectedYear][selectedMonth];
+    const report = reports.find(
+      r => `${r.month}_${r.year}` === selectedReportFromParams
+    );
     if (report) {
       await getReportPositions(`/reports/${report._id}/signals`);
     }
-  }, [selectedYear, selectedMonth, getReportPositions, groupedReports]);
+  }, [reports, selectedReportFromParams, getReportPositions]);
 
   useEffect(() => {
-    if (!!selectedYear && !!selectedMonth && !!reports) {
+    if (!!selectedReportFromParams && !!reports) {
       getPositions();
     }
-  }, [selectedYear, selectedMonth, reports, getPositions]);
+  }, [selectedReportFromParams, reports, getPositions]);
 
-  const selectedReport = ((groupedReports || {})[selectedYear] || {})[
-    selectedMonth
-  ];
+  const selectedReport = findReport(reports, selectedReportFromParams);
 
   return (
     <Box>
-      Reports
-      <div>
-        <select onChange={onSelect.bind(null, ["year"])} value={selectedYear}>
-          <option>Select Year</option>
-          {availableYears.map(year => (
-            <option key={"year-" + year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
-        <select onChange={onSelect.bind(null, "month")} value={selectedMonth}>
-          <option>Select Month</option>
-          {getAvailableMonthsFromYear(selectedYear).map(
-            ([month, monthName]) => (
-              <option key={"month-" + month} value={month}>
-                {monthName}
-              </option>
-            )
-          )}
-        </select>
-      </div>
-      {selectedReport && (
-        <div>
-          <h1 className="is-size-4">
-            {monthNames[selectedReport.month - 1]} {selectedReport.year}
-          </h1>
+      <div className="content is-normal">
+        <h3>Results</h3>
 
-          <Row>
-            <Column className="has-text-centered">
-              <p className="heading">Trades</p>
-              <p className="title"> {selectedReport.total_trades}</p>
-            </Column>
-            <Column className="has-text-centered">
-              <p className="heading">Winning Trades</p>
-              <p className="title">
-                {" "}
-                {selectedReport.total_wins} (
-                {Number(
-                  (selectedReport.total_wins * 100) /
-                    selectedReport.total_trades
-                ).toFixed(1)}
-                %)
-              </p>
-            </Column>
-            <Column className="has-text-centered">
-              <p className="heading"> Average Profit</p>
-              <p
-                className={`title ${getColor(selectedReport.average_change)} `}>
-                {" "}
-                {selectedReport.average_change}%
-              </p>
-            </Column>
-          </Row>
+        <div className="field">
+          <label className="label">Reports</label>
+          <div className="select">
+            <select
+              onChange={onSelect.bind(null, "report")}
+              value={selectedReportFromParams}>
+              <option value="" disabled>
+                Select report
+              </option>
+              {(reports ?? []).map(report => (
+                <option
+                  value={getReportValue(report)}
+                  key={getReportValue(report)}>
+                  {getReportName(report)}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-      )}
-      <div>
-        <ReportsTable positions={reportPositions} />
+
+        {selectedReport && (
+          <div className="content">
+            <h1 className="is-size-4">
+              {monthNames[selectedReport.month - 1]} {selectedReport.year}
+            </h1>
+
+            <Row>
+              <Column className="has-text-centered">
+                <p className="heading">Closed Trades</p>
+                <p className="title"> {selectedReport.total_trades}</p>
+              </Column>
+              <Column className="has-text-centered">
+                <p className="heading">Winning Trades</p>
+                <p className="title">
+                  {" "}
+                  {selectedReport.total_wins} (
+                  {Number(
+                    (selectedReport.total_wins * 100) /
+                      selectedReport.total_trades
+                  ).toFixed(1)}
+                  %)
+                </p>
+              </Column>
+              <Column className="has-text-centered">
+                <p className="heading"> Average Profit</p>
+                <p
+                  className={`title ${getColor(
+                    selectedReport.average_change
+                  )} `}>
+                  {" "}
+                  {selectedReport.average_change}%
+                </p>
+              </Column>
+            </Row>
+          </div>
+        )}
+        <div className="content">
+          <ReportsTable
+            positions={[...new Array(50)]
+              .map(() => reportPositions)
+              .flat()
+              .filter(v => !!v)}
+          />
+        </div>
       </div>
     </Box>
   );

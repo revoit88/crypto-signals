@@ -29,6 +29,7 @@ $widescreen-enabled: false;
 @import "../node_modules/bulma/sass/form/input-textarea.sass";
 @import "../node_modules/bulma/sass/form/select.sass";
 @import "../node_modules/bulma/sass/grid/columns.sass";
+@import "../node_modules/bulma/sass/layout/hero.sass";
 
 .block:not(:last-child) {
   margin-bottom: 1.5rem;

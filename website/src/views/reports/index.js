@@ -80,32 +80,34 @@ const Reports = () => {
       <div className="content is-normal">
         <h3>Results</h3>
 
-        <div className="field">
-          <label className="label">Reports</label>
-          <div className="select">
-            <select
-              onChange={onSelect.bind(null, "report")}
-              value={selectedReportFromParams}>
-              <option value="" disabled>
-                Select report
-              </option>
-              {(reports ?? []).map(report => (
-                <option
-                  value={getReportValue(report)}
-                  key={getReportValue(report)}>
-                  {getReportName(report)}
-                </option>
-              ))}
-            </select>
+        <div className="field is-horizontal">
+          <label className="field-label is-normal">Available Reports</label>
+          <div className="field-body">
+            <div className="field is-narrow">
+              <div className="control">
+                <div className="select is-fullwidth">
+                  <select
+                    onChange={onSelect.bind(null, "report")}
+                    value={selectedReportFromParams}>
+                    <option value="" disabled>
+                      Select report
+                    </option>
+                    {(reports ?? []).map(report => (
+                      <option
+                        value={getReportValue(report)}
+                        key={getReportValue(report)}>
+                        {getReportName(report)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {selectedReport && (
           <div className="content">
-            <h1 className="is-size-4">
-              {monthNames[selectedReport.month - 1]} {selectedReport.year}
-            </h1>
-
             <Row>
               <Column className="has-text-centered">
                 <p className="heading">Closed Trades</p>

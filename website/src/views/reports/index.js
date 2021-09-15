@@ -137,12 +137,7 @@ const Reports = () => {
           </div>
         )}
         <div className="content">
-          <ReportsTable
-            positions={[...new Array(50)]
-              .map(() => reportPositions)
-              .flat()
-              .filter(v => !!v)}
-          />
+          <ReportsTable positions={reportPositions} />
         </div>
       </div>
     </Box>

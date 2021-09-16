@@ -225,7 +225,6 @@ exports.broadcast = async function (request, h) {
       );
 
       if (config.environment === "production") {
-        // send to zignaly
         const promises = []
           .concat(getTelegramBotRequest(position, config)) //telegram
           .concat([]) //discord
@@ -327,73 +326,73 @@ exports.getWeeklyReport = async function (request, h) {
 
 exports.repeatClosePositions = async function (request, h) {
   try {
-    const Position =
-      request.server.plugins.mongoose.connection.model("Position");
+    // const Position =
+    //   request.server.plugins.mongoose.connection.model("Position");
 
-    const closed_positions = await Position.countDocuments({
-      $and: [
-        { status: "closed" },
-        { close_time: { $gt: Date.now() - config.repeat_close_position_hours } }
-      ]
-    });
+    // const closed_positions = await Position.countDocuments({
+    //   $and: [
+    //     { status: "closed" },
+    //     { close_time: { $gt: Date.now() - config.repeat_close_position_hours } }
+    //   ]
+    // });
 
-    if (!closed_positions) {
-      return h.response();
-    }
+    // if (!closed_positions) {
+    //   return h.response();
+    // }
 
-    let signals = [];
+    // let signals = [];
 
-    for (const provider of PROVIDERS) {
-      try {
-        const { data } = await axios.get(
-          `https://zignaly.com/new_api/provider_api/open_positions`,
-          { headers: { "x-provider-key": provider.key } }
-        );
+    // for (const provider of PROVIDERS) {
+    //   try {
+    //     const { data } = await axios.get(
+    //       `https://zignaly.com/new_api/provider_api/open_positions`,
+    //       { headers: { "x-provider-key": provider.key } }
+    //     );
 
-        const open_positions = (data || []).map(p => p.n);
+    //     const open_positions = (data || []).map(p => p.n);
 
-        signals = signals
-          .concat(open_positions)
-          .reduce((a, c) => [...new Set([...a, c])], []);
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    //     signals = signals
+    //       .concat(open_positions)
+    //       .reduce((a, c) => [...new Set([...a, c])], []);
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
-    if (!signals.length) {
-      return h.response();
-    }
+    // if (!signals.length) {
+    //   return h.response();
+    // }
 
-    const positions = await Position.find(
-      {
-        $and: [
-          { status: "closed" },
-          { signal: { $in: signals.map(s => castToObjectId(s)) } }
-        ]
-      },
-      {
-        exchange: 1,
-        symbol: 1,
-        sell_price: 1,
-        signal: 1,
-        _id: 1
-      }
-    ).lean();
+    // const positions = await Position.find(
+    //   {
+    //     $and: [
+    //       { status: "closed" },
+    //       { signal: { $in: signals.map(s => castToObjectId(s)) } }
+    //     ]
+    //   },
+    //   {
+    //     exchange: 1,
+    //     symbol: 1,
+    //     sell_price: 1,
+    //     signal: 1,
+    //     _id: 1
+    //   }
+    // ).lean();
 
-    if (!positions.length) {
-      return h.response();
-    }
+    // if (!positions.length) {
+    //   return h.response();
+    // }
 
-    for (const position of positions) {
-      await api.post(`/positions/broadcast`, {
-        exchange: position.exchange,
-        symbol: position.symbol,
-        price: position.sell_price,
-        signal: position.signal.toString(),
-        type: "exit",
-        _id: position._id.toString()
-      });
-    }
+    // for (const position of positions) {
+    //   await api.post(`/positions/broadcast`, {
+    //     exchange: position.exchange,
+    //     symbol: position.symbol,
+    //     price: position.sell_price,
+    //     signal: position.signal.toString(),
+    //     type: "exit",
+    //     _id: position._id.toString()
+    //   });
+    // }
 
     return h.response();
   } catch (error) {

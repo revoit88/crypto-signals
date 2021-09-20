@@ -3,7 +3,7 @@ const qs = require("querystring");
 const mongoose = require("mongoose");
 const {
   reserved_amount,
-  btc_address,
+  btc_addresses,
   eth_address,
   port,
   db_uri
@@ -11,6 +11,7 @@ const {
 const { nz } = require("@crypto-signals/utils");
 const { binance, api } = require("./axios");
 const { sendMail } = require("./mailer");
+const axios = require("axios");
 
 app.use(async (req, res, next) => {
   const connection = await mongoose
@@ -38,6 +39,15 @@ app.post("/withdraw-btc", async (req, res) => {
 
     const { data: account } = await accountPromise;
     const { data: btc_status } = await btcStatusPromise;
+    const { data: balances } = await axios.get(
+      `https://blockchain.info/balance?cors=true&active=${btc_addresses.join(
+        "|"
+      )}`
+    );
+
+    const [[btc_address]] = Object.keys(balances)
+      .map(key => [key, balances[key]?.final_balance])
+      .sort(([_, a], [__, b]) => a - b);
 
     const positions = await PositionModel.find(
       { $and: [{ status: "open" }, { buy_order: { $exists: true } }] },

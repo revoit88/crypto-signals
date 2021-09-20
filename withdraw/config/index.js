@@ -11,6 +11,6 @@ module.exports = {
   port: process.env.WITHDRAW_PORT || 3000,
   //=======================
   reserved_amount: +process.env.RESERVED_AMOUNT,
-  btc_address: process.env.BTC_ADDRESS,
+  btc_addresses: process.env.BTC_ADDRESS.split(","),
   eth_address: process.env.ETH_ADDRESS
 };

@@ -7,6 +7,7 @@ const PositionModel = require("./PositionModel");
 const ReportModel = require("./ReportModel");
 const SignalModel = require("./SignalModel");
 const TelegramModel = require("./TelegramModel");
+const WithdrawalModel = require("./WithdrawalModel");
 
 module.exports = {
   AccountModel,
@@ -17,5 +18,6 @@ module.exports = {
   PositionModel,
   ReportModel,
   SignalModel,
-  TelegramModel
+  TelegramModel,
+  WithdrawalModel
 };

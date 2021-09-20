@@ -20,6 +20,7 @@ app.use(async (req, res, next) => {
     })
     .asPromise();
   require("./src/position/model")(connection);
+  require("./src/withdrawal/model")(connection);
   req.app.mongoose = connection;
   next();
 });
@@ -29,6 +30,7 @@ app.post("/withdraw-btc", async (req, res) => {
     console.log(`=== Withdrawing BTC @ ${new Date().toUTCString()} ===`);
 
     const PositionModel = req.app.mongoose.model("Position");
+    const WithdrawalModel = req.app.mongoose.model("Withdrawal");
     const accountPromise = binance.get("/api/v3/account");
     const btcStatusPromise = binance.get(
       "/sapi/v1/asset/assetDetail?asset=BTC"
@@ -73,11 +75,13 @@ app.post("/withdraw-btc", async (req, res) => {
         `/sapi/v1/capital/withdraw/apply?${withdrawQuery}`
       );
 
-      console.log("withdrawResult: ", withdrawResult);
-      // if (!withdrawResult.success) {
-      //   console.error(withdrawResult.msg);
-      //   return res.status(500).send(withdrawResult);
-      // }
+      await WithdrawalModel.create({
+        id: withdrawResult.id,
+        coin: "BTC",
+        address: btc_address,
+        amount: amount_to_withdraw,
+        fee: withdraw_fee
+      });
     }
 
     const getMessage = amount => {

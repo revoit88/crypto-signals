@@ -4,7 +4,11 @@ const {
   toSymbolStepPrecision,
   milliseconds
 } = require("@crypto-signals/utils");
-const { exchange, minimum_order_size } = require("@crypto-signals/config");
+const {
+  exchange,
+  minimum_order_size,
+  quote_asset
+} = require("@crypto-signals/config");
 const qs = require("querystring");
 
 const MAX_REQUESTS = 95;
@@ -27,12 +31,9 @@ async function getOrderFromDbOrBinance(request, buy_order) {
   const OrderModel = request.server.plugins.mongoose.connection.model("Order");
   let order;
   try {
-    order = await OrderModel.findOne({
-      $and: [
-        { orderId: { $eq: buy_order.orderId } },
-        { symbol: { $eq: buy_order.symbol } }
-      ]
-    }).hint("orderId_-1_symbol_-1");
+    order = await OrderModel.findOne({ clientOrderId: buy_order.clientOrderId })
+      .hint("clientOrderId_1")
+      .lean();
     if (!order) {
       throw new Error("Order does not exist in database.");
     }
@@ -415,7 +416,7 @@ exports.createMarketOrder = async function (request, h) {
   const AccountModel =
     request.server.plugins.mongoose.connection.model("Account");
 
-  const account = await AccountModel.findOne({ id: "production" });
+  const account = await AccountModel.findOne({ id: "production" }).lean();
 
   if (Date.now() < account.create_order_after) {
     return h.response();
@@ -423,7 +424,7 @@ exports.createMarketOrder = async function (request, h) {
 
   const positionId = request.query.position;
 
-  const position = await PositionModel.findOne({ id: positionId });
+  const position = await PositionModel.findOne({ id: positionId }).lean();
 
   if (!!position.trader_lock) {
     return h.response();
@@ -436,7 +437,9 @@ exports.createMarketOrder = async function (request, h) {
 
   const symbol_market = await MarketModel.findOne({
     $and: [{ exchange }, { symbol: position.symbol }]
-  }).hint("exchange_1_symbol_1");
+  })
+    .hint("exchange_1_symbol_1")
+    .lean();
 
   const buy_order = await getOrderFromDbOrBinance(request, position.buy_order);
 
@@ -460,14 +463,16 @@ exports.createMarketOrder = async function (request, h) {
   }
 
   try {
+    const quantity_to_sell =
+      position.symbol.replace(quote_asset, "") === buy_order.commissionAsset
+        ? +buy_order.executedQty - +buy_order.commissionAmount
+        : buy_order.executedQty;
+
     const query = qs.stringify({
       ...newQuery,
       type: "MARKET",
       side: "SELL",
-      quantity: toSymbolStepPrecision(
-        buy_order.executedQty * 0.999,
-        position.symbol
-      )
+      quantity: toSymbolStepPrecision(quantity_to_sell, position.symbol)
     });
     const { data, headers } = await binance.post(`/api/v3/order?${query}`);
 

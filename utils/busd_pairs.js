@@ -5,7 +5,6 @@ module.exports = [
   { symbol: "ETHBUSD", priceTickSize: 0.01, stepSize: 0.00001 },
   { symbol: "LTCBUSD", priceTickSize: 0.01, stepSize: 0.00001 },
   { symbol: "LINKBUSD", priceTickSize: 0.001, stepSize: 0.001 },
-  { symbol: "ETCBUSD", priceTickSize: 0.001, stepSize: 0.001 },
   { symbol: "EOSBUSD", priceTickSize: 0.0001, stepSize: 0.01 },
   { symbol: "XLMBUSD", priceTickSize: 0.00001, stepSize: 0.1 },
   { symbol: "ADABUSD", priceTickSize: 0.0001, stepSize: 0.01 },

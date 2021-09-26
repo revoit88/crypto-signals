@@ -94,5 +94,15 @@ module.exports = [
   { symbol: "HNTBUSD", priceTickSize: 0.001, stepSize: 0.1 },
   { symbol: "FTTBUSD", priceTickSize: 0.01, stepSize: 0.1 },
   { symbol: "IOTXBUSD", priceTickSize: 0.00001, stepSize: 1 },
-  { symbol: "MLNBUSD", priceTickSize: 0.01, stepSize: 0.01 }
+  { symbol: "MLNBUSD", priceTickSize: 0.01, stepSize: 0.01 },
+  { symbol: "QNTBUSD", priceTickSize: 0.1, stepSize: 0.001 },
+  { symbol: "FLOWBUSD", priceTickSize: 0.01, stepSize: 0.01 },
+  { symbol: "XECBUSD", priceTickSize: 0.00000001, stepSize: 1 },
+  { symbol: "MINABUSD", priceTickSize: 0.001, stepSize: 0.1 },
+  { symbol: "OGNBUSD", priceTickSize: 0.0001, stepSize: 0.1 },
+  { symbol: "POLYBUSD", priceTickSize: 0.0001, stepSize: 0.1 },
+  { symbol: "ELFBUSD", priceTickSize: 0.0001, stepSize: 0.1 },
+  { symbol: "RENBUSD", priceTickSize: 0.0001, stepSize: 1 },
+  { symbol: "STXBUSD", priceTickSize: 0.001, stepSize: 0.1 },
+  { symbol: "FETBUSD", priceTickSize: 0.0001, stepSize: 1 }
 ];

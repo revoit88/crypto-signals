@@ -3,7 +3,7 @@ const { binance } = require("../axios");
 const Mongoose = require("mongoose");
 const { parseOrder, parseAccountUpdate } = require("../utils");
 const { milliseconds } = require("@crypto-signals/utils");
-const { quote_asset } = require("@crypto-signals/config");
+const { quote_asset, pairs } = require("@crypto-signals/config");
 
 module.exports = class Observer {
   /**
@@ -12,6 +12,7 @@ module.exports = class Observer {
    */
   constructor(db) {
     this.database = db;
+    this.allowed_pairs = pairs.map(v => v.symbol);
   }
 
   async init() {
@@ -77,8 +78,11 @@ module.exports = class Observer {
           const message = parsedData.data;
           if (message.e === "executionReport") {
             const parsedOrder = parseOrder(message);
+            const validPair = this.allowed_pairs.some(
+              v => v === parsedOrder.symbol
+            );
 
-            if (parsedOrder.orderId && parsedOrder.symbol) {
+            if (parsedOrder.orderId && validPair) {
               try {
                 await OrderModel.findOneAndUpdate(
                   {

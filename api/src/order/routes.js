@@ -8,6 +8,13 @@ module.exports = {
 
     server.route({
       method: "GET",
+      path: "/{clientOrderId}",
+      handler: Controller.getOrderById,
+      options: { auth: { access: { scope: ["microservice"] } } }
+    });
+
+    server.route({
+      method: "GET",
       path: "/",
       handler: Controller.getOrder,
       options: { auth: { access: { scope: ["observer"] } } }

@@ -2,27 +2,18 @@ const Boom = require("@hapi/boom");
 const { binance } = require("../../utils/axios");
 const qs = require("querystring");
 
-exports.getOrder = async function (request, h) {
+exports.getOrderById = async function (request, h) {
   try {
-    const query = qs.stringify(request.query);
-    const { data } = await binance.get(`/api/v3/order?${query}`);
-    if (!!data.orderId) {
-      return data;
-    }
-    throw data;
+    const { clientOrderId } = request.params;
+    const OrderModel =
+      request.server.plugins.mongoose.connection.model("Order");
+    const order = await OrderModel.findOne({ clientOrderId })
+      .hint("clientOrderId_1")
+      .lean();
+    return order;
   } catch (error) {
-    console.error(error);
-    try {
-      const query = qs.stringify(request.query);
-      const { data } = await binance.get(`/api/v3/order?${query}`);
-      if (!!data.orderId) {
-        return data;
-      }
-      throw data;
-    } catch (error_2) {
-      console.error(error_2);
-      return Boom.internal();
-    }
+    request.server.logger.error(error);
+    return Boom.internal();
   }
 };
 

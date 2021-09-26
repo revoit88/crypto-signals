@@ -174,12 +174,12 @@ exports.updateTradedMarkets = async function (request, h) {
   try {
     const all_markets = await MarketModel.find({}).lean();
     const cmc_promise = axios.get(
-      `${cmc_api_url}/v1/cryptocurrency/listings/latest?limit=300`,
+      `${cmc_api_url}/v1/cryptocurrency/listings/latest?limit=200`,
       { headers: { "X-CMC_PRO_API_KEY": cmc_api_key } }
     );
 
     const coingecko_promise = axios.get(
-      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=USD&order=market_cap_desc&per_page=250&page=1&sparkline=false`
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=USD&order=market_cap_desc&per_page=200&page=1&sparkline=false`
     );
 
     const { data: cmc_response } = await cmc_promise;

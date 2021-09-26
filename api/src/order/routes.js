@@ -13,12 +13,12 @@ module.exports = {
       options: { auth: { access: { scope: ["microservice"] } } }
     });
 
-    server.route({
-      method: "GET",
-      path: "/",
-      handler: Controller.getOrder,
-      options: { auth: { access: { scope: ["observer"] } } }
-    });
+    // server.route({
+    //   method: "GET",
+    //   path: "/",
+    //   handler: Controller.getOrder,
+    //   options: { auth: { access: { scope: ["observer"] } } }
+    // });
 
     server.route({
       method: "POST",

@@ -2,8 +2,8 @@ const ws = require("ws");
 const { binance } = require("../axios");
 const Mongoose = require("mongoose");
 const { parseOrder, parseAccountUpdate } = require("../utils");
-const { milliseconds } = require("@crypto-signals/utils");
-const { quote_asset, pairs } = require("@crypto-signals/config");
+const { milliseconds, pairs } = require("@crypto-signals/utils");
+const { quote_asset } = require("@crypto-signals/config");
 
 module.exports = class Observer {
   /**

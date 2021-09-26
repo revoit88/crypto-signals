@@ -45,7 +45,11 @@ module.exports = class Observer {
       }
 
       if (!spot_account_listen_key) {
-        throw new Error("No listen key");
+        throw new Error("No listen key returned from binance.");
+      }
+
+      if (account.spot_account_listen_key !== spot_account_listen_key) {
+        console.log("Using new listen key.");
       }
 
       await Account.findOneAndUpdate(

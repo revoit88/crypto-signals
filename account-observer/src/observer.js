@@ -14,8 +14,6 @@ module.exports = class Observer {
     this.database = db;
   }
 
-  order_events = {};
-
   async init() {
     try {
       console.log(
@@ -29,6 +27,7 @@ module.exports = class Observer {
 
       if (
         account.spot_account_listen_key &&
+        account.last_spot_account_listen_key_update &&
         Date.now() - account.last_spot_account_listen_key_update >
           milliseconds.hour
       ) {

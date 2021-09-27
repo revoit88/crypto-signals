@@ -21,7 +21,8 @@ function replaceObjectKeys(obj) {
 
 function getTelegramBotRequest(position, config) {
   if (!config.telegram_bot_url) {
-    throw new Error("Telegram Bot URL is not defined");
+    return Promise.resolve();
+    //throw new Error("Telegram Bot URL is not defined");
   }
   if (!config.microservice_token) {
     throw new Error("MicroService Token is not defined");

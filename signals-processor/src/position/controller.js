@@ -109,7 +109,7 @@ module.exports = db => {
         $set: { position: createdPosition._id }
       });
 
-      if (!!use_main_account && config.environment === "production") {
+      if (!!use_main_account && accountType === "production") {
         trader
           .createMarketBuyOrder({
             symbol: createdPosition.symbol,

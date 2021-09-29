@@ -11,7 +11,7 @@ const {
 } = require("@crypto-signals/config");
 const qs = require("querystring");
 
-const MAX_REQUESTS = 95;
+const MAX_REQUESTS = 48; // limit 50
 
 async function checkHeaders(headers, model) {
   if (Number(headers["x-mbx-order-count-10s"]) >= MAX_REQUESTS) {

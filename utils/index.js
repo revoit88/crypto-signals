@@ -43,12 +43,16 @@ function toFixedDecimal(value, decimals) {
   return value ? +Number(value).toFixed(decimals || 2) : null;
 }
 
+function toFixedPrecision(n, digits = 8) {
+  return +Number(n).toPrecision(digits);
+}
+
 function getSymbolPrecision(symbol, type) {
   return pairs.find(p => p.symbol === symbol)[type];
 }
 
 const getResult = (value, tick) => {
-  return Math.trunc(Number(value / tick)) / Math.ceil(1 / tick);
+  return Math.trunc(toFixedPrecision(value / tick)) / Math.ceil(1 / tick);
 };
 
 /**

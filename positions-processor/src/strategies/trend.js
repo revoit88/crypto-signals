@@ -32,7 +32,7 @@ module.exports = db => {
     const candles = await CandleModel.find({
       $and: [
         { symbol },
-        { open_time: { $gte: Date.now() - getTimeDiff(3, interval) } },
+        { open_time: { $gte: Date.now() - getTimeDiff(10, interval) } },
         { open_time: { $lte: Date.now() } }
       ]
     })
@@ -40,7 +40,13 @@ module.exports = db => {
       .sort({ open_time: 1 })
       .lean();
 
-    const [previous_candle, candle] = candles.slice(-2);
+    /*
+        Binance does not push candles during maintenance hours.
+        Therefore when system comes back up, there is a gap between
+        the last candle when maintenance started and when it finished
+      */
+
+    const [previous_candle = {}, candle = {}] = candles.slice(-2);
 
     try {
       const positions = await PositionModel.find({

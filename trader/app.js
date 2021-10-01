@@ -34,6 +34,10 @@ const init = async () => {
       options: { db_uri: config.db_uri }
     },
     {
+      plugin: require("./src/account/routes"),
+      routes: { prefix: "/account" }
+    },
+    {
       plugin: require("./src/order/routes"),
       routes: { prefix: "/order" }
     }

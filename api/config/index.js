@@ -33,5 +33,6 @@ module.exports = {
   cmc_api_url: process.env.CMC_API_URL,
   cmc_api_key: process.env.CMC_API_KEY,
   discord_microservice_url: process.env.DISCORD_MICROSERVICE_URL,
-  telegram_bot_url: process.env.TELEGRAM_BOT_URL
+  telegram_bot_url: process.env.TELEGRAM_BOT_URL,
+  redis_positions_channel: process.env.REDIS_POSITIONS_CHANNEL
 };

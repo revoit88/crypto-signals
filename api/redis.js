@@ -9,6 +9,7 @@ module.exports = {
   register: async function (server, options) {
     try {
       const db = Redis.createClient({ url: options.redis_uri });
+      const pubSub = db.duplicate({ url: options.redis_uri });
       const getAsync = promisify(db.get).bind(db);
       const setAsync = promisify(db.set).bind(db);
       const delAsync = promisify(db.del).bind(db);
@@ -26,6 +27,7 @@ module.exports = {
       server.expose("rpushAsync", rpushAsync);
       server.expose("llenAsync", llenAsync);
       server.expose("lpopAsync", lpopAsync);
+      server.expose("pubSub", pubSub);
     } catch (error) {
       throw error;
     }

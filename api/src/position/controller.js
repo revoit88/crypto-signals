@@ -1,7 +1,7 @@
 const Boom = require("@hapi/boom");
 const axios = require("axios");
 const config = require("@crypto-signals/config");
-const { castToObjectId, getTelegramBotRequest } = require("../../utils");
+const { castToObjectId } = require("../../utils");
 const {
   orderAlphabetically,
   toSymbolPrecision
@@ -191,7 +191,16 @@ exports.findOpenPositions = async function (request, h) {
 exports.broadcast = async function (request, h) {
   const MarketModel =
     request.server.plugins.mongoose.connection.model("Market");
+  const pubsub = request.server.plugins.redis.pubSub;
   const position = request.payload;
+
+  const publishPosition = (publisher, data, cfg) => {
+    publisher.publish(
+      `${cfg.quote_asset}_${cfg.redis_positions_channel}`,
+      JSON.stringify(data)
+    );
+  };
+
   try {
     request.server.publish("/positions", position);
 
@@ -201,37 +210,25 @@ exports.broadcast = async function (request, h) {
 
     if (position.type === "exit") {
       request.logger.info(
-        `${new Date().toISOString()} | SELL | ${position.exchange}@${
-          position.symbol
-        } @ ${position.price} | ${position.signal}`
+        `${new Date().toISOString()} | SELL | ${position.symbol} @ ${
+          position.price
+        } | ${position.signal}`
       );
 
       if (config.environment === "production") {
-        //broadcast sell signal
-        const promises = []
-          .concat(getTelegramBotRequest(position, config)) //telegram
-          .concat([]) //discord
-          .concat([]); //other providers
-
-        await Promise.all(promises);
+        publishPosition(pubsub, position, config);
       }
     }
 
     if (position.type === "entry" && market.broadcast_signals) {
       request.logger.info(
-        `${new Date().toISOString()} | BUY | ${position.exchange}@${
-          position.symbol
-        } @ ${position.price} | ${position.signal}`
+        `${new Date().toISOString()} | BUY | ${position.symbol} @ ${
+          position.price
+        } | ${position.signal}`
       );
 
       if (config.environment === "production") {
-        const promises = []
-          .concat(getTelegramBotRequest(position, config)) //telegram
-          .concat([]) //discord
-          // add signals promises for other services eg cryptohopper, 3commas
-          .concat([]);
-
-        await Promise.all(promises);
+        publishPosition(pubsub, position, config);
       }
     }
 

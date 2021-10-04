@@ -1,7 +1,7 @@
 const Hapi = require("@hapi/hapi");
 const Boom = require("@hapi/boom");
 const config = require("@crypto-signals/config");
-const { toFixedDecimal } = require("@crypto-signals/utils");
+const { toFixedDecimal, getPriceAsString } = require("@crypto-signals/utils");
 const axios = require("axios");
 const { startOfISOWeek, endOfISOWeek, format } = require("date-fns");
 
@@ -88,7 +88,7 @@ Pair: ${String(signal.symbol).replace(
       )}
 Average ${signal.type === "entry" ? "Entry" : "Exit"} Price: ${
         config.currency_symbol
-      }${signal.price}`;
+      }${getPriceAsString(signal.price)}`;
 
       await axios.post(config.webhook_url, { content });
     }

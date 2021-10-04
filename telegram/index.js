@@ -4,7 +4,8 @@ const express = require("express");
 const app = express();
 const axios = require("axios");
 const config = require("./config");
-const { castToObjectId, getPriceAsString } = require("./utils");
+const { castToObjectId } = require("./utils");
+const { getPriceAsString } = require("@crypto-signals/utils");
 
 if (!config.telegram_api_url) {
   throw new Error("Telegram API URL is not defined");

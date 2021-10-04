@@ -88,7 +88,7 @@ Pair: ${String(signal.symbol).replace(
       )}
 Average ${signal.type === "entry" ? "Entry" : "Exit"} Price: ${
         config.currency_symbol
-      } ${signal.price}`;
+      }${signal.price}`;
 
       await axios.post(config.webhook_url, { content });
     }

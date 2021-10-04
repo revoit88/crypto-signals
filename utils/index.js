@@ -246,6 +246,11 @@ const benchmark = (fn, text) => {
   });
 };
 
+function getPriceAsString(price) {
+  const isExponential = Number(price).toString().includes("e");
+  return isExponential ? Number(price).toFixed(8) : Number(price).toString();
+}
+
 module.exports = {
   pairs,
   milliseconds,
@@ -267,5 +272,6 @@ module.exports = {
   getBinanceInstance,
   getBooleanValue,
   buildCandles,
-  benchmark
+  benchmark,
+  getPriceAsString
 };

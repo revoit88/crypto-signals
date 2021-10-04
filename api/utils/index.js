@@ -19,27 +19,8 @@ function replaceObjectKeys(obj) {
   return obj;
 }
 
-function getTelegramBotRequest(position, config) {
-  if (!config.telegram_bot_url) {
-    return Promise.resolve();
-    //throw new Error("Telegram Bot URL is not defined");
-  }
-  if (!config.microservice_token) {
-    throw new Error("MicroService Token is not defined");
-  }
-  if (!position) {
-    throw new Error("Position is not defined");
-  }
-  return axios.post(`${config.telegram_bot_url}/signals/broadcast`, position, {
-    headers: {
-      Authorization: `Bearer ${config.microservice_token}`
-    }
-  });
-}
-
 module.exports = {
   validateNumber,
   castToObjectId,
-  replaceObjectKeys,
-  getTelegramBotRequest
+  replaceObjectKeys
 };

@@ -1,8 +1,7 @@
 const Hapi = require("@hapi/hapi");
 const Boom = require("@hapi/boom");
 const config = require("@crypto-signals/config");
-const { toFixedDecimal } = require("@crypto-signals/utils");
-const { castToObjectId } = require("./utils");
+const { toFixedDecimal, getPriceAsString } = require("@crypto-signals/utils");
 const axios = require("axios");
 const { startOfISOWeek, endOfISOWeek, format } = require("date-fns");
 
@@ -15,6 +14,10 @@ const init = async () => {
     {
       plugin: require("./db"),
       options: { db_uri: config.db_uri }
+    },
+    {
+      plugin: require("./redis"),
+      options: { redis_uri: config.redis_uri }
     }
   ]);
 
@@ -65,46 +68,39 @@ Average Profit Per Signal: ${averageProfit}%
           return Boom.internal();
         }
       }
-    },
-    {
-      path: "/position-closed",
-      method: "POST",
-      handler: async (request, h) => {
-        try {
-          const PositionModel =
-            request.server.plugins.mongoose.connection.model("Position");
-
-          const id = request.query.id;
-
-          const position = await PositionModel.findOne({
-            _id: castToObjectId(id)
-          }).lean();
-
-          if (position?.change < 0) {
-            return h.response();
-          }
-
-          const content = `**New profit generated on pair ${position.symbol}**
-Profit: ${position.change}%
-Entry Date: ${format(new Date(position.open_time), "dd/MM/yyyy HH:mm")}
-Exit Date:${format(new Date(position.close_time), "dd/MM/yyyy HH:mm")}
-Entry Price: ${position.buy_price}
-Exit Price: ${position.sell_price}
-          `;
-
-          await axios.post(config.trend_webhook_url, { content });
-
-          return h.response();
-        } catch (error) {
-          console.error(error);
-          return Boom.internal();
-        }
-      }
     }
   ]);
 
+  const pubsub = server.plugins.redis.pubSub;
+
+  pubsub.on("subscribe", function (channel) {
+    console.log(`[Discord] Subscribed to channel: ${channel}`);
+  });
+  pubsub.on("message", async function (channel, data) {
+    if (channel === `${config.quote_asset}_${config.redis_positions_channel}`) {
+      const signal = JSON.parse(data);
+
+      const content = `=== **New Signal** ===
+Type: ${String(signal.type).toUpperCase()}
+Pair: ${String(signal.symbol).replace(
+        config.quote_asset,
+        `/${config.quote_asset}`
+      )}
+Average ${signal.type === "entry" ? "Entry" : "Exit"} Price: ${
+        config.currency_symbol
+      }${getPriceAsString(signal.price)}`;
+
+      await axios.post(config.webhook_url, { content });
+    }
+  });
+
+  pubsub.subscribe(
+    `${config.quote_asset}_${config.redis_positions_channel}`,
+    function () {}
+  );
+
   await server.start();
-  console.log(`Server running on port ${config.port}`);
+  console.log(`[Discord] Server running on port ${config.port}`);
 };
 
 init();

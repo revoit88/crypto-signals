@@ -12,7 +12,6 @@ module.exports = {
   port: +process.env.API_PORT || 8080,
   allowed_pairs: pairs.map(p => p.symbol),
   environment: process.env.NODE_ENV,
-  position_percentage_size: process.env.PROFIT_SHARING_POSITION_PERCENTAGE_SIZE,
   signals_interval:
     +process.env.PROCESS_SIGNALS_INTERVAL * milliseconds.seconds,
   positions_interval:
@@ -22,17 +21,12 @@ module.exports = {
   binance_api_key: process.env.BINANCE_API_KEY,
   binance_api_secret: process.env.BINANCE_API_SECRET,
   microservice_token: process.env.MICROSERVICE_TOKEN,
-  trader_url: process.env.TRADER_URL,
   api_url: process.env.API_URL,
   signals_processor_microservice_url: process.env.SIGNALS_PROCESSOR_URL,
   positions_processor_microservice_url: process.env.POSITIONS_PROCESSOR_URL,
   candles_processor_microservice_url: process.env.CANDLES_PROCESSOR_URL,
-  repeat_close_position_hours:
-    +process.env.REPEAT_CLOSE_POSITION_HOURS * milliseconds.hour,
   quote_asset: process.env.QUOTE_ASSET,
   cmc_api_url: process.env.CMC_API_URL,
   cmc_api_key: process.env.CMC_API_KEY,
-  discord_microservice_url: process.env.DISCORD_MICROSERVICE_URL,
-  telegram_bot_url: process.env.TELEGRAM_BOT_URL,
   redis_positions_channel: process.env.REDIS_POSITIONS_CHANNEL
 };

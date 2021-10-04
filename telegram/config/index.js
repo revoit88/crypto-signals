@@ -12,5 +12,5 @@ module.exports = {
   microservice_token: process.env.MICROSERVICE_TOKEN,
   quote_asset: process.env.QUOTE_ASSET,
   redis_positions_channel: process.env.REDIS_POSITIONS_CHANNEL,
-  currency_symbol: process.env.CURRENCY_SYMBOL
+  currency_symbol: process.env.CURRENCY_SYMBOL ?? "₿"
 };

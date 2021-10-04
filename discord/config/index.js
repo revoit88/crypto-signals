@@ -11,5 +11,5 @@ module.exports = {
   quote_asset: process.env.QUOTE_ASSET,
   redis_positions_channel: process.env.REDIS_POSITIONS_CHANNEL,
   webhook_url: process.env.DISCORD_WEBHOOK_URL,
-  currency_symbol: process.env.CURRENCY_SYMBOL
+  currency_symbol: process.env.CURRENCY_SYMBOL ?? "₿" // server text editor won't let me input the bitcoin symbol
 };

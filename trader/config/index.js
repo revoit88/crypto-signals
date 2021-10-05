@@ -12,5 +12,8 @@ module.exports = {
   iron_secret: process.env.IRON_SECRET,
   minimum_order_size: +process.env.BINANCE_MINIMUM_ORDER_SIZE,
   quote_asset: process.env.QUOTE_ASSET,
-  reserved_amount: +process.env.RESERVED_AMOUNT
+  reserved_amount: +process.env.RESERVED_AMOUNT,
+  default_buy_order_type: process.env.DEFAULT_BUY_ORDER_TYPE ?? "MARKET",
+  default_sell_order_type: process.env.DEFAULT_SELL_ORDER_TYPE ?? "MARKET",
+  default_buy_amount: +process.env.DEFAULT_BUY_AMOUNT
 };

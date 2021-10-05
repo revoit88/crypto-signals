@@ -4,6 +4,7 @@ const config = require("@crypto-signals/config");
 const { toFixedDecimal, getPriceAsString } = require("@crypto-signals/utils");
 const axios = require("axios");
 const { startOfISOWeek, endOfISOWeek, format } = require("date-fns");
+const { castToObjectId } = require("./utils");
 
 const init = async () => {
   const server = Hapi.server({
@@ -90,7 +91,16 @@ Average ${signal.type === "entry" ? "Entry" : "Exit"} Price: ${
         config.currency_symbol
       }${getPriceAsString(signal.price)}`;
 
-      await axios.post(config.webhook_url, { content });
+      const PositionModel =
+        server.plugins.mongoose.connection.model("Position");
+
+      const position = await PositionModel.findById(castToObjectId(signal._id))
+        .select({ broadcast: true })
+        .lean();
+
+      if (!!position?.broadcast) {
+        await axios.post(config.webhook_url, { content });
+      }
     }
   });
 

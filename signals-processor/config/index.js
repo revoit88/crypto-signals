@@ -4,6 +4,7 @@ dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 const { milliseconds } = require("@crypto-signals/utils");
 
 module.exports = {
+  api_url: process.env.API_URL,
   db_uri: process.env.DB_URI,
   redis_uri: process.env.REDIS_URI,
   exchange: process.env.EXCHANGE,

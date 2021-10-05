@@ -93,11 +93,13 @@ Price: ${config.currency_symbol}${getPriceAsString(price)}`;
             );
 
             if (signal_type === "entry") {
-              // edit position and set entry message id
               await PositionModel.findByIdAndUpdate(
                 castToObjectId(position_id),
                 {
-                  $set: { entry_signal_telegram_message_id: message.message_id }
+                  $set: {
+                    entry_signal_telegram_message_id:
+                      message?.result?.message_id
+                  }
                 }
               );
             }

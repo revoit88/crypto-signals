@@ -131,9 +131,10 @@ exports.createOrder = async function (request, h) {
 
   let query = {
     type:
-      request.query.type === "entry"
+      request.query.orderType ??
+      (request.query.type === "entry"
         ? default_buy_order_type
-        : default_sell_order_type,
+        : default_sell_order_type),
     symbol: request.query.symbol,
     side: request.query.type === "entry" ? "BUY" : "SELL",
     timeInForce: "GTC"

@@ -198,7 +198,7 @@ exports.broadcast = async function (request, h) {
     console.log(
       `${new Date().toISOString()} | ${
         position.type === "exit" ? "SELL" : "BUY"
-      } | ${position.symbol} @ ${position.price} | ${position.signal}`
+      } | ${position.symbol} @ ${position.price} | ${position._id}`
     );
 
     if (config.environment === "production") {

@@ -6,7 +6,7 @@ const {
   orderAlphabetically,
   toSymbolPrecision
 } = require("@crypto-signals/utils");
-const { api } = require("../../utils/axios");
+const { api, trader } = require("../../utils/axios");
 
 exports.create = async function (request, h) {
   try {
@@ -189,47 +189,24 @@ exports.findOpenPositions = async function (request, h) {
 };
 
 exports.broadcast = async function (request, h) {
-  const MarketModel =
-    request.server.plugins.mongoose.connection.model("Market");
   const pubsub = request.server.plugins.redis.pubSub;
   const position = request.payload;
-
-  const publishPosition = (publisher, data, cfg) => {
-    publisher.publish(
-      `${cfg.quote_asset}_${cfg.redis_positions_channel}`,
-      JSON.stringify(data)
-    );
-  };
 
   try {
     request.server.publish("/positions", position);
 
-    const market = await MarketModel.findOne({
-      $and: [{ exchange: position.exchange }, { symbol: position.symbol }]
-    }).hint("exchange_1_symbol_1");
+    console.log(
+      `${new Date().toISOString()} | ${
+        position.type === "exit" ? "SELL" : "BUY"
+      } | ${position.symbol} @ ${position.price} | ${position.signal}`
+    );
 
-    if (position.type === "exit") {
-      request.logger.info(
-        `${new Date().toISOString()} | SELL | ${position.symbol} @ ${
-          position.price
-        } | ${position.signal}`
+    if (config.environment === "production") {
+      pubsub.publish(
+        `${config.quote_asset}_${config.redis_positions_channel}`,
+        JSON.stringify(position)
       );
-
-      if (config.environment === "production") {
-        publishPosition(pubsub, position, config);
-      }
-    }
-
-    if (position.type === "entry" && market.broadcast_signals) {
-      request.logger.info(
-        `${new Date().toISOString()} | BUY | ${position.symbol} @ ${
-          position.price
-        } | ${position.signal}`
-      );
-
-      if (config.environment === "production") {
-        publishPosition(pubsub, position, config);
-      }
+      await trader.post(`/order?${new URLSearchParams(position).toString()}`);
     }
 
     return h.response();

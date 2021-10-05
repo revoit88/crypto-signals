@@ -9,8 +9,8 @@
     "restart": "npm stop && npm start"
   },
   "dependencies": {
-    "@crypto-signals/utils": "file:../utils",
     "@crypto-signals/config": "file:./config",
+    "@crypto-signals/utils": "file:../utils",
     "@hapi/hapi": "^20.0.1",
     "@hapi/iron": "^6.0.0",
     "dotenv": "^8.2.0",

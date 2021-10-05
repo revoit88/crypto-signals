@@ -19,7 +19,6 @@ function broadcastPositionUpdate(position) {
         exchange: position.exchange,
         symbol: position.symbol,
         price: position.sell_price,
-        signal: position.signal.toString(),
         type: "exit",
         _id: position._id.toString()
       })

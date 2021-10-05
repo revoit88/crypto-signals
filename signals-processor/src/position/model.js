@@ -14,7 +14,6 @@ function broadcastEntryPosition(position) {
         exchange: position.exchange,
         symbol: position.symbol,
         price: position.buy_price,
-        signal: position.signal.toString(),
         type: "entry",
         _id: position._id.toString(),
         time: position.open_time

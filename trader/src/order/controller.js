@@ -104,12 +104,12 @@ exports.createOrder = async function (request, h) {
   ).lean();
 
   const notEnoughBalance =
-    account.balance <= default_buy_amount && request.query.type === "entry";
+    account?.balance <= default_buy_amount && request.query.type === "entry";
 
-  const shouldNotBuy = request.query.type === "entry" && !position.broadcast;
+  const shouldNotBuy = request.query.type === "entry" && !position?.broadcast;
 
   if (
-    Date.now() < account.create_order_after ||
+    Date.now() < account?.create_order_after ||
     notEnoughBalance ||
     shouldNotBuy
   ) {

@@ -129,21 +129,23 @@ exports.createOrder = async function (request, h) {
     );
   }
 
+  const orderType =
+    request.query.orderType ??
+    (request.query.type === "entry"
+      ? default_buy_order_type
+      : default_sell_order_type);
+
   let query = {
-    type:
-      request.query.orderType ??
-      (request.query.type === "entry"
-        ? default_buy_order_type
-        : default_sell_order_type),
+    type: orderType,
     symbol: request.query.symbol,
-    side: request.query.type === "entry" ? "BUY" : "SELL",
-    timeInForce: "GTC"
+    side: request.query.type === "entry" ? "BUY" : "SELL"
   };
 
   if (query.side === "BUY" && query.type === "MARKET") {
     query["quoteOrderQty"] = default_buy_amount;
   }
   if (query.type === "LIMIT") {
+    query["timeInForce"] = "GTC";
     query["price"] = request.query.price;
     if (query.side === "BUY") {
       query["quantity"] = toSymbolStepPrecision(

@@ -12,7 +12,6 @@ const {
   calculateBuySignal,
   castToObjectId
 } = require("./utils");
-const { api } = require("./axios");
 
 const init = async () => {
   const server = Hapi.server({
@@ -181,45 +180,7 @@ const init = async () => {
                     { new: true }
                   );
                   await delAsync(`${last_candle.symbol}_has_open_signal`);
-
-                  // create position
-                  const position = await positionController.create(
-                    updatedSignal,
-                    last_candle,
-                    !!market.use_main_account
-                  );
-                  // broadcast signal closed
-                  api
-                    .broadcast("signals", {
-                      exchange: open_signal.exchange,
-                      symbol: open_signal.symbol,
-                      type: "exit",
-                      _id: open_signal._id.toString()
-                    })
-                    .catch(error => {
-                      console.log("Exit signal broadcast error.");
-                      if (error) {
-                        console.error(error);
-                      }
-                    });
-                  // broadcast new position
-
-                  api
-                    .broadcast("positions", {
-                      exchange: position.exchange,
-                      symbol: position.symbol,
-                      price: position.buy_price,
-                      signal: position.signal.toString(),
-                      type: "entry",
-                      _id: position._id.toString(),
-                      time: position.open_time
-                    })
-                    .catch(error => {
-                      console.log("Entry position broadcast error.");
-                      if (error) {
-                        console.error(error);
-                      }
-                    });
+                  await positionController.create(updatedSignal, last_candle);
                   return Promise.resolve();
                 }
 

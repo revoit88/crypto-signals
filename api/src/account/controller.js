@@ -69,8 +69,8 @@ exports.getUpdatedBalance = async function (request, h) {
 
 exports.cancelUnfilledOrders = async function (request, h) {
   try {
-    const SignalModel =
-      request.server.plugins.mongoose.connection.model("Signal");
+    const PositionModel =
+      request.server.plugins.mongoose.connection.model("Position");
     const OrderModel =
       request.server.plugins.mongoose.connection.model("Order");
     const MarketModel =
@@ -79,6 +79,8 @@ exports.cancelUnfilledOrders = async function (request, h) {
     const orders = await OrderModel.find({
       $and: [
         { status: { $nin: ["FILLED", "CANCELED"] } },
+        // remove this if need to cancel sell orders too
+        // also add index without side
         { side: { $ne: "SELL" } },
         { time: { $lt: Date.now() - milliseconds.minute * 10 } },
         { time: { $gt: Date.now() - milliseconds.hour } }
@@ -86,44 +88,47 @@ exports.cancelUnfilledOrders = async function (request, h) {
     }).hint("status_1_side_1_time_-1");
 
     if (orders.length) {
-      const signals = await SignalModel.find({
+      const positions = await PositionModel.find({
         "buy_order.orderId": { $in: orders.map(o => o.orderId) }
-      }).hint("buy_order.orderId_1");
+      })
+        .hint("buy_order.orderId_1")
+        .lean();
 
       const markets = await MarketModel.find({
         $and: [
           { exchange },
           { symbol: { $in: [...new Set(orders.map(o => o.symbol))] } }
         ]
-      }).hint("exchange_1_symbol_1");
+      })
+        .hint("exchange_1_symbol_1")
+        .lean();
 
-      await Promise.all(
-        orders.map(async order => {
-          const signal = signals.find(
-            s => (s.buy_order || {}).orderId === (order || {}).orderId
-          );
+      for (const order of orders) {
+        const position = positions.find(
+          p => p?.buy_order?.orderId === order?.orderId
+        );
 
-          const market = markets.find(m => m.symbol === order.symbol);
+        const market = markets.find(m => m.symbol === order.symbol);
 
-          if (
-            (!signal ||
-              (signal.trailing_stop_buy < market.last_price &&
-                getChange(market.last_price, signal.trailing_stop_buy) > 1)) &&
-            !(order.clientOrderId || "").match(/web_/)
-          ) {
-            const tradeQuery = qs.stringify({
-              symbol: order.symbol,
-              orderId: order.orderId
-            });
+        if (
+          (!position ||
+            // if need to cancel sell orders change this
+            (position.buy_price < market.last_price &&
+              getChange(market.last_price, position.buy_price) > 1)) &&
+          !(order.clientOrderId || "").match(/web_/)
+        ) {
+          const tradeQuery = new URLSearchParams({
+            symbol: order.symbol,
+            orderId: order.orderId
+          }).toString();
 
-            try {
-              await binance.delete(`/api/v3/order?${tradeQuery}`);
-            } catch (error) {
-              request.logger.error(error.toJSON());
-            }
+          try {
+            await binance.delete(`/api/v3/order?${tradeQuery}`);
+          } catch (error) {
+            request.logger.error(error.toJSON());
           }
-        })
-      );
+        }
+      }
     }
 
     return h.response();

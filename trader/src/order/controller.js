@@ -7,8 +7,12 @@ const {
 const {
   exchange,
   minimum_order_size,
-  quote_asset
+  quote_asset,
+  default_buy_amount,
+  default_buy_order_type,
+  default_sell_order_type
 } = require("@crypto-signals/config");
+const { castToObjectId } = require("../../utils");
 const qs = require("querystring");
 
 const MAX_REQUESTS = 48; // limit 50
@@ -82,19 +86,33 @@ exports.getOrder = async function (request, h) {
 };
 
 exports.createOrder = async function (request, h) {
-  const stopPrice = (request.query || {}).stopPrice;
-  const signalId = request.query.signal;
+  const positionId = request.query._id;
 
-  const SignalModel =
-    request.server.plugins.mongoose.connection.model("Signal");
+  const PositionModel =
+    request.server.plugins.mongoose.connection.model("Position");
   const MarketModel =
     request.server.plugins.mongoose.connection.model("Market");
   const AccountModel =
     request.server.plugins.mongoose.connection.model("Account");
 
-  const account = await AccountModel.findOne({ id: "production" }).hint("id_1");
+  const account = await AccountModel.findOne({ id: "production" })
+    .hint("id_1")
+    .lean();
 
-  if (Date.now() < account.create_order_after) {
+  const position = await PositionModel.findById(
+    castToObjectId(positionId)
+  ).lean();
+
+  const notEnoughBalance =
+    account?.balance <= default_buy_amount && request.query.type === "entry";
+
+  const shouldNotBuy = request.query.type === "entry" && !position?.broadcast;
+
+  if (
+    Date.now() < account?.create_order_after ||
+    notEnoughBalance ||
+    shouldNotBuy
+  ) {
     return h.response();
   }
 
@@ -111,53 +129,62 @@ exports.createOrder = async function (request, h) {
     );
   }
 
-  const newQuery = Object.keys(request.query).reduce(
-    (acc, key) =>
-      ["stopPrice", "signal"].includes(key)
-        ? acc
-        : { ...acc, [key]: request.query[key] },
-    {}
-  );
+  const orderType =
+    request.query.orderType ??
+    (request.query.type === "entry"
+      ? default_buy_order_type
+      : default_sell_order_type);
+
+  let query = {
+    type: orderType,
+    symbol: request.query.symbol,
+    side: request.query.type === "entry" ? "BUY" : "SELL"
+  };
+
+  if (query.side === "BUY" && query.type === "MARKET") {
+    query["quoteOrderQty"] = default_buy_amount;
+  }
+  if (query.type === "LIMIT") {
+    query["timeInForce"] = "GTC";
+    query["price"] = request.query.price;
+    if (query.side === "BUY") {
+      query["quantity"] = toSymbolStepPrecision(
+        default_buy_amount / request.query.price,
+        request.query.symbol
+      );
+    }
+  }
+  if (query.side === "SELL") {
+    const buy_order = await getOrderFromDbOrBinance(
+      request,
+      position.buy_order
+    );
+
+    const quantity_to_sell =
+      position.symbol.replace(quote_asset, "") === buy_order.commissionAsset
+        ? +buy_order.executedQty - +buy_order.commissionAmount
+        : +buy_order.executedQty;
+    query["quantity"] = toSymbolStepPrecision(
+      quantity_to_sell,
+      position.symbol
+    );
+  }
 
   try {
-    const query = qs.stringify({ ...newQuery, stopPrice });
-    const { data, headers } = await binance.post(`/api/v3/order?${query}`);
+    const searchParams = new URLSearchParams(query).toString();
+    const { data, headers } = await binance.post(
+      `/api/v3/order?${searchParams}`
+    );
 
     await checkHeaders(headers, AccountModel);
 
-    if (!!(data || {}).orderId) {
-      await SignalModel.findOneAndUpdate(
-        { id: signalId },
-        { $set: { buy_order: data } }
-      );
+    if (!!data?.orderId) {
+      await PositionModel.findByIdAndUpdate(castToObjectId(positionId), {
+        $set: { [`${query.side.toLowerCase()}_order`]: data }
+      });
     }
   } catch (error) {
-    if (
-      ((((error || {}).response || {}).data || {}).msg || "") ===
-      "Stop price would trigger immediately."
-    ) {
-      try {
-        const query = qs.stringify({
-          ...newQuery,
-          price: stopPrice,
-          type: "LIMIT"
-        });
-        const { data, headers } = await binance.post(`/api/v3/order?${query}`);
-
-        await checkHeaders(headers, AccountModel);
-
-        if (!!(data || {}).orderId) {
-          await SignalModel.findOneAndUpdate(
-            { id: signalId },
-            { $set: { buy_order: data } }
-          );
-        }
-      } catch (error_2) {
-        request.server.logger.error(getError(error_2));
-      }
-    } else {
-      request.server.logger.error(getError(error));
-    }
+    request.server.logger.error(getError(error));
   } finally {
     await MarketModel.findOneAndUpdate(
       { $and: [{ exchange }, { symbol: request.query.symbol }] },

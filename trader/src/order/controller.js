@@ -136,48 +136,64 @@ exports.createOrder = async function (request, h) {
     );
   }
 
-  const orderType =
-    request.query.orderType ??
-    (request.query.type === "entry"
-      ? default_buy_order_type
-      : default_sell_order_type);
+  try {
+    const orderType =
+      request.query.orderType ??
+      (request.query.type === "entry"
+        ? default_buy_order_type
+        : default_sell_order_type);
 
-  let query = {
-    type: orderType,
-    symbol: request.query.symbol,
-    side: request.query.type === "entry" ? "BUY" : "SELL"
-  };
+    let query = {
+      type: orderType,
+      symbol: request.query.symbol,
+      side: request.query.type === "entry" ? "BUY" : "SELL"
+    };
 
-  if (query.side === "BUY" && query.type === "MARKET") {
-    query["quoteOrderQty"] = default_buy_amount;
-  }
-  if (query.type === "LIMIT") {
-    query["timeInForce"] = "GTC";
-    query["price"] = request.query.price;
-    if (query.side === "BUY") {
+    if (query.side === "BUY" && query.type === "MARKET") {
+      query["quoteOrderQty"] = default_buy_amount;
+    }
+    if (query.type === "LIMIT") {
+      query["timeInForce"] = "GTC";
+      query["price"] = request.query.price;
+      if (query.side === "BUY") {
+        query["quantity"] = toSymbolStepPrecision(
+          default_buy_amount / request.query.price,
+          request.query.symbol
+        );
+      }
+    }
+    if (query.side === "SELL") {
+      let buy_order = await getOrderFromDbOrBinance(
+        request,
+        position.buy_order
+      );
+
+      if (buy_order?.status !== "CANCELED" && buy_order?.status !== "FILLED") {
+        //cancel order and refetch from db
+        const cancel_query = new URLSearchParams({
+          symbol: buy_order.symbol,
+          orderId: buy_order.orderId
+        }).toString();
+        await binance.delete(`/api/v3/order?${cancel_query}`);
+        buy_order = await getOrderFromDbOrBinance(request, position.buy_order);
+      }
+
+      const quantity_to_sell =
+        position.symbol.replace(quote_asset, "") === buy_order.commissionAsset
+          ? +buy_order.executedQty - +buy_order.commissionAmount
+          : +buy_order.executedQty;
+
+      if (quantity_to_sell === 0) {
+        throw new Error(
+          `Buy order for position ${position?._id} was not filled.`
+        );
+      }
+
       query["quantity"] = toSymbolStepPrecision(
-        default_buy_amount / request.query.price,
-        request.query.symbol
+        quantity_to_sell,
+        position.symbol
       );
     }
-  }
-  if (query.side === "SELL") {
-    const buy_order = await getOrderFromDbOrBinance(
-      request,
-      position.buy_order
-    );
-
-    const quantity_to_sell =
-      position.symbol.replace(quote_asset, "") === buy_order.commissionAsset
-        ? +buy_order.executedQty - +buy_order.commissionAmount
-        : +buy_order.executedQty;
-    query["quantity"] = toSymbolStepPrecision(
-      quantity_to_sell,
-      position.symbol
-    );
-  }
-
-  try {
     const searchParams = new URLSearchParams(query).toString();
     const { data, headers } = await binance.post(
       `/api/v3/order?${searchParams}`

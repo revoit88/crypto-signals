@@ -81,7 +81,10 @@ exports.updateMarketLocks = async function (request, h) {
           }
         }
       ]
-    });
+    })
+      .select({ symbol: true })
+      .hint("trader_lock_1_last_trader_lock_update_1")
+      .lean();
 
     if (!!locked_markets.length) {
       await MarketModel.updateMany(

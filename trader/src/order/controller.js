@@ -111,11 +111,14 @@ exports.createOrder = async function (request, h) {
     account?.balance <= default_buy_amount && request.query.type === "entry";
 
   const shouldNotBuy = request.query.type === "entry" && !position?.broadcast;
+  const doesNotHaveBuyOrder =
+    request.query.type === "exit" && !position?.buy_order;
 
   if (
     Date.now() < account?.create_order_after ||
     notEnoughBalance ||
-    shouldNotBuy
+    shouldNotBuy ||
+    doesNotHaveBuyOrder
   ) {
     return h.response();
   }

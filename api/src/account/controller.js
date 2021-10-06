@@ -202,21 +202,33 @@ exports.updateListenKey = async function (request, h) {
   try {
     const AccountModel =
       request.server.plugins.mongoose.connection.model("Account");
-    const account = await AccountModel.findOne({ id: "production" }).hint(
-      "id_1"
-    );
+    const account = await AccountModel.findOne({ id: "production" })
+      .hint("id_1")
+      .lean();
     if (
       !!account.spot_account_listen_key &&
       account.last_spot_account_listen_key_update >
         Date.now() - milliseconds.hour
     ) {
-      const query = qs.stringify({
+      let keyExists = true;
+      const query = new URLSearchParams({
         listenKey: account.spot_account_listen_key
-      });
-      await binance.put(`api/v3/userDataStream?${query}`);
+      }).toString();
+
+      try {
+        await binance.put(`api/v3/userDataStream?${query}`);
+      } catch (error) {
+        // listen key does not exist
+        if (error?.response?.data?.code === -1125) {
+          keyExists = false;
+        }
+      }
       await AccountModel.findOneAndUpdate(
         { id: "production" },
-        { $set: { last_spot_account_listen_key_update: Date.now() } }
+        {
+          $set: { last_spot_account_listen_key_update: Date.now() },
+          ...(!keyExists && { $unset: { spot_account_listen_key: true } })
+        }
       );
     }
     return h.response();

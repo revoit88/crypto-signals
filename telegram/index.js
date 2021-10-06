@@ -78,7 +78,7 @@ Mongoose.createConnection(
           const getMessage = (signal_type, position) => {
             const price =
               position[`${signal_type === "entry" ? "buy" : "sell"}_price`];
-            return `Signal Type: ${String(signal_type).toUpperCase()}
+            return `Type: ${String(signal_type).toUpperCase()}
 Pair: ${String(position.symbol).replace(
               config.quote_asset,
               `/${config.quote_asset}`

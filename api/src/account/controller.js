@@ -221,6 +221,8 @@ exports.updateListenKey = async function (request, h) {
         // listen key does not exist
         if (error?.response?.data?.code === -1125) {
           keyExists = false;
+        } else {
+          throw error;
         }
       }
       await AccountModel.findOneAndUpdate(

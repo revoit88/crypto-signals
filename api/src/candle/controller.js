@@ -240,12 +240,12 @@ exports.persist = async function (request, h) {
 
       const length = await llenAsync(`${candle.symbol}_candles`);
       const candles = await lpopAsync([`${candle.symbol}_candles`, length]);
-      const toUpdate = Object.entries(
+      const toUpdate = Object.values(
         (candles || []).reduce((acc, candle) => {
           const parsed = JSON.parse(candle);
           return { ...acc, [parsed.id]: parsed };
         }, {})
-      ).map(([_, value]) => value);
+      );
 
       if (toUpdate.length) {
         await CandleModel.bulkWrite(

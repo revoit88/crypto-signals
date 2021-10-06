@@ -32,6 +32,10 @@ function getError(error) {
 }
 
 async function getOrderFromDbOrBinance(request, buy_order) {
+  if (!buy_order) {
+    throw new Error("Order is not defined.");
+  }
+
   const OrderModel = request.server.plugins.mongoose.connection.model("Order");
   let order;
   try {
@@ -43,10 +47,10 @@ async function getOrderFromDbOrBinance(request, buy_order) {
     }
   } catch (error) {
     request.logger.error(error);
-    const query = qs.stringify({
+    const query = new URLSearchParams({
       orderId: buy_order.orderId,
       symbol: buy_order.symbol
-    });
+    }).toString();
     try {
       const { data } = await binance.get(`/api/v3/order?${query}`);
 

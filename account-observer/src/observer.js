@@ -2,7 +2,7 @@ const ws = require("ws");
 const { binance } = require("../axios");
 const Mongoose = require("mongoose");
 const { parseOrder, parseAccountUpdate } = require("../utils");
-const { milliseconds, pairs } = require("@crypto-signals/utils");
+const { pairs } = require("@crypto-signals/utils");
 const { quote_asset } = require("@crypto-signals/config");
 
 module.exports = class Observer {
@@ -24,17 +24,7 @@ module.exports = class Observer {
       const Account = this.database.model("Account");
       const OrderModel = this.database.model("Order");
 
-      const account = await Account.findOne({ id: "production" });
-
-      if (
-        account.spot_account_listen_key &&
-        account.last_spot_account_listen_key_update &&
-        Date.now() - account.last_spot_account_listen_key_update >
-          milliseconds.hour
-      ) {
-        console.log("Deleting listen key.");
-        await binance.deleteListenKey(account.spot_account_listen_key);
-      }
+      const account = await Account.findOne({ id: "production" }).lean();
 
       let spot_account_listen_key;
       try {

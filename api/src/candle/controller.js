@@ -239,9 +239,11 @@ exports.persist = async function (request, h) {
       await setAsync(`${candle.symbol}_last_signals_process_date`, Date.now());
 
       const length = await llenAsync(`${candle.symbol}_candles`);
-      const candles = await lpopAsync([`${candle.symbol}_candles`, length]);
+      const candles =
+        (await lpopAsync([`${candle.symbol}_candles`, length])) || [];
+      candles.push(JSON.stringify(candle));
       const toUpdate = Object.values(
-        (candles || []).reduce((acc, candle) => {
+        candles.reduce((acc, candle) => {
           const parsed = JSON.parse(candle);
           return { ...acc, [parsed.id]: parsed };
         }, {})

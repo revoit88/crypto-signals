@@ -16,7 +16,8 @@ const {
   positions_interval,
   signals_interval,
   exchange,
-  interval
+  interval,
+  candles_processor_microservice_url
 } = require("@crypto-signals/config");
 const qs = require("querystring");
 
@@ -327,11 +328,11 @@ exports.getCandlesFromBinance = async function (request, h) {
       }
     }
 
-    const query = qs.stringify({
+    const query = new URLSearchParams({
       symbol,
       interval,
       startTime: Date.now() - getTimeDiff(160, interval)
-    });
+    }).toString();
 
     const { data } = await binance.get(`/api/v3/klines?${query}`);
 
@@ -364,10 +365,12 @@ exports.getCandlesFromBinance = async function (request, h) {
         });
       }
 
-      await candles_processor_microservice.post(
-        `?symbol=${symbol}`,
-        processed.slice(-10).map(c => c.id)
-      );
+      if (candles_processor_microservice_url) {
+        await candles_processor_microservice.post(
+          `?symbol=${symbol}`,
+          processed.slice(-10).map(c => c.id)
+        );
+      }
     }
 
     return h.response();

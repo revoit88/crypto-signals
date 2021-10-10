@@ -4,7 +4,6 @@ module.exports = {
   name: "account routes",
   version: "1.0.0",
   register: function (server, options) {
-    server.subscription("/account/{id}");
     server.route({
       method: "GET",
       path: "/balance/update",

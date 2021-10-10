@@ -5,8 +5,6 @@ module.exports = {
   name: "signals routes",
   version: "1.0.0",
   register: async function (server, options) {
-    server.subscription("/signals");
-
     server.route({
       method: "POST",
       path: "/",

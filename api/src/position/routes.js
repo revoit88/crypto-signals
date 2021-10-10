@@ -5,8 +5,6 @@ module.exports = {
   name: "positions routes",
   version: "1.0.0",
   register: function (server, options) {
-    server.subscription("/positions");
-
     server.route({
       method: "POST",
       path: "/",

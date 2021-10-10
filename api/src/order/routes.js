@@ -4,8 +4,6 @@ module.exports = {
   name: "orders routes",
   version: "1.0.0",
   register: function (server, options) {
-    server.subscription("/orders");
-
     server.route({
       method: "GET",
       path: "/{clientOrderId}",

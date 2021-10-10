@@ -5,8 +5,6 @@ module.exports = {
   name: "candles routes",
   version: "1.0.0",
   register: function (server, options) {
-    server.subscription("/candles/{symbol}");
-
     server.route({
       method: "POST",
       path: "/",

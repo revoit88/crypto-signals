@@ -55,7 +55,7 @@ const init = async () => {
       plugin: require("./redis"),
       options: { redis_uri: config.redis_uri }
     },
-    { plugin: require("@hapi/nes") },
+    { plugin: require("./src/ws") },
     {
       plugin: require("./src/candle/routes"),
       routes: { prefix: "/candles" },

@@ -5,9 +5,6 @@ module.exports = {
   name: "markets routes",
   version: "1.0.0",
   register: function (server, options) {
-    server.subscription("/markets");
-    server.subscription("/markets/{symbol}");
-
     server.route({
       method: "POST",
       path: "/broadcast",

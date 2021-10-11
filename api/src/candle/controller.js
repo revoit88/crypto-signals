@@ -146,18 +146,6 @@ exports.deleteOldCandles = async function (request, h) {
   }
 };
 
-exports.broadcast = async function (request, h) {
-  try {
-    const candle = request.payload;
-
-    request.server.publish(`/candles/${candle.symbol}`, candle);
-    return h.response();
-  } catch (error) {
-    request.server.logger.error(error);
-    return Boom.internal();
-  }
-};
-
 exports.getPastDayCandles = async function (request, h) {
   try {
     const Candle = request.server.plugins.mongoose.connection.model("Candle");
@@ -192,14 +180,6 @@ exports.persist = async function (request, h) {
       request.server.plugins.mongoose.connection.model("Market");
 
     const candle = request.payload;
-
-    request.server.publish(`/candles/${candle.symbol}`, candle);
-    request.server.publish(`/markets/${candle.symbol}`, {
-      exchange: candle.exchange,
-      symbol: candle.symbol,
-      last_price: candle.close_price,
-      last_update: new Date(candle.event_time).getTime()
-    });
 
     const last_signals_process_date = await getAsync(
       `${candle.symbol}_last_signals_process_date`

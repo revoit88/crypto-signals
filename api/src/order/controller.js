@@ -254,14 +254,3 @@ exports.updateTrailingStopLossOrder = async function (request, h) {
     }
   }
 };
-
-exports.broadcast = async function (request, h) {
-  const order = request.payload;
-  try {
-    request.server.publish("/orders", order);
-    return h.response();
-  } catch (error) {
-    request.logger.error(error);
-    return Boom.internal();
-  }
-};

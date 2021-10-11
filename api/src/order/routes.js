@@ -52,19 +52,5 @@ module.exports = {
       handler: Controller.updateTrailingStopLossOrder,
       options: { auth: { access: { scope: ["observer"] } } }
     });
-
-    server.route({
-      method: "POST",
-      path: "/broadcast",
-      handler: Controller.broadcast,
-      options: {
-        auth: {
-          access: {
-            scope: ["microservice"]
-          }
-        },
-        validate: { query: false }
-      }
-    });
   }
 };

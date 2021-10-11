@@ -71,19 +71,6 @@ module.exports = {
     });
 
     server.route({
-      method: "POST",
-      path: "/broadcast",
-      handler: Controller.broadcast,
-      options: {
-        auth: {
-          access: {
-            scope: ["observer", "microservice"]
-          }
-        }
-      }
-    });
-
-    server.route({
       method: "GET",
       path: "/past-day",
       handler: Controller.getPastDayCandles,

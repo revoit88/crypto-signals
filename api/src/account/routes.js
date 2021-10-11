@@ -40,22 +40,6 @@ module.exports = {
     });
 
     server.route({
-      method: "POST",
-      path: "/broadcast",
-      handler: Controller.broadcast,
-      options: {
-        auth: {
-          access: {
-            scope: ["observer", "microservice"]
-          }
-        },
-        validate: {
-          query: false
-        }
-      }
-    });
-
-    server.route({
       method: "GET",
       path: "/{id}",
       handler: Controller.getAccountById,

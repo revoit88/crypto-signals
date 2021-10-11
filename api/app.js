@@ -55,7 +55,10 @@ const init = async () => {
       plugin: require("./redis"),
       options: { redis_uri: config.redis_uri }
     },
-    { plugin: require("./src/ws") },
+    {
+      plugin: require("./src/ws"),
+      options: { enabled: config.websocket_server_enabled }
+    },
     {
       plugin: require("./src/candle/routes"),
       routes: { prefix: "/candles" },

@@ -106,6 +106,15 @@ const init = async () => {
     }
   ]);
 
+  server.route({
+    method: "GET",
+    path: "/health",
+    options: { auth: false },
+    handler: async (request, h) => {
+      return h.response({ ok: true });
+    }
+  });
+
   await server.start();
   console.log(`Server running on port ${config.port}`);
 };

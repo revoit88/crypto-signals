@@ -1,7 +1,11 @@
 const dotenv = require("dotenv");
 const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
-const { pairs, milliseconds } = require("@crypto-signals/utils");
+const {
+  pairs,
+  milliseconds,
+  getBooleanValue
+} = require("@crypto-signals/utils");
 
 module.exports = {
   exchange: process.env.EXCHANGE,
@@ -28,5 +32,8 @@ module.exports = {
   quote_asset: process.env.QUOTE_ASSET,
   cmc_api_url: process.env.CMC_API_URL,
   cmc_api_key: process.env.CMC_API_KEY,
-  redis_positions_channel: process.env.REDIS_POSITIONS_CHANNEL
+  redis_positions_channel: process.env.REDIS_POSITIONS_CHANNEL,
+  websocket_server_enabled: getBooleanValue(
+    process.env.WEBSOCKET_SERVER_ENABLED
+  )
 };

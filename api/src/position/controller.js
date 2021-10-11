@@ -193,8 +193,6 @@ exports.broadcast = async function (request, h) {
   const position = request.payload;
 
   try {
-    request.server.publish("/positions", position);
-
     console.log(
       `${new Date().toISOString()} | ${
         position.type === "exit" ? "SELL" : "BUY"
@@ -202,6 +200,8 @@ exports.broadcast = async function (request, h) {
     );
 
     if (config.environment === "production") {
+      const broadcast = request.server.plugins.wss.broadcast;
+      broadcast(request.payload);
       pubsub.publish(
         `${config.quote_asset}_${config.redis_positions_channel}`,
         JSON.stringify(position)

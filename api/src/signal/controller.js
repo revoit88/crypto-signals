@@ -121,7 +121,8 @@ exports.delete = async function (request, h) {};
 
 exports.broadcast = async function (request, h) {
   try {
-    request.server.publish("/signals", request.payload);
+    const broadcast = request.server.plugins.wss.broadcast;
+    broadcast(request.payload);
     return h.response();
   } catch (error) {
     request.logger.error(error);
@@ -326,9 +327,8 @@ exports.getDaylyReport = async function (request, h) {
 exports.findOpenSignals = async function (request, h) {
   try {
     const Signal = request.server.plugins.mongoose.connection.model("Signal");
-    const MarketModel = request.server.plugins.mongoose.connection.model(
-      "Market"
-    );
+    const MarketModel =
+      request.server.plugins.mongoose.connection.model("Market");
 
     const signals = await Signal.find(
       { status: "open" },
@@ -344,9 +344,8 @@ exports.findOpenSignals = async function (request, h) {
     const { kucoin_signals, binance_signals } = signals.reduce(
       (acc, signal) => ({
         ...acc,
-        [`${signal.exchange}_signals`]: acc[
-          `${signal.exchange}_signals`
-        ].concat(signal)
+        [`${signal.exchange}_signals`]:
+          acc[`${signal.exchange}_signals`].concat(signal)
       }),
       { kucoin_signals: [], binance_signals: [] }
     );

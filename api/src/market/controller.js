@@ -32,18 +32,6 @@ exports.updateById = async function (request, h) {
   }
 };
 
-exports.broadcast = async function (request, h) {
-  const market = request.payload;
-  try {
-    request.server.publish("/markets", market);
-    request.server.publish(`/markets/${market.symbol}`, market);
-    return h.response();
-  } catch (error) {
-    request.server.logger.error(error);
-    return Boom.internal();
-  }
-};
-
 exports.getMarkets = async function (request, h) {
   const Market = request.server.plugins.mongoose.connection.model("Market");
   // const exchange= request.query.exchange;
@@ -113,9 +101,6 @@ exports.persist = async function (request, h) {
       request.server.plugins.mongoose.connection.model("Market");
 
     const market = request.payload;
-
-    request.server.publish("/markets", market);
-    request.server.publish(`/markets/${market.symbol}`, market);
 
     const last_markets_persist_date = await getAsync(
       "last_markets_persist_date"

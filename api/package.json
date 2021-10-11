@@ -15,7 +15,6 @@
     "@crypto-signals/utils": "file:../utils",
     "@hapi/hapi": "^20.0.1",
     "@hapi/iron": "^6.0.0",
-    "@hapi/nes": "^12.0.4",
     "axios": "^0.21.1",
     "date-fns": "^2.23.0",
     "date-fns-tz": "^1.1.6",
@@ -24,6 +23,7 @@
     "joi": "^17.2.1",
     "mongoose": "^5.10.7",
     "pino-http-send": "^0.4.2",
-    "redis": "^3.1.0"
+    "redis": "^3.1.0",
+    "ws": "^8.2.3"
   }
 }

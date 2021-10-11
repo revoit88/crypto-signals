@@ -4,7 +4,6 @@ module.exports = {
   name: "account routes",
   version: "1.0.0",
   register: function (server, options) {
-    server.subscription("/account/{id}");
     server.route({
       method: "GET",
       path: "/balance/update",
@@ -38,22 +37,6 @@ module.exports = {
       path: "/listen-key",
       handler: Controller.updateListenKey,
       options: { auth: { access: { scope: ["microservice"] } } }
-    });
-
-    server.route({
-      method: "POST",
-      path: "/broadcast",
-      handler: Controller.broadcast,
-      options: {
-        auth: {
-          access: {
-            scope: ["observer", "microservice"]
-          }
-        },
-        validate: {
-          query: false
-        }
-      }
     });
 
     server.route({

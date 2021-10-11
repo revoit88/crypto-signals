@@ -240,16 +240,6 @@ exports.updateListenKey = async function (request, h) {
   }
 };
 
-exports.broadcast = async function (request, h) {
-  try {
-    request.server.publish(`/account/${request.payload.id}`, request.payload);
-    return h.response();
-  } catch (error) {
-    request.logger.error(error);
-    return Boom.internal();
-  }
-};
-
 exports.getAccountById = async function (request, h) {
   try {
     const AccountModel =

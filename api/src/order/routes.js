@@ -4,8 +4,6 @@ module.exports = {
   name: "orders routes",
   version: "1.0.0",
   register: function (server, options) {
-    server.subscription("/orders");
-
     server.route({
       method: "GET",
       path: "/{clientOrderId}",
@@ -53,20 +51,6 @@ module.exports = {
       path: "/tsl",
       handler: Controller.updateTrailingStopLossOrder,
       options: { auth: { access: { scope: ["observer"] } } }
-    });
-
-    server.route({
-      method: "POST",
-      path: "/broadcast",
-      handler: Controller.broadcast,
-      options: {
-        auth: {
-          access: {
-            scope: ["microservice"]
-          }
-        },
-        validate: { query: false }
-      }
     });
   }
 };

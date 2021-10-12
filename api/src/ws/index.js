@@ -40,6 +40,7 @@ module.exports = {
 
         console.log("WebSocket Server started");
         server.expose("broadcast", broadcast);
+        server.expose("server", wss);
       } catch (error) {
         throw error;
       }

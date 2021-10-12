@@ -103,7 +103,8 @@ const init = async () => {
     {
       plugin: require("./src/report/routes"),
       routes: { prefix: "/reports" }
-    }
+    },
+    { plugin: require("./src/ws/routes"), routes: { prefix: "/ws" } }
   ]);
 
   server.route({

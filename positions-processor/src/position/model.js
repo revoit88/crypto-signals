@@ -16,7 +16,6 @@ function broadcastPositionUpdate(position) {
   ) {
     api
       .broadcast("positions", {
-        exchange: position.exchange,
         symbol: position.symbol,
         price: position.sell_price,
         type: "exit",

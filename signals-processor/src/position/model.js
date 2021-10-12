@@ -11,12 +11,10 @@ function broadcastEntryPosition(position) {
   if (!!api_url && environment === "production") {
     api
       .broadcast("positions", {
-        exchange: position.exchange,
         symbol: position.symbol,
         price: position.buy_price,
         type: "entry",
-        _id: position._id.toString(),
-        time: position.open_time
+        _id: position._id.toString()
       })
       .catch(error => {
         console.log("Entry position broadcast error.");

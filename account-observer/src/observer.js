@@ -2,8 +2,8 @@ const ws = require("ws");
 const { binance } = require("../axios");
 const Mongoose = require("mongoose");
 const { parseOrder, parseAccountUpdate } = require("../utils");
-const { pairs } = require("@crypto-signals/utils");
-const { quote_asset } = require("@crypto-signals/config");
+const { pairs, milliseconds } = require("@crypto-signals/utils");
+const { quote_asset, environment } = require("@crypto-signals/config");
 
 module.exports = class Observer {
   /**
@@ -13,44 +13,68 @@ module.exports = class Observer {
   constructor(db) {
     this.database = db;
     this.allowed_pairs = pairs.map(v => v.symbol);
+    this.listenKeyKeepAliveInterval = null;
+  }
+
+  startListenKeyKeepAliveInterval() {
+    this.listenKeyKeepAliveInterval = setInterval(async () => {
+      const account = await this.database
+        .model("Account")
+        .findOne({ id: environment })
+        .select({ spot_account_listen_key: true })
+        .lean();
+
+      await binance.listenKeyKeepAlive(account.spot_account_listen_key);
+    }, milliseconds.minute * 30);
+  }
+
+  stopListenKeyKeepAliveInterval() {
+    clearInterval(this.listenKeyKeepAliveInterval);
+  }
+
+  async updateBalance() {
+    const balance = await binance.getAccountBalance(quote_asset);
+    await this.database
+      .model("Account")
+      .updateOne({ id: environment }, { $set: { balance } });
+  }
+
+  async getListenKey() {
+    const account = await this.database
+      .model("Account")
+      .findOne({ id: environment })
+      .select({ spot_account_listen_key: true })
+      .lean();
+    let spot_account_listen_key;
+
+    try {
+      spot_account_listen_key = await binance.createListenKey();
+    } catch (error) {
+      console.error(error);
+      spot_account_listen_key = await binance.createListenKey();
+    }
+
+    if (!spot_account_listen_key) {
+      throw new Error("No listen key returned from binance.");
+    }
+
+    if (account.spot_account_listen_key !== spot_account_listen_key) {
+      console.log("Using new listen key.");
+    }
+
+    await this.database
+      .model("Account")
+      .updateOne({ id: environment }, { $set: { spot_account_listen_key } });
+
+    this.startListenKeyKeepAliveInterval();
+
+    return spot_account_listen_key;
   }
 
   async init() {
     try {
-      console.log(
-        `Observer for spot account started at ${new Date().toUTCString()}.`
-      );
-
-      const Account = this.database.model("Account");
-      const OrderModel = this.database.model("Order");
-
-      const account = await Account.findOne({ id: "production" }).lean();
-
-      let spot_account_listen_key;
-      try {
-        spot_account_listen_key = await binance.createListenKey();
-      } catch (error) {
-        console.error(error);
-        spot_account_listen_key = await binance.createListenKey();
-      }
-
-      if (!spot_account_listen_key) {
-        throw new Error("No listen key returned from binance.");
-      }
-
-      if (account.spot_account_listen_key !== spot_account_listen_key) {
-        console.log("Using new listen key.");
-      }
-
-      await Account.findOneAndUpdate(
-        { id: "production" },
-        {
-          $set: {
-            spot_account_listen_key,
-            last_spot_account_listen_key_update: Date.now()
-          }
-        }
-      );
+      await this.updateBalance();
+      let spot_account_listen_key = await this.getListenKey();
 
       this.client = new ws(
         `wss://stream.binance.com:9443/stream?streams=${spot_account_listen_key}`
@@ -78,7 +102,7 @@ module.exports = class Observer {
 
             if (parsedOrder.orderId && validPair) {
               try {
-                await OrderModel.findOneAndUpdate(
+                await this.database.model("Order").findOneAndUpdate(
                   {
                     $and: [
                       { orderId: { $eq: parsedOrder.orderId } },
@@ -90,7 +114,7 @@ module.exports = class Observer {
                 );
               } catch (error) {
                 console.error(error);
-                await OrderModel.findOneAndUpdate(
+                await this.database.model("Order").findOneAndUpdate(
                   {
                     $and: [
                       { orderId: { $eq: parsedOrder.orderId } },
@@ -106,11 +130,12 @@ module.exports = class Observer {
           if (message.e === "outboundAccountPosition") {
             const update = parseAccountUpdate(message, quote_asset);
             if (update) {
-              await Account.findOneAndUpdate(
-                { id: "production" },
-                { $set: { balance: update } },
-                { new: true }
-              );
+              await this.database
+                .model("Account")
+                .findOneAndUpdate(
+                  { id: "production" },
+                  { $set: { balance: update } }
+                );
             }
           }
         } catch (error) {

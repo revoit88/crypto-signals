@@ -7,5 +7,6 @@ module.exports = {
   api_url: process.env.API_URL,
   host: process.env.CANDLES_PROCESSOR_HOST || "localhost",
   port: +process.env.CANDLES_PROCESSOR_PORT || 8080,
-  quote_asset: process.env.QUOTE_ASSET
+  quote_asset: process.env.QUOTE_ASSET,
+  environment: process.env.NODE_ENV
 };

@@ -107,18 +107,20 @@ exports.createOrder = async function (request, h) {
     castToObjectId(positionId)
   ).lean();
 
-  const notEnoughBalance =
-    account?.balance <= default_buy_amount && request.query.type === "entry";
+  const enoughBalance =
+    request.query.type === "entry"
+      ? account?.balance > default_buy_amount
+      : true;
 
-  const shouldNotBuy = request.query.type === "entry" && !position?.broadcast;
-  const doesNotHaveBuyOrder =
-    request.query.type === "exit" && !position?.buy_order;
+  const canBuy = !!position?.broadcast;
+  const hasBuyOrder =
+    request.query.type === "exit" ? !!position?.buy_order : true;
 
   if (
     Date.now() < account?.create_order_after ||
-    notEnoughBalance ||
-    shouldNotBuy ||
-    doesNotHaveBuyOrder
+    !enoughBalance ||
+    !canBuy ||
+    !hasBuyOrder
   ) {
     return h.response();
   }

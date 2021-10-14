@@ -3,6 +3,10 @@ const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 const { milliseconds } = require("@crypto-signals/utils");
 
+if (!process.env.STRATEGY) {
+  throw new Error("The strategy is not defined");
+}
+
 module.exports = {
   api_url: process.env.API_URL,
   db_uri: process.env.DB_URI,

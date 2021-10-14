@@ -2,6 +2,10 @@ const dotenv = require("dotenv");
 const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
+if (!process.env.STRATEGY) {
+  throw new Error("The strategy is not defined");
+}
+
 module.exports = {
   api_url: process.env.API_URL,
   environment: process.env.NODE_ENV,

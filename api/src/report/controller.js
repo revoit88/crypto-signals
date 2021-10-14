@@ -2,6 +2,7 @@ const Boom = require("@hapi/boom");
 const { startOfMonth, endOfMonth, subWeeks } = require("date-fns");
 const { zonedTimeToUtc } = require("date-fns-tz");
 const { castToObjectId } = require("../../utils");
+const { strategy, quote_asset, interval } = require("@crypto-signals/config");
 
 exports.create = async function (request, h) {
   try {
@@ -55,7 +56,8 @@ exports.create = async function (request, h) {
       total_wins: positions.filter(p => p.change > 0).length,
       average_change: +Number(
         positions.reduce((a, c) => a + c.change, 0) / positions.length || 0
-      ).toFixed(2)
+      ).toFixed(2),
+      strategy: String(`${strategy}_${quote_asset}_${interval}`).toLowerCase()
     };
 
     await Report.create(processed);

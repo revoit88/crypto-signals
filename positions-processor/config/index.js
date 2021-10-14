@@ -10,5 +10,5 @@ module.exports = {
   interval: process.env.INTERVAL,
   host: process.env.POSITIONS_PROCESSOR_HOST || "localhost",
   port: +process.env.POSITIONS_PROCESSOR_PORT || 8080,
-  strategy: process.env.POSITIONS_PROCESSOR_STRATEGY
+  strategy: process.env.STRATEGY
 };

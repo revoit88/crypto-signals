@@ -35,5 +35,6 @@ module.exports = {
   redis_positions_channel: process.env.REDIS_POSITIONS_CHANNEL,
   websocket_server_enabled: getBooleanValue(
     process.env.WEBSOCKET_SERVER_ENABLED
-  )
+  ),
+  strategy: process.env.STRATEGY
 };

@@ -2,6 +2,10 @@ const dotenv = require("dotenv");
 const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
+if (!process.env.STRATEGY) {
+  throw new Error("The strategy is not defined");
+}
+
 module.exports = {
   api_url: process.env.API_URL,
   environment: process.env.NODE_ENV,
@@ -10,5 +14,5 @@ module.exports = {
   interval: process.env.INTERVAL,
   host: process.env.POSITIONS_PROCESSOR_HOST || "localhost",
   port: +process.env.POSITIONS_PROCESSOR_PORT || 8080,
-  strategy: process.env.POSITIONS_PROCESSOR_STRATEGY
+  strategy: process.env.STRATEGY
 };

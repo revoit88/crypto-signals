@@ -1,3 +1,3 @@
-const trend_and_volume = require("./trend_and_volume");
+const trend = require("./trend");
 
-module.exports = { trend_and_volume };
+module.exports = { trend };

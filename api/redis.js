@@ -21,6 +21,7 @@ module.exports = {
       await delAsync("candles");
 
       console.log("redis started");
+      server.expose("client", db);
       server.expose("getAsync", getAsync);
       server.expose("setAsync", setAsync);
       server.expose("delAsync", delAsync);

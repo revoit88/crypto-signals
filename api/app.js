@@ -112,7 +112,22 @@ const init = async () => {
     path: "/health",
     options: { auth: false },
     handler: async (request, h) => {
-      return h.response({ ok: true });
+      let ok = true;
+
+      try {
+        const mongodbIsConnected = request.server.plugins.mongoose.connection
+          .getClient()
+          .isConnected();
+        const redisIsConnected = request.server.plugins.redis.client.ping();
+        const pubsubIsConnected = request.server.plugins.redis.pubSub.ping();
+        if (!mongodbIsConnected || !redisIsConnected || !pubsubIsConnected) {
+          ok = false;
+        }
+      } catch (error) {
+        console.error(error);
+        ok = false;
+      }
+      return h.response({ ok });
     }
   });
 

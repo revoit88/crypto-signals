@@ -321,7 +321,7 @@ const getCumulativeIndicator = async ({
   getter,
   parseFn
 }) => {
-  const [result] = await candles
+  const result = await candles
     .reduce(async (p_acc, candle, index, array) => {
       const acc = await p_acc;
       const sliced_candles = array.slice(0, index + 1).map(sliced => ({
@@ -336,7 +336,7 @@ const getCumulativeIndicator = async ({
       const value = await fn(sliced_candles, sliced_ohlc, parseFn);
       return acc.concat({ ...candle, ...value });
     }, Promise.resolve([]))
-    .then(r => r.slice(-1));
+    .then(r => getter(r[r.length - 1]));
   return result;
 };
 

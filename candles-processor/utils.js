@@ -13,7 +13,12 @@ const truncateDecimals = v => Number(Number(v).toFixed(4));
 const validateValue = value =>
   typeof value === "undefined" ? null : truncateDecimals(value);
 
-const invalidNumber = v => typeof v === "undefined" || v === null || isNaN(v);
+const invalidNumber = v =>
+  typeof v === "undefined" ||
+  v === null ||
+  isNaN(v) ||
+  v === -Infinity ||
+  v === Infinity;
 
 /**
  *
@@ -21,44 +26,27 @@ const invalidNumber = v => typeof v === "undefined" || v === null || isNaN(v);
  * @returns {OHLC} result
  */
 const getOHLCValues = array => {
-  /**
-   *
-   * @param {Object} ohlc Object containing Open, High, Low, Close values
-   * @returns {Boolean} `true` for error, `false` if all values are ok
-   */
-  const assertResult = ohlc => {
-    return Object.keys(ohlc).some(key => {
-      return ohlc[key].some(v => typeof v !== "number");
-    });
+  const assertValue = value => {
+    if (invalidNumber(value)) throw new Error("Invalid OHLC value: " + value);
+    return value;
   };
 
-  const ohlc = array.reduce(
-    (
-      acc,
-      { open_price, close_price, high_price, low_price, base_asset_volume }
-    ) => {
-      return {
-        open: acc.open.concat(open_price),
-        high: acc.high.concat(high_price),
-        low: acc.low.concat(low_price),
-        close: acc.close.concat(close_price),
-        volume: acc.volume.concat(base_asset_volume),
-        hl2: acc.hl2.concat((high_price + low_price) / 2)
-      };
-    },
-    {
-      open: [],
-      high: [],
-      low: [],
-      close: [],
-      volume: [],
-      hl2: []
-    }
-  );
+  const ohlc = {
+    open: [],
+    high: [],
+    low: [],
+    close: [],
+    volume: [],
+    hl2: []
+  };
 
-  const error = assertResult(ohlc);
-  if (error) {
-    throw "INVALID OHLC VALUES";
+  for (const candle of array) {
+    ohlc.open.push(assertValue(candle.open_price));
+    ohlc.high.push(assertValue(candle.high_price));
+    ohlc.low.push(assertValue(candle.low_price));
+    ohlc.close.push(assertValue(candle.close_price));
+    ohlc.volume.push(assertValue(candle.base_asset_volume));
+    ohlc.hl2.push(assertValue((candle.high_price + candle.low_price) / 2));
   }
   return ohlc;
 };
@@ -134,21 +122,19 @@ const getSMA = (data, periods = 28, parseFn = validateValue) => {
 
 const getRMA = async (data, periods, validateFn) => {
   const alpha = 1 / periods;
-  let sum = await data.reduce(async (prev, current, index, array) => {
-    try {
-      const acc = await prev;
-      const [previous] = acc.slice(-1);
-      const nan = isNaN(previous);
-      const src = array.slice(0, index + 1);
-      const sum = nan
-        ? await getSMA([src], periods, validateFn)
-        : validateFn(alpha * current + (1 - alpha) * nz(previous));
 
-      return Promise.resolve(acc.concat(sum));
-    } catch (error) {
-      console.error(error);
-    }
-  }, Promise.resolve([]));
+  let sum = [];
+
+  for (const item of data) {
+    const previous = sum[sum.length - 1];
+    const nan = isNaN(previous);
+    const src = data.slice(0, sum.length + 1);
+    const value = nan
+      ? await getSMA([src], periods, validateFn)
+      : validateFn(alpha * item + (1 - alpha) * nz(previous));
+    sum.push(value);
+  }
+
   return sum;
 };
 
@@ -223,9 +209,9 @@ const getMACD = (data, parseFn = validateValue) => {
         return reject(err);
       }
       const [macd_result, signal_result, histogram_result] = res;
-      const [macd] = macd_result.slice(-1);
-      const [macd_signal] = signal_result.slice(-1);
-      const [macd_histogram] = histogram_result.slice(-1);
+      const macd = macd_result.pop();
+      const macd_signal = signal_result.pop();
+      const macd_histogram = histogram_result.pop();
       return resolve({
         macd: parseFn(macd),
         macd_signal: parseFn(macd_signal),
@@ -399,7 +385,7 @@ const getCHATR = async (candles, ohlc) => {
 
   const tr = await getTR([high, low, close], true, nz);
   const rma = await getRMA(tr, 10, nz);
-  const atrp = rma.map((t, i) => [t, close[i]]).map(([t, c]) => (t / c) * 100);
+  const atrp = rma.map((t, i) => (t / close[i]) * 100);
   const avg = await getEMA([atrp], 28, undefined, nz);
 
   return {
@@ -409,61 +395,55 @@ const getCHATR = async (candles, ohlc) => {
 };
 
 async function getPumpOrDump(ohlc) {
+  //Pump Alerts by herrkaschel
   const lookback = 150;
   const threshold = 15; // % change to be considered a pump
   const { volume, close } = ohlc;
 
-  let { is_pump } = await volume.reduce(async (prev, _, index, array) => {
-    try {
-      const acc = await prev;
-      const [prev_mav] = acc.mav.slice(-1);
-      const [prev_historic_max] = acc.historic_max.slice(-1);
-      const src = array.slice(0, index + 1);
-      if (src.length < 2) {
-        return acc;
-      }
-      const [previous_close = 0, current_close = 0] = close
-        .slice(0, index + 1)
-        .slice(-2);
-      const mav = await getSMA([src], lookback);
-      const difference = nz(mav) - nz(prev_mav);
-      const increasing = current_close > previous_close && difference > 0;
-      const vroc =
-        increasing && nz(prev_mav) !== 0 ? difference * (100 / prev_mav) : 0;
-      const firstVrocNormalizedValue = 10;
-      const historic_max =
-        vroc > nz(prev_historic_max)
-          ? vroc
-          : nz(prev_historic_max, firstVrocNormalizedValue);
-      const vrocNormalized =
-        nz(historic_max) !== 0 ? (vroc / historic_max) * 100 : 0;
+  let mav = [];
+  let all_historic_max = [];
+  let is_pump = [];
 
-      return Promise.resolve({
-        is_pump: acc.is_pump.concat(vrocNormalized >= threshold),
-        historic_max: acc.historic_max.concat(historic_max),
-        mav: acc.mav.concat(nz(mav))
-      });
-    } catch (error) {
-      console.error(error);
+  for (let index = 0; index < volume.length; index++) {
+    const prev_mav = mav[mav.length - 1];
+    const prev_historic_max = all_historic_max[all_historic_max.length - 1];
+    const src = volume.slice(0, index + 1);
+    if (src.length < 2) {
+      continue;
     }
-  }, Promise.resolve({ mav: [], historic_max: [], is_pump: [] }));
-  const [current_value] = is_pump.slice(-1);
-  return { is_pump: current_value };
+    const previous_close = close[index - 1] || 0;
+    const current_close = close[index] || 0;
+    const mav_sma = await getSMA([src], lookback);
+    const difference = nz(mav_sma) - nz(prev_mav);
+    const increasing = current_close > previous_close && difference > 0;
+    const vroc =
+      increasing && nz(prev_mav) !== 0 ? difference * (100 / prev_mav) : 0;
+    const firstVrocNormalizedValue = 10;
+    const historic_max =
+      vroc > nz(prev_historic_max)
+        ? vroc
+        : nz(prev_historic_max, firstVrocNormalizedValue);
+    const vrocNormalized =
+      nz(historic_max) !== 0 ? (vroc / historic_max) * 100 : 0;
+
+    is_pump.push(vrocNormalized >= threshold);
+    all_historic_max.push(historic_max);
+    mav.push(nz(mav_sma));
+  }
+  return { is_pump: is_pump[is_pump.length - 1] };
 }
 
 function getVolumeTrend(ohlc) {
   const { open, close, volume } = ohlc;
   const lookback = 14;
 
-  const length = volume.length - lookback;
+  let up = 0;
+  let down = 0;
 
-  const { up, down } = volume.slice(-lookback).reduce(
-    (acc, current, index) => {
-      const dir = close[length + index] > open[length + index] ? "up" : "down";
-      return { ...acc, [dir]: acc[dir] + current };
-    },
-    { up: 0, down: 0 }
-  );
+  for (let i = volume.length - lookback; i < volume.length; i++) {
+    close[i] > open[i] ? (up += volume[i]) : (down += volume[i]);
+  }
+
   return { volume_trend: up - down > 0 ? 1 : -1 };
 }
 
@@ -472,12 +452,14 @@ async function getEMASlope(ohlc, parseFn) {
   const periods = 50;
 
   const ema = await getEMA([hl2], periods, true, parseFn);
-  const slopes = ema.map((v, i, array) => {
-    const previous = nz(array[i - 1]);
-    return nz(v / previous) > 1 ? 1 : -1;
-  });
+  let slope = 0;
+  let previous = 0;
+  for (const value of ema) {
+    slope = nz(value / previous) > 1 ? 1 : -1;
+    previous = value;
+  }
 
-  return { ema_50: ema.slice(-1)[0], ema_50_slope: slopes.slice(-1)[0] };
+  return { ema_50: ema[ema.length - 1], ema_50_slope: slope };
 }
 
 /**

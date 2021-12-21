@@ -36,7 +36,7 @@ module.exports = hl2 => {
           nz(previousPrices[2])) /
         10;
       const smooth = [currentSmooth].concat(acc.smooth);
-      const previousPeriod = acc.period.slice(-1);
+      const [previousPeriod] = acc.period.slice(-1);
       const currentDetrender = compute(smooth, previousPeriod);
       const detrender = [currentDetrender].concat(acc.detrender);
 
